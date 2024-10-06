@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
-    lead_list,lead_detail,lead_create,lead_update, lead_delete, LeadListView, LeadDetailView, LeadCreateView, LeadUpdateView, LeadDeleteView,AssignAgentView
-)
+    lead_list,lead_detail,lead_create,lead_update, lead_delete, LeadListView, LeadDetailView, LeadCreateView, LeadUpdateView, LeadDeleteView,AssignAgentView,
+CategoryListView,CategoryDetailView )
 
 app_name = 'leads'  # Add this line
 
@@ -17,8 +17,8 @@ urlpatterns = [
     # path('<int:pk>/followups/create/', FollowUpCreateView.as_view(), name='lead-followup-create'),
     # path('followups/<int:pk>/', FollowUpUpdateView.as_view(), name='lead-followup-update'),
     # path('followups/<int:pk>/delete/', FollowUpDeleteView.as_view(), name='lead-followup-delete'),
-    # path('categories/', CategoryListView.as_view(), name='category-list'),
-    # path('categories/<int:pk>/', CategoryDetailView.as_view(), name='category-detail'),
+    path('categories/', CategoryListView.as_view(), name='category-list'),
+    path('categories/<int:pk>/', CategoryDetailView.as_view(), name='category-detail'),
     # path('categories/<int:pk>/update/', CategoryUpdateView.as_view(), name='category-update'),
     # path('categories/<int:pk>/delete/', CategoryDeleteView.as_view(), name='category-delete'),
     # path('create-category/', CategoryCreateView.as_view(), name='category-create'),
