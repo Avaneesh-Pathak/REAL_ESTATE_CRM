@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect,reverse
 from django.http import HttpResponse
 from .models import Lead, Agent, Category
-from .forms import LeadForm, LeadModelForm,CustomUserCreationForm, AssignAgentForm
+from .forms import LeadForm, LeadModelForm,CustomUserCreationForm, AssignAgentForm,LeadCategoryUpdateForm
 from django.views import generic 
 from agents.mixins import OrganisorAndLoginRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -105,10 +105,12 @@ class LeadCreateView(OrganisorAndLoginRequiredMixin,generic.CreateView):
 def lead_create(request):
     form = LeadModelForm()
     if request.method == "POST":
-        print('Recieving')
         form = LeadModelForm(request.POST)
         if form.is_valid():
-            form.save()
+            form.save()  
+            # lead = form.save(commit=False)
+            # lead.organisation = request.user.userprofile
+            # lead.save()
             return redirect("/leads")
 
     context = {
@@ -235,7 +237,23 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
         return queryset
 
 
+class LeadCategoryUpdateView(LoginRequiredMixin, generic.UpdateView):
+    template_name = "leads/lead_category_update.html"
+    form_class = LeadCategoryUpdateForm
 
+    def get_queryset(self):
+        user = self.request.user
+        # initial queryset of leads for the entire organisation
+        if user.is_organisor:
+            queryset = Lead.objects.filter(organisation=user.userprofile)
+        else:
+            queryset = Lead.objects.filter(organisation=user.agent.organisation)
+            # filter for the agent that is logged in
+            queryset = queryset.filter(agent__user=user)
+        return queryset
+     
+    def get_success_url(self):
+        return reverse("leads:lead-detail", kwargs={"pk": self.get_object().id}) 
 
 
 
