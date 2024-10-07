@@ -6,12 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RealEstate_CRM</title>
-    <link rel="stylesheet" href="{% static 'CSS/style.css' %}" />
+    <link rel="stylesheet" href="{% static '/style.css' %}" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries"></script>
 </head>
 <body>
     <div>
     {% include 'navbar.html' %}
+    {% include 'messages.html' %}
     {% block content %}
     {% endblock content %}
     </div>
