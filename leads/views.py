@@ -43,6 +43,9 @@ class LandingPageView(generic.TemplateView):
             return redirect("dashboard")
         return super().dispatch(request, *args, **kwargs)
 
+def landing_page(request):
+    return render(request, "landing.html")
+
 
 class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
     template_name = "dashboard.html"
@@ -79,11 +82,11 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         return context
 
 
-def landing_page(request):
-    return render(request, "landing.html")
+
 
     
 class LeadListView(LoginRequiredMixin,generic.ListView):
+    
     template_name = "leads/lead_list.html"
     context_object_name = "leads"
 
@@ -416,6 +419,31 @@ class FollowUpCreateView(LoginRequiredMixin, generic.CreateView):
         followup.save()
         return super(FollowUpCreateView, self).form_valid(form)
 
+class FollowupList(LoginRequiredMixin,generic.ListView):
+    
+    template_name = "leads/followup_list.html"
+    context_object_name = "followups"
+    
+
+    def get_queryset(self):
+        user = self.request.user
+        # Define the initial queryset based on user type
+        if user.is_organisor:
+            return FollowUp.objects.filter(lead__organisation=user.userprofile)
+        else:
+            return FollowUp.objects.filter(
+                lead__organisation=user.agent.organisation,
+                lead__agent__user=user
+            )
+    
+
+def followup_list(request,lead_id):
+    followups = FollowUp.objects.all(lead_id=lead_id)
+    context = {
+        "followups":followups
+    }
+    print(followups)
+    return render(request,"leads/followup_list.html",context)
 
 class FollowUpUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = "leads/followup_update.html"

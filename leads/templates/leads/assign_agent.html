@@ -1,11 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <a href="{% url 'leads:lead-list' %}">Go Back to Leads</a>
-    <h1>Assign an agent to this lead</h1>
-    <form method="post" action=".">
-        {% csrf_token%}
-        {{ form.as_p}}
-        <button type="submit">Submit</button>
-    </form>
+
+    <div class="container">
+        <!-- Back to leads link -->
+        <a href="{% url 'leads:lead-list' %}" class="back-link">← Go Back to Leads</a>
+
+        <!-- Header -->
+        <h1>Assign an Agent to This Lead</h1>
+
+        <!-- Form for assigning an agent -->
+        <form method="post" action=".">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <!-- Submit button -->
+            <button type="submit">Assign Agent</button>
+        </form>
+    </div>
+
     {% endblock content%}
