@@ -104,6 +104,7 @@ class Sale(models.Model):
     agent = models.ForeignKey(User, on_delete=models.CASCADE)
     sale_price = models.DecimalField(max_digits=15, decimal_places=2)
     sale_date = models.DateField()
+    organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
     
     def __str__(self):
         return f"Sale of {self.property.address} by {self.agent.username} for ${self.sale_price}"
@@ -115,6 +116,7 @@ class Property(models.Model):
     description = models.TextField(null=True, blank=True)
     agent = models.ForeignKey('Agent', on_delete=models.CASCADE, null=True, blank=True)
     # Add any other fields necessary for the property model
+    organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title

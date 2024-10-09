@@ -92,4 +92,4 @@ class SaleForm(forms.ModelForm):
 class PropertyModelForm(forms.ModelForm):
     class Meta:
         model = Property
-        fields = ['title', 'price'] 
+        fields = ['title', 'address', 'price', 'description', 'agent', 'organisation']

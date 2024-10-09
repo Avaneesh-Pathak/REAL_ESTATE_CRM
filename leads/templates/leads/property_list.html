@@ -3,7 +3,7 @@
 
 {% block content %}
     <h1 class="text-2xl font-bold mb-4">Property List</h1>
-    <a href="{% url 'property_create' %}" class="text-blue-500 hover:underline">Add New Property</a>
+    <a href="{% url 'leads:property_create' %}" class="text-blue-500 hover:underline">Add New Property</a>
 
     <ul class="mt-4">
         {% for property in properties %}

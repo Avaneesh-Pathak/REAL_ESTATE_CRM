@@ -64,12 +64,12 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         # How many new leads in the last 30 days
         thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
         # Total sales for the organisation          
-        #total_salaries = Salary.objects.filter(organisation=user.userprofile).count()
+        total_salaries = Salary.objects.filter(organisation=user.userprofile).count()
         # Total sales for the organisation
-        #total_sales = Sale.objects.filter(organisation=user.userprofile).count()
+        total_sales = Sale.objects.filter(organisation=user.userprofile).count()
         
         # Total properties managed by the organisation
-        #total_properties = Property.objects.filter(organisation=user.userprofile).count()
+        total_properties = Property.objects.filter(organisation=user.userprofile).count()
         
         total_in_past30 = Lead.objects.filter(
             organisation=user.userprofile,
@@ -88,9 +88,9 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
             "total_lead_count": total_lead_count,
             "total_in_past30": total_in_past30,
             "converted_in_past30": converted_in_past30,
-           # "total_salaries": total_salaries,
-            #"total_sales": total_sales,
-            #"total_properties": total_properties,
+            "total_salaries": total_salaries,
+            "total_sales": total_sales,
+            "total_properties": total_properties,
         })
         return context
 
@@ -495,51 +495,6 @@ class FollowUpDeleteView(OrganisorAndLoginRequiredMixin, generic.DeleteView):
             queryset = queryset.filter(lead__agent__user=user)
         return queryset
 
-
-
-# def lead_update(request, pk):
-#     lead = Lead.objects.get(id=pk)
-#     form = LeadForm()
-#     if request.method == "POST":
-#         form = LeadForm(request.POST)
-#         if form.is_valid():
-#             first_name = form.cleaned_data['first_name']
-#             last_name = form.cleaned_data['last_name']
-#             age = form.cleaned_data['age']
-#             lead.first_name = first_name
-#             lead.last_name = last_name
-#             lead.age = age
-#             lead.save()
-#             return redirect("/leads")
-    # context = {
-    #     "form": form,
-    #     "lead": lead
-    # }
-#     return render(request, "leads/lead_update.html", context)
-
-
-# def lead_create(request):
-    # form = LeadForm()
-    # if request.method == "POST":
-    #     form = LeadForm(request.POST)
-    #     if form.is_valid():
-    #         first_name = form.cleaned_data['first_name']
-    #         last_name = form.cleaned_data['last_name']
-    #         age = form.cleaned_data['age']
-    #         agent = Agent.objects.first()
-    #         Lead.objects.create(
-    #             first_name=first_name,
-    #             last_name=last_name,
-    #             age=age,
-    #             agent=agent
-    #         )
-    #         return redirect("/leads")
-    # context = {
-    #     "form": form
-    # }
-#     return render(request, "leads/lead_create.html", context)
-
-
 class LeadJsonView(generic.View):
 
     def get(self, request, *args, **kwargs):
@@ -554,9 +509,6 @@ class LeadJsonView(generic.View):
             "qs": qs,
         })
     
-
-
-
 
 def create_salary(request):
     if request.method == 'POST':
@@ -595,9 +547,6 @@ def create_sale(request):
     return render(request, 'leads/sale_form.html', {'form': form})
 
 
-
-
-
 def manage_sale(request):
     if request.method == 'POST':
         form = SaleForm(request.POST)
@@ -624,37 +573,49 @@ class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_queryset(self):
         return Property.objects.filter(agent__user=self.request.user)
-
 class PropertyCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'leads/property_create.html'  # Update with your template path
-    form_class = PropertyModelForm  # Make sure to create this form
+    form_class = PropertyModelForm
 
     def get_success_url(self):
-        return reverse("property-list")  # Update to the correct URL name
+        return reverse('property_list')  # Redirect to property list after successful creation
 
     def form_valid(self, form):
-        property_instance = form.save(commit=False)
-        property_instance.agent = self.request.user.agent  # Assuming the user is an agent
-        property_instance.save()
+        property = form.save(commit=False)
+        property.agent = self.request.user.agent  # Assign the current user's agent profile
+        property.save()
         messages.success(self.request, "Property created successfully.")
         return super(PropertyCreateView, self).form_valid(form)
 
 class PropertyUpdateView(LoginRequiredMixin, generic.UpdateView):
-    model = Property
     template_name = 'leads/property_update.html'  # Update with your template path
-    form_class = PropertyModelForm  # Make sure to create this form
+    form_class = PropertyModelForm
+
+    def get_queryset(self):
+        return Property.objects.filter(agent__user=self.request.user)
 
     def get_success_url(self):
-        return reverse("property-detail", kwargs={"pk": self.object.pk})  # Update to the correct URL name
+        return reverse('property_list')  # Redirect to property list after successful update
+
+    def form_valid(self, form):
+        form.save()
+        messages.info(self.request, "Property updated successfully.")
+        return super(PropertyUpdateView, self).form_valid(form)
 
 class PropertyDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Property
     template_name = 'leads/property_delete.html'  # Update with your template path
 
+    def get_queryset(self):
+        return Property.objects.filter(agent__user=self.request.user)
+
     def get_success_url(self):
+        return reverse('property_list')  # Redirect to property list after successful deletion
+
+    def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Property deleted successfully.")
- 
-        return reverse("property-list")  # Update to the correct URL name
+        return super(PropertyDeleteView, self).delete(request, *args, **kwargs)
+
 
 class SaleListView(ListView):
     model = Sale
