@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load tailwind_filters %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-4">Bonus Information</h1>
+
+    <ul class="mt-4">
+        {% for bonus in bonuses %}
+            <li class="bg-gray-100 p-4 rounded shadow mb-2">
+                <h3 class="text-xl font-semibold">{{ bonus.agent.username }}</h3>
+                <p class="text-gray-600">Bonus Amount: ${{ bonus.amount }}</p>
+                <p class="text-gray-600">Date: {{ bonus.date }}</p>
+            </li>
+        {% empty %}
+            <li class="bg-red-100 p-4 rounded">No bonuses recorded.</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}

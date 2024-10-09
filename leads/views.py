@@ -8,6 +8,9 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views import generic
+from django.views.generic import ListView
+from .models import Property, Sale, Salary, Bonus
+from leads.models import Category
 from agents.mixins import OrganisorAndLoginRequiredMixin
 from .models import Lead, Agent, Category, FollowUp
 from .forms import (
@@ -17,7 +20,7 @@ from .forms import (
     AssignAgentForm, 
     LeadCategoryUpdateForm,
     CategoryModelForm,
-    FollowUpModelForm
+    FollowUpModelForm,SalaryForm,SaleForm,PropertyModelForm
 )
 
 
@@ -60,14 +63,21 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
 
         # How many new leads in the last 30 days
         thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
-
+        # Total sales for the organisation          
+        #total_salaries = Salary.objects.filter(organisation=user.userprofile).count()
+        # Total sales for the organisation
+        #total_sales = Sale.objects.filter(organisation=user.userprofile).count()
+        
+        # Total properties managed by the organisation
+        #total_properties = Property.objects.filter(organisation=user.userprofile).count()
+        
         total_in_past30 = Lead.objects.filter(
             organisation=user.userprofile,
             date_added__gte=thirty_days_ago
         ).count()
 
         # How many converted leads in the last 30 days
-        converted_category = Category.objects.get(name="Converted")
+        converted_category = Category.objects.filter(name="Converted").first()
         converted_in_past30 = Lead.objects.filter(
             organisation=user.userprofile,
             category=converted_category,
@@ -77,7 +87,10 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         context.update({
             "total_lead_count": total_lead_count,
             "total_in_past30": total_in_past30,
-            "converted_in_past30": converted_in_past30
+            "converted_in_past30": converted_in_past30,
+           # "total_salaries": total_salaries,
+            #"total_sales": total_sales,
+            #"total_properties": total_properties,
         })
         return context
 
@@ -540,3 +553,126 @@ class LeadJsonView(generic.View):
         return JsonResponse({
             "qs": qs,
         })
+    
+
+
+
+
+def create_salary(request):
+    if request.method == 'POST':
+        form = SalaryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success
+            messages.success(request, "Salary created successfully.")
+            return redirect('salary_list')  # Redirect to a salary list view
+    else:
+        form = SalaryForm()
+    return render(request, 'leads/salary_form.html', {'form': form})
+
+
+
+def manage_salary(request):
+    if request.method == 'POST':
+        form = SalaryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('salary_list')  # Redirect to salary list or another view
+    else:
+        form = SalaryForm()
+    return render(request, 'leads/manage_salary.html', {'form': form})
+
+
+def create_sale(request):
+    if request.method == 'POST':
+        form = SaleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Sale created successfully.")
+            return redirect('sale_list')  # Redirect to a sale list view
+    else:
+        form = SaleForm()
+    return render(request, 'leads/sale_form.html', {'form': form})
+
+
+
+
+
+def manage_sale(request):
+    if request.method == 'POST':
+        form = SaleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('sale_list')  # Redirect to sales list or another view
+    else:
+        form = SaleForm()
+    return render(request, 'leads/manage_sale.html', {'form': form})
+
+
+class PropertyListView(LoginRequiredMixin, ListView):
+    model = Property
+    template_name = 'leads/property_list.html'  # Update with your template path
+    context_object_name = 'properties'
+
+    def get_queryset(self):
+        return Property.objects.filter(agent__user=self.request.user)
+
+class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Property
+    template_name = 'leads/property_detail.html'  # Update with your template path
+    context_object_name = 'property'
+
+    def get_queryset(self):
+        return Property.objects.filter(agent__user=self.request.user)
+
+class PropertyCreateView(LoginRequiredMixin, generic.CreateView):
+    template_name = 'leads/property_create.html'  # Update with your template path
+    form_class = PropertyModelForm  # Make sure to create this form
+
+    def get_success_url(self):
+        return reverse("property-list")  # Update to the correct URL name
+
+    def form_valid(self, form):
+        property_instance = form.save(commit=False)
+        property_instance.agent = self.request.user.agent  # Assuming the user is an agent
+        property_instance.save()
+        messages.success(self.request, "Property created successfully.")
+        return super(PropertyCreateView, self).form_valid(form)
+
+class PropertyUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Property
+    template_name = 'leads/property_update.html'  # Update with your template path
+    form_class = PropertyModelForm  # Make sure to create this form
+
+    def get_success_url(self):
+        return reverse("property-detail", kwargs={"pk": self.object.pk})  # Update to the correct URL name
+
+class PropertyDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Property
+    template_name = 'leads/property_delete.html'  # Update with your template path
+
+    def get_success_url(self):
+        messages.success(self.request, "Property deleted successfully.")
+ 
+        return reverse("property-list")  # Update to the correct URL name
+
+class SaleListView(ListView):
+    model = Sale
+    template_name = 'leads/sale_list.html'  # Update with your template path
+    context_object_name = 'sales'
+
+class SalaryListView(ListView):
+    model = Salary
+    template_name = 'leads/salary_list.html'  # Update with your template path
+    context_object_name = 'salaries'
+
+class BonusInfoView(ListView):
+    model = Bonus
+    template_name = 'leads/bonus_info.html'  # Update with your template path
+    context_object_name = 'bonuses'
+
+
+
+
+
+

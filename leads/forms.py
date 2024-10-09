@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
-from .models import Lead, Agent, Category, FollowUp
+from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property
 
 User = get_user_model()
 
@@ -75,3 +75,21 @@ class FollowUpModelForm(forms.ModelForm):
             'file'
         )
 
+
+class SalaryForm(forms.ModelForm):
+    class Meta:
+        model = Salary
+        fields = ['agent', 'base_salary', 'bonus', 'payment_date']
+
+
+
+class SaleForm(forms.ModelForm):
+    class Meta:
+        model = Sale
+        fields = ['property', 'agent', 'sale_price', 'sale_date']
+
+
+class PropertyModelForm(forms.ModelForm):
+    class Meta:
+        model = Property
+        fields = ['title', 'price'] 

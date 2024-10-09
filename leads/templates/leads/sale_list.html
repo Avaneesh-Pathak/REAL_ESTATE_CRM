@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load tailwind_filters %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-4">Sale List</h1>
+    
+    <ul class="mt-4">
+        {% for sale in sales %}
+            <li class="bg-gray-100 p-4 rounded shadow mb-2">
+                <h3 class="text-xl font-semibold">{{ sale.property.title }}</h3>
+                <p class="text-gray-600">Sold by: {{ sale.agent.username }}</p>
+                <p class="text-gray-600">Sale Price: ${{ sale.sale_price }}</p>
+                <p class="text-gray-600">Sale Date: {{ sale.sale_date }}</p>
+            </li>
+        {% empty %}
+            <li class="bg-red-100 p-4 rounded">No sales recorded.</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User 
 from django.db.models.signals import post_save , pre_save
 from django.contrib.auth.models import AbstractUser
 
@@ -83,3 +84,47 @@ def post_user_created_signal(sender, instance, created, **kwargs):
 
 
 post_save.connect(post_user_created_signal, sender=User)
+
+
+
+class Salary(models.Model):
+    agent = models.ForeignKey(User, on_delete=models.CASCADE)  # Or your Agent model
+    base_salary = models.DecimalField(max_digits=10, decimal_places=2)
+    bonus = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    payment_date = models.DateField()
+    organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
+
+    
+    def __str__(self):
+        return f"Salary for {self.agent.username} on {self.payment_date}"
+
+
+class Sale(models.Model):
+    property = models.ForeignKey('Property', on_delete=models.CASCADE)
+    agent = models.ForeignKey(User, on_delete=models.CASCADE)
+    sale_price = models.DecimalField(max_digits=15, decimal_places=2)
+    sale_date = models.DateField()
+    
+    def __str__(self):
+        return f"Sale of {self.property.address} by {self.agent.username} for ${self.sale_price}"
+
+class Property(models.Model):
+    title = models.CharField(max_length=255,default='Untitled Property')
+    address = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=15, decimal_places=2)
+    description = models.TextField(null=True, blank=True)
+    agent = models.ForeignKey('Agent', on_delete=models.CASCADE, null=True, blank=True)
+    # Add any other fields necessary for the property model
+
+    def __str__(self):
+        return self.title
+    
+
+
+class Bonus(models.Model):
+    agent = models.ForeignKey(User, on_delete=models.CASCADE)
+    bonus_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date_awarded = models.DateField()
+
+    def __str__(self):
+        return f"{self.agent.username} - Bonus of {self.bonus_amount}"

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load tailwind_filters %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-4">Property List</h1>
+    <a href="{% url 'property_create' %}" class="text-blue-500 hover:underline">Add New Property</a>
+
+    <ul class="mt-4">
+        {% for property in properties %}
+            <li class="bg-gray-100 p-4 rounded shadow mb-2">
+                <h3 class="text-xl font-semibold">{{ property.title }}</h3>
+                <p>{{ property.description }}</p>
+                <p class="text-gray-600">Price: ${{ property.price }}</p>
+                <p class="text-gray-600">Agent: {{ property.agent.username }}</p>
+            </li>
+        {% empty %}
+            <li class="bg-red-100 p-4 rounded">No properties available.</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}

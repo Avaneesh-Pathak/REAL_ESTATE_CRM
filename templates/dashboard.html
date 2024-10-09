@@ -29,7 +29,29 @@
                 </div>
             </div>
         </div>
-        
+{% comment %}         
+        <div class="flex flex-wrap mt-10">
+            {% if user.is_organisor %}
+            <!-- Buttons for the Organizer -->
+            <div class="p-4 w-full">
+                <h2 class="title-font text-2xl font-medium text-gray-900 mb-4">Management</h2>
+                <div class="flex space-x-4">
+                    <a href="{% url 'property_list' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg">View Properties</a>
+                    <a href="{% url 'sale_list' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg">View Sales</a>
+                    <a href="{% url 'salary_list' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg">View Salaries</a>
+                </div>
+            </div>
+            {% else %}
+            <!-- Buttons for the Agent -->
+            <div class="p-4 w-full">
+                <h2 class="title-font text-2xl font-medium text-gray-900 mb-4">Agent Dashboard</h2>
+                <div class="flex space-x-4">
+                    <a href="{% url 'property_list' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg">View My Properties</a>
+                    <a href="{% url 'bonus_info' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg">View My Bonus</a>
+                </div>
+            </div>
+            {% endif %}
+        </div> {% endcomment %}
       </div>
     </div>
 </section>
