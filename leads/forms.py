@@ -80,6 +80,13 @@ class SalaryForm(forms.ModelForm):
     class Meta:
         model = Salary
         fields = ['agent', 'base_salary', 'bonus', 'payment_date']
+        widgets = {
+            'payment_date': forms.DateInput(attrs={
+                'type': 'date',  # Use HTML5 date input
+                'class': 'form-control',
+                'placeholder': 'DD-MM-YYYY',  # Optional placeholder
+            }),
+        }
 
 
 
@@ -87,6 +94,14 @@ class SaleForm(forms.ModelForm):
     class Meta:
         model = Sale
         fields = ['property', 'agent', 'sale_price', 'sale_date']
+    def __init__(self, *args, **kwargs):
+        super(SaleForm, self).__init__(*args, **kwargs)
+        self.fields['sale_date'].widget = forms.TextInput(attrs={
+            'type': 'date',  # or you can set it to 'text' if you want to use datepicker
+            'class': 'form-control',
+            'placeholder': 'DD-MM-YYYY'  # Optional placeholder
+        })
+
 
 
 class PropertyModelForm(forms.ModelForm):

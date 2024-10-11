@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="w-full mb-6 py-6 flex justify-between items-center border-b border-gray-200">
+    <div>
+        <h1 class="text-4xl text-gray-800">Salary Data</h1>
+    </div>
+    {% if request.user.is_organisor %}
+    <div>
+        <a class="text-gray-500 hover:text-blue-500" href="{% url 'leads:create_salary' %}">
+            Add Salary Data
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<table class="table table-striped mt-4 w-full">
+    <thead>
+        <tr>
+            <th class="text-left">Agent</th>
+            <th class="text-right">Base Salary</th>
+            <th class="text-right">Bonus</th>
+            <th class="text-right">Payment Date</th>
+            <th class="text-right">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for salary in salaries %}
+            <tr class="bg-gray-100">
+                <td>{{ salary.agent.username }}</td>
+                <td class="text-right">${{ salary.base_salary }}</td>
+                <td class="text-right">${{ salary.bonus }}</td>
+                <td class="text-right">{{ salary.payment_date|date:"F j, Y" }}</td>
+                <td class="text-right" style="vertical-align: bottom;">
+                    <a href="{% url 'leads:manage_salary' salary.id %}" class="btn btn-link text-indigo-600 hover:text-indigo-900">
+                        Edit
+                    </a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="text-center bg-red-100 p-4 rounded">No salaries available.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock content %}

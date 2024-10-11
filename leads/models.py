@@ -114,7 +114,7 @@ class Property(models.Model):
     address = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=15, decimal_places=2)
     description = models.TextField(null=True, blank=True)
-    agent = models.ForeignKey('Agent', on_delete=models.CASCADE, null=True, blank=True)
+    agent = models.ForeignKey(Agent, null=True, blank=True, on_delete=models.SET_NULL)
     # Add any other fields necessary for the property model
     organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
 

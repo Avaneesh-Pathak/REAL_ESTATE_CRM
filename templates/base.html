@@ -7,15 +7,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DJCRM</title>
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
-    
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />  <!-- Datepicker CSS --> {% endcomment %}
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
 </head>
 <body>
     <div class="max-w-7xl mx-auto">
         {% include 'navbar.html' %}
-        {% include 'messages.html' %}
+
+        <!-- Message block -->
+        {% if messages %}
+          <div class="alert-messages">
+            {% for message in messages %}
+              <div id="message-{{ forloop.counter }}" class="alert bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                {{ message }}
+                <!-- Close button -->
+                <span class="absolute top-0 right-0 px-4 py-3 cursor-pointer close-alert" onclick="this.parentElement.style.display='none';">
+                  &times;
+                </span>
+              </div>
+            {% endfor %}
+          </div>
+
+          <script>
+            // Automatically hide the alert after 5 seconds
+            setTimeout(function() {
+              var alerts = document.getElementsByClassName('alert');
+              for (var i = 0; i < alerts.length; i++) {
+                alerts[i].style.display = 'none';
+              }
+            }, 5000); // 5000 milliseconds = 5 seconds
+          </script>
+
+          <style>
+            .close-alert {
+              font-size: 20px;
+              font-weight: bold;
+              color: #f56565; /* Change color if needed */
+            }
+            .close-alert:hover {
+              color: #c53030; /* Darker on hover */
+            }
+          </style>
+        {% endif %}
+
         {% block content %}
         {% endblock content %}
     </div>
+
     {% include "scripts.html" %}
+
+    <!-- Include jQuery and Bootstrap Datepicker JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    
+    <script>
+        // Initialize the datepicker for inputs with the ID that matches your date field in the form
+        $(document).ready(function() {
+            // This should match the ID of the date input field in your forms
+            $('input[type="date"]').datepicker({
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                todayHighlight: true
+            });
+        });
+    </script>
 </body>
 </html>

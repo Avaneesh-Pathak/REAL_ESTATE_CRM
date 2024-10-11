@@ -4,7 +4,7 @@ from django import contrib
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.http.response import JsonResponse
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse,get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views import generic
@@ -64,12 +64,12 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         # How many new leads in the last 30 days
         thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
         # Total sales for the organisation          
-        total_salaries = Salary.objects.filter(organisation=user.userprofile).count()
+        total_salaries = Salary.objects.count()
         # Total sales for the organisation
-        total_sales = Sale.objects.filter(organisation=user.userprofile).count()
+        total_sales = Sale.objects.count()
         
         # Total properties managed by the organisation
-        total_properties = Property.objects.filter(organisation=user.userprofile).count()
+        total_properties = Property.objects.count()
         
         total_in_past30 = Lead.objects.filter(
             organisation=user.userprofile,
@@ -515,80 +515,105 @@ def create_salary(request):
         form = SalaryForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success
-            messages.success(request, "Salary created successfully.")
-            return redirect('salary_list')  # Redirect to a salary list view
+            
+            messages.success(request, "Salary Info Added.")
+            return redirect('leads:salary_list')  # Redirect to a salary list view
     else:
         form = SalaryForm()
-    return render(request, 'leads/salary_form.html', {'form': form})
+    return render(request, 'salary/create_salary.html', {'form': form})
 
+def manage_salary(request, salary_id=None):
+    if salary_id:  # Check if we are updating an existing salary
+        salary = get_object_or_404(Salary, id=salary_id)
+    else:
+        salary = None
 
-
-def manage_salary(request):
     if request.method == 'POST':
-        form = SalaryForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('salary_list')  # Redirect to salary list or another view
+        if 'delete' in request.POST:  # Check if delete button was pressed
+            salary.delete()  # Delete the salary instance
+            messages.success(request, "Salary deleted successfully.")
+            return redirect('leads:salary_list')  # Redirect after deletion
+        else:
+            form = SalaryForm(request.POST, instance=salary)  # Bind the form to the instance if updating
+            if form.is_valid():
+                form.save()  # Save the salary instance
+                messages.success(request, "Salary updated successfully.")
+                return redirect('leads:salary_list')  # Redirect after saving
     else:
-        form = SalaryForm()
-    return render(request, 'leads/manage_salary.html', {'form': form})
+        form = SalaryForm(instance=salary)  # Create form with instance if updating
 
+    return render(request, 'salary/manage_salary.html', {'form': form, 'salary': salary})
 
 def create_sale(request):
     if request.method == 'POST':
         form = SaleForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Sale created successfully.")
-            return redirect('sale_list')  # Redirect to a sale list view
+            messages.success(request, "Sale added successfully.")
+            return redirect('leads:sale_list')  # Redirect to a sale list view
     else:
-        form = SaleForm()
-    return render(request, 'leads/sale_form.html', {'form': form})
+        form = SaleForm()  # Instantiate an empty form
+    return render(request, 'sale/create_sale.html', {'form': form})
 
+def manage_sale(request, sale_id=None):
+    # If sale_id is provided, fetch the sale; otherwise, it's a new sale
+    sale = get_object_or_404(Sale, id=sale_id) if sale_id else None
 
-def manage_sale(request):
     if request.method == 'POST':
-        form = SaleForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('sale_list')  # Redirect to sales list or another view
+        if 'delete' in request.POST:  # Check if the delete button was pressed
+            if sale:  # Ensure the sale exists
+                sale.delete()  # Delete the sale instance
+                messages.success(request, "Sale deleted successfully.")
+                return redirect('leads:sale_list')  # Redirect after deletion
+        else:  # If not a delete request, process form submission
+            form = SaleForm(request.POST, instance=sale)  # Bind form to instance if updating
+            if form.is_valid():
+                form.save()  # Save the sale instance
+                messages.success(request, "Sale updated successfully.")
+                return redirect('leads:sale_list')  # Redirect after saving
     else:
-        form = SaleForm()
-    return render(request, 'leads/manage_sale.html', {'form': form})
+        form = SaleForm(instance=sale) if sale else SaleForm()  # Create form with instance if updating
 
+    return render(request, 'sale/manage_sale.html', {'form': form, 'sale': sale})
+
+  
 
 class PropertyListView(LoginRequiredMixin, ListView):
     model = Property
-    template_name = 'leads/property_list.html'  # Update with your template path
+    template_name = 'property/property_list.html'  # Update with your template path
     context_object_name = 'properties'
-
-    def get_queryset(self):
-        return Property.objects.filter(agent__user=self.request.user)
 
 class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
     model = Property
-    template_name = 'leads/property_detail.html'  # Update with your template path
+    template_name = 'property/property_detail.html'  # Update with your template path
     context_object_name = 'property'
 
     def get_queryset(self):
         return Property.objects.filter(agent__user=self.request.user)
+
+        
 class PropertyCreateView(LoginRequiredMixin, generic.CreateView):
-    template_name = 'leads/property_create.html'  # Update with your template path
+    template_name = 'property/property_create.html'  # Update with your template path
     form_class = PropertyModelForm
 
     def get_success_url(self):
-        return reverse('property_list')  # Redirect to property list after successful creation
-
+        return reverse('leads:property_list')  # Redirect to property list after successful creation
+    
     def form_valid(self, form):
         property = form.save(commit=False)
-        property.agent = self.request.user.agent  # Assign the current user's agent profile
-        property.save()
-        messages.success(self.request, "Property created successfully.")
+        
+        # Check if the user has an agent
+        if hasattr(self.request.user, 'agent'):
+            property.agent = self.request.user.agent  # Assign the user's agent if it exists
+        else:
+            property.agent = None  # Explicitly set to None if the user has no agent
+
+        property.save()  # Save the property, even if no agent is assigned
+        messages.success(self.request, "Property Added successfully.")
         return super(PropertyCreateView, self).form_valid(form)
 
 class PropertyUpdateView(LoginRequiredMixin, generic.UpdateView):
-    template_name = 'leads/property_update.html'  # Update with your template path
+    template_name = 'property/property_update.html'  # Update with your template path
     form_class = PropertyModelForm
 
     def get_queryset(self):
@@ -604,7 +629,7 @@ class PropertyUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 class PropertyDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Property
-    template_name = 'leads/property_delete.html'  # Update with your template path
+    template_name = 'property/property_delete.html'  # Update with your template path
 
     def get_queryset(self):
         return Property.objects.filter(agent__user=self.request.user)
@@ -619,12 +644,12 @@ class PropertyDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class SaleListView(ListView):
     model = Sale
-    template_name = 'leads/sale_list.html'  # Update with your template path
+    template_name = 'sale/sale_list.html'  # Update with your template path
     context_object_name = 'sales'
 
 class SalaryListView(ListView):
     model = Salary
-    template_name = 'leads/salary_list.html'  # Update with your template path
+    template_name = 'salary/salary_list.html'  # Update with your template path
     context_object_name = 'salaries'
 
 class BonusInfoView(ListView):
@@ -634,6 +659,6 @@ class BonusInfoView(ListView):
 
 
 
-
+#
 
 
