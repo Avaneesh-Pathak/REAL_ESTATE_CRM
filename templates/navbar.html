@@ -11,10 +11,7 @@
           {% if request.user.is_organisor %}
           <a href="{% url 'agents:agent-list' %}" class="mr-5 hover:text-gray-900">Agents</a>
           {% endif %}
-          <a href="{% url 'leads:lead-list' %}" class="mr-5 hover:text-gray-900">Leads</a>
-          <a href="{% url 'leads:property_list' %}" class="mr-5 hover:text-gray-900">Property List</a>
-          <a href="{% url 'leads:salary_list' %}" class="mr-5 hover:text-gray-900">Salary List</a>
-          <a href="{% url 'leads:sale_list' %}" class="mr-5 hover:text-gray-900">Sale List</a>
+          
           {% if lead.pk %}
             <a href="{% url 'leads:lead-followup-create' lead.pk %}" class="mr-5 hover:text-gray-900">Create Follow-up</a>
           {% endif %}  

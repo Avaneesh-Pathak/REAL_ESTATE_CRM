@@ -1,0 +1,17 @@
+<form method="get" class="mb-4">
+    <label for="project_name" class="block text-lg">Select Project:</label>
+    <select name="project_name" id="project_name" class="border p-2">
+        <option value="">-- Select Project --</option>
+        {% for project in projects %}
+        <option value="{{ project.name }}" {% if selected_project == project.name %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="block_code" class="block text-lg mt-4">Block Code:</label>
+    <select name="block_code" id="block_code" class="border p-2">
+        <option value="All" {% if block_code == 'All' %}selected{% endif %}>All</option>
+        <!-- Add block codes dynamically based on the selected project -->
+    </select>
+    
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 mt-4">Filter</button>
+</form>

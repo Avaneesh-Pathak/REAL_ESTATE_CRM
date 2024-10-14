@@ -8,13 +8,72 @@
     <title>DJCRM</title>
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    {% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />  <!-- Datepicker CSS --> {% endcomment %}
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px; /* Initially hidden */
+            width: 250px;
+            height: 100%;
+            background-color: #f8f9fa; /* Light background */
+            transition: left 0.3s ease;
+            z-index: 1000; /* Ensure it's above other content */
+        }
 
+        .sidebar.active {
+            left: 0; /* Show the sidebar */
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #e2e2e2; /* Highlight on hover */
+        }
+
+        .hamburger {
+            cursor: pointer;
+            font-size: 24px;
+            margin: 15px; /* Some margin for the icon */
+        }
+
+        .close-btn {
+            cursor: pointer;
+            font-size: 24px;
+            margin: 15px; /* Some margin for the icon */
+            text-align: right; /* Align to the right */
+        }
+    </style>
 </head>
-<body>
+<body class="bg-white text-black dark:bg-gray-800 dark:text-white">
     <div class="max-w-7xl mx-auto">
         {% include 'navbar.html' %}
+
+        <!-- Hamburger Icon -->
+        <div class="hamburger" id="hamburger">
+            &#9776; <!-- Unicode character for hamburger icon -->
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="close-btn" id="close-btn">&times;</div> <!-- Close button -->
+            <a href="{% url 'dashboard' %}">Home</a>
+            <a href="{% url 'leads:lead-list' %}">Leads</a>
+            {% comment %} <a href="{% url 'leads:property_list' %}" >Daybook</a> {% endcomment %}
+            <a href="{% url 'leads:sale_list' %}">Sales</a>
+            <a href="{% url 'leads:property_list' %}" >Properties</a>
+            <a href="{% url 'leads:salary_list' %}">Salary</a>
+            <a href="{% url 'leads:create_project' %}" >Create Project</a>
+            <a href="{% url 'leads:plot_status' %}" >Project Status</a>
+            <a href="{% url 'leads:calculate_emi' %}">Calculate EMI</a>
+            <!-- Add more links as needed -->
+        </div>
 
         <!-- Message block -->
         {% if messages %}
@@ -63,13 +122,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     
     <script>
-        // Initialize the datepicker for inputs with the ID that matches your date field in the form
         $(document).ready(function() {
-            // This should match the ID of the date input field in your forms
+            // Initialize the datepicker for inputs with the ID that matches your date field in the form
             $('input[type="date"]').datepicker({
                 format: 'yyyy-mm-dd',
                 autoclose: true,
                 todayHighlight: true
+            });
+
+            // Toggle Sidebar
+            $('#hamburger').click(function() {
+                $('#sidebar').addClass('active');
+            });
+
+            // Close Sidebar
+            $('#close-btn').click(function() {
+                $('#sidebar').removeClass('active');
+            });
+
+            // Close sidebar when clicking outside of it
+            $(document).click(function(event) {
+                if (!$(event.target).closest('#sidebar, #hamburger').length) {
+                    $('#sidebar').removeClass('active');
+                }
             });
         });
     </script>

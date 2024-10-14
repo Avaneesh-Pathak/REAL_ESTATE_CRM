@@ -112,12 +112,18 @@ class LeadListView(LoginRequiredMixin,generic.ListView):
                 agent__isnull=False
             )
         else:
-            queryset = Lead.objects.filter(
-                organisation=user.agent.organisation, agent__isnull=False)
-            # filter for the agent that is logged in
-            queryset = queryset.filter(agent__user=user)
+            # Check if the user has an associated agent
+            if hasattr(user, 'agent'):
+                queryset = Lead.objects.filter(
+                    organisation=user.agent.organisation, 
+                    agent__isnull=False
+                )
+                # Filter for the agent that is logged in
+                queryset = queryset.filter(agent__user=user)
+            else:
+                queryset = Lead.objects.none()  # Return an empty queryset if no agent exists
+
         return queryset
-    
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = super(LeadListView, self).get_context_data(**kwargs)
@@ -659,6 +665,114 @@ class BonusInfoView(ListView):
 
 
 
-#
+# Project
+from django.shortcuts import render
+from .models import Plot
+
+def plot_status_view(request):
+    projects = Project.objects.all()  # Fetch all project names
+    project_name = request.GET.get('project_name', None)
+    block_code = request.GET.get('block_code', 'All')
+    
+    plots = Plot.objects.none()  # Initialize with no plots
+    if project_name:
+        plots = Plot.objects.filter(project__name=project_name)
+        if block_code != 'All':
+            plots = plots.filter(project__block_code=block_code)
+
+    return render(request, 'project\plot_status.html', {
+        'projects': projects, 
+        'plots': plots,
+        'selected_project': project_name,
+        'block_code': block_code
+    })
+from django.shortcuts import render, redirect
+from .forms import ProjectForm
+from .models import Project, Plot
+
+def create_project_view(request):
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            # Create the project
+            project_name = form.cleaned_data['name']
+            block_code = form.cleaned_data['block_code']
+            start_plot = form.cleaned_data['start_plot']
+            end_plot = form.cleaned_data['end_plot']
+
+            # Save the project
+            project = Project.objects.create(name=project_name, block_code=block_code)
+
+            # Create plots for the project
+            for plot_no in range(start_plot, end_plot + 1):
+                Plot.objects.create(project=project, plot_no=f"{block_code}-{plot_no}")
+
+            return redirect('project/plot_status')  # Redirect to project status page after creation
+    else:
+        form = ProjectForm()
+
+    return render(request, 'project/create_project.html', {'form': form})
 
 
+
+
+# EMI
+from decimal import Decimal, InvalidOperation, getcontext
+
+def calculate_emi(request):
+    emi = None  # Initialize emi variable
+    error_message = None  # Initialize error message variable
+    if request.method == "POST":
+        try:
+            # Retrieve input values and convert to Decimal
+            total_amount = Decimal(request.POST.get('total_amount', '0'))  # Default to 0 if not provided
+            down_payment = Decimal(request.POST.get('down_payment', '0'))  # Default to 0 if not provided
+            interest_rate = Decimal(request.POST.get('interest_rate', '0'))  # Default to 0 if not provided
+            tenure = request.POST.get('tenure', '0')
+
+            # Validate input values
+            if total_amount < 0 or down_payment < 0 or interest_rate < 0:
+                error_message = "Please provide valid positive numbers for Total Amount, Down Payment, and Interest Rate."
+            else:
+                # Custom tenure handling
+                if tenure == 'other':
+                    custom_tenure = request.POST.get('custom_tenure', '0')
+                    if custom_tenure:
+                        custom_tenure = Decimal(custom_tenure)
+                        if custom_tenure <= 0:
+                            error_message = "Please enter a valid number of months."
+                        else:
+                            tenure = custom_tenure
+                    else:
+                        error_message = "Please enter a custom number of months."
+                else:
+                    tenure = Decimal(tenure)
+
+                # Calculate loan amount
+                loan_amount = total_amount - down_payment
+
+                # Check if loan amount is positive
+                if loan_amount < 0:
+                    error_message = "Loan amount must be positive (Total Amount should be greater than Down Payment)."
+                else:
+                    # Convert interest rate from percentage to a decimal
+                    monthly_interest_rate = interest_rate / Decimal(100) / Decimal(12)
+
+                    # EMI calculation using the formula
+                    if monthly_interest_rate > 0:
+                        emi = (loan_amount * monthly_interest_rate * (1 + monthly_interest_rate) ** tenure) / \
+                              ((1 + monthly_interest_rate) ** tenure - 1)
+                    else:
+                        emi = loan_amount / tenure  # In case interest rate is 0, simple division
+
+                    # Set precision for Decimal calculations
+                    emi = emi.quantize(Decimal('0.001'))  # Round to three decimal places
+
+        except InvalidOperation as e:
+            error_message = f"Error in calculation: {str(e)}"
+        except ValueError as e:
+            error_message = f"Value error: {str(e)}"
+        except ZeroDivisionError as e:
+            error_message = "Error: Division by zero."
+
+    return render(request, 'EMI/emi_calculation.html', {'emi': emi, 'error_message': error_message})

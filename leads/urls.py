@@ -1,10 +1,12 @@
 from django.urls import path
+from . import views
 from .views import (
     LeadListView, LeadDetailView, LeadCreateView, LeadUpdateView, LeadDeleteView,
     AssignAgentView, CategoryListView, CategoryDetailView, LeadCategoryUpdateView,
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
-    create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView
+    create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,
+    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi
 )
 
 app_name = "leads"
@@ -17,7 +19,7 @@ urlpatterns = [
     path('create_sale/', create_sale, name='create_sale'),
     path('manage_salary/<int:salary_id>/', manage_salary, name='manage_salary'),
     path('sale/manage/<int:sale_id>/', manage_sale, name='manage_sale'),
-    path('', LeadListView.as_view(), name='lead-list'),
+    path('leads/', LeadListView.as_view(), name='lead-list'),
     path('<int:pk>/',LeadDetailView.as_view(),name='lead-detail'),
     path('<int:pk>/update/',LeadUpdateView.as_view(), name='lead-update'),
     path('<int:pk>/delete/',LeadDeleteView.as_view(), name='lead-delete'),
@@ -39,4 +41,8 @@ urlpatterns = [
     path('properties/<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
     path('properties/<int:pk>/update/', PropertyUpdateView.as_view(), name='property-update'),
     path('properties/<int:pk>/delete/', PropertyDeleteView.as_view(), name='property-delete'),
+    # URL for creating a new project
+    path('create-project/', views.create_project_view, name='create_project'),
+    path('create-project/project/plot_status/', views.plot_status_view, name='plot_status'),
+    path('calculate-emi/', calculate_emi, name='calculate_emi'), 
 ]

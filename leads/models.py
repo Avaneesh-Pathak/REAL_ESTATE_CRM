@@ -130,3 +130,38 @@ class Bonus(models.Model):
 
     def __str__(self):
         return f"{self.agent.username} - Bonus of {self.bonus_amount}"
+
+
+# PROJECT
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=100)
+    block_code = models.CharField(max_length=10,default='NA')
+
+    def __str__(self):
+        return self.name
+
+class Plot(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
+    plot_no = models.CharField(max_length=10,default=0)
+    status = models.CharField(max_length=10, choices=[('Available', 'Available'), ('Booked', 'Booked'), ('Hold', 'Hold'), ('Sold Out', 'Sold Out')], default='Available')
+    buyer_name = models.CharField(max_length=100, null=True, blank=True)
+    booking_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.project.name} - {self.plot_no}"
+    
+
+# EMI
+from django.db import models
+
+class EmiPlan(models.Model):
+    name = models.CharField(max_length=100)  # Name of the EMI plan
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2)  # Interest rate (e.g., 8.5%)
+    tenure_months = models.IntegerField()  # Number of months for EMI
+    minimum_downpayment = models.DecimalField(max_digits=10, decimal_places=2)  # Minimum down payment
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name

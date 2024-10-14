@@ -108,3 +108,53 @@ class PropertyModelForm(forms.ModelForm):
     class Meta:
         model = Property
         fields = ['title', 'address', 'price', 'description', 'agent', 'organisation']
+
+# PROJECT
+
+from django import forms
+from .models import Project, Plot
+
+
+class ProjectForm(forms.Form):
+    name = forms.CharField(max_length=100, label="Project Name")
+    block_code = forms.CharField(max_length=10, label="Block Code")
+    start_plot = forms.IntegerField(label="Start Plot Number")
+    end_plot = forms.IntegerField(label="End Plot Number")
+
+
+
+    def save(self, project, commit=True):
+        block = super().save(commit=False)
+        block.project = project
+        if commit:
+            block.save()
+            # Create plots for this block
+            for plot_num in range(self.cleaned_data['from_plot'], self.cleaned_data['to_plot'] + 1):
+                Plot.objects.create(block=block, plot_number=plot_num)
+        return block
+
+# EMI
+
+
+
+
+from django import forms
+
+class EmiCalculationForm(forms.Form):
+    total_amount = forms.DecimalField(label='Total Amount', max_digits=10, decimal_places=2)
+    down_payment = forms.DecimalField(label='Down Payment', max_digits=10, decimal_places=2)
+    
+    TENURE_CHOICES = [
+        (3, '3 Months'),
+        (6, '6 Months'),
+        (12, '1 Year'),
+        (24, '2 Years'),
+        ('other', 'Other (Enter months)'),
+    ]
+    
+    tenure = forms.ChoiceField(choices=TENURE_CHOICES, label='Select Tenure')
+    custom_tenure = forms.IntegerField(label='Custom Tenure (in months)', required=False)
+    interest_rate = forms.DecimalField(label='Interest Rate (%)', max_digits=5, decimal_places=2, required=True)
+
+
+
