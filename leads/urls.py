@@ -6,7 +6,7 @@ from .views import (
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,
-    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi
+    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create
 )
 
 app_name = "leads"
@@ -45,4 +45,7 @@ urlpatterns = [
     path('create-project/', views.create_project_view, name='create_project'),
     path('create-project/project/plot_status/', views.plot_status_view, name='plot_status'),
     path('calculate-emi/', calculate_emi, name='calculate_emi'), 
+    #DAYBOOK
+    path('daybook/', daybook_list, name='daybook_list'),  # URL for listing expenses
+    path('daybook/create/', daybook_create, name='daybook_create'),
 ]

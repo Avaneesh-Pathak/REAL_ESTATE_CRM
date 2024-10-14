@@ -812,3 +812,28 @@ def calculate_emi(request):
             error_message = "Error: Division by zero."
 
     return render(request, 'EMI/emi_calculation.html', {'emi': emi, 'error_message': error_message})
+
+# DAYBOOK
+from django.shortcuts import render, redirect
+from .models import Daybook
+from .forms import DaybookEntryForm  # Update the import statement
+from django.db.models import Sum
+
+def daybook_list(request):
+    expenses = Daybook.objects.all()
+    total_balance = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+    context = {
+        'expenses': expenses,
+        'total_balance': total_balance,
+    }
+    return render(request,'Daybook/daybook_list.html', context)
+
+def daybook_create(request):
+    if request.method == 'POST':
+        form = DaybookEntryForm(request.POST)  # Update to use the new form name
+        if form.is_valid():
+            form.save()
+            return redirect('leads:daybook_list')  # Redirect to the daybook list after saving
+    else:
+        form = DaybookEntryForm()  # Update to use the new form name
+    return render(request, 'Daybook/daybook_form.html', {'form': form})

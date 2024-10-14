@@ -168,3 +168,29 @@ class EmiPlan(models.Model):
 
     def __str__(self):
         return self.name
+
+# DAYBOOK
+
+from django.db import models
+from django.utils import timezone
+
+class Daybook(models.Model):
+    ACTIVITY_CHOICES = [
+        ('pantry', 'Pantry'),
+        ('fuel', 'Fuel'),
+        ('office_expense', 'Office Expense'),
+        ('site_development', 'Site Development'),
+        ('site_visit', 'Site Visit'),
+        ('printing', 'Printing'),
+        ('utility', 'Utility'),
+        ('others', 'Others'),
+    ]
+
+    date = models.DateField(default=timezone.now)
+    activity = models.CharField(max_length=50, choices=ACTIVITY_CHOICES)
+    custom_activity = models.CharField(max_length=100, blank=True, null=True)  # For "Others"
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    remark = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.date} - {self.activity} - {self.amount}"

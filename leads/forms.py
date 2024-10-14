@@ -156,5 +156,21 @@ class EmiCalculationForm(forms.Form):
     custom_tenure = forms.IntegerField(label='Custom Tenure (in months)', required=False)
     interest_rate = forms.DecimalField(label='Interest Rate (%)', max_digits=5, decimal_places=2, required=True)
 
+# DAYBOOK
 
+from .models import Daybook
 
+class DaybookEntryForm(forms.ModelForm):
+    class Meta:
+        model = Daybook
+        fields = ['date', 'activity', 'custom_activity', 'amount', 'remark']
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        activity = cleaned_data.get('activity')
+        custom_activity = cleaned_data.get('custom_activity')
+
+        if activity == 'others' and not custom_activity:
+            raise forms.ValidationError("Please enter the custom activity.")
+
+        return cleaned_data
