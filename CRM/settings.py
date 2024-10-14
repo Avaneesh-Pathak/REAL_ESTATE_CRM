@@ -1,18 +1,19 @@
 from pathlib import Path
-import environ
+# import environ
 
-# Initialize environment variables
-env = environ.Env(
-    DEBUG=(bool, False),  # Default DEBUG to False
-    EMAIL_PORT=(int, 587),  # Default email port to 587
-)
+# # Initialize environment variables
+# env = environ.Env(
+#     DEBUG=(bool, False),  # Default DEBUG to False
+#     EMAIL_PORT=(int, 587),  # Default email port to 587
+# )
 
-# Read .env file
-environ.Env.read_env()
+# # Read .env file
+# environ.Env.read_env()
 
-# Retrieve environment variables
-DEBUG = env('DEBUG')
-SECRET_KEY = env('SECRET_KEY')
+# # Retrieve environment variables
+# DEBUG = env('DEBUG')
+# SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = "django-insecure-_-s#%_=bpv+xk2c4y_tuiea0uw_e7gw!63afunys%vx5-fxyt0"
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,9 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # settings.py
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DEBUG = True
 
 # Allowed hosts (adjust for production)
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+ALLOWED_HOSTS =[]
 
 # Installed apps
 INSTALLED_APPS = [
@@ -79,14 +81,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'CRM.wsgi.application'
 
 # Database configuration
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env.int("DB_PORT", default=5432),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -129,42 +128,42 @@ LOGOUT_REDIRECT_URL = "/"
 CRISPY_TEMPLATE_PACK = "tailwind"
 
 # Email settings
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = True
-EMAIL_PORT = env.int("EMAIL_PORT")
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+# EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = env.int("EMAIL_PORT")
+# DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
-# Secure settings for production
-if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    X_FRAME_OPTIONS = "DENY"
+# # Secure settings for production
+# if not DEBUG:
+#     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#     SECURE_SSL_REDIRECT = True
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
+#     SECURE_BROWSER_XSS_FILTER = True
+#     SECURE_CONTENT_TYPE_NOSNIFF = True
+#     SECURE_HSTS_SECONDS = 31536000
+#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#     SECURE_HSTS_PRELOAD = True
+#     X_FRAME_OPTIONS = "DENY"
 
 
-AWS_ACCESS_KEY_ID ='AKIAYM7PN3PCBA4F2K6R'
-AWS_SECRET_ACCESS_KEY ='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'
-AWS_STORAGE_BUCKET_NAME='djcrm'
-AWS_S3_SIGNATURE_NAME='s3v4'
-AWS_S3_REGION_NAME='eu-north-1'
-AWS_S3_FILE_OVERWRITE= False
-AWS_DEFAULT_ACL=None
-AWS_S3_VERIFY=True
-DEFAULT_FILE_STORAGE='storages.backends.s3boto3.S3Boto3Storage'
+# AWS_ACCESS_KEY_ID ='AKIAYM7PN3PCBA4F2K6R'
+# AWS_SECRET_ACCESS_KEY ='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'
+# AWS_STORAGE_BUCKET_NAME='djcrm'
+# AWS_S3_SIGNATURE_NAME='s3v4'
+# AWS_S3_REGION_NAME='eu-north-1'
+# AWS_S3_FILE_OVERWRITE= False
+# AWS_DEFAULT_ACL=None
+# AWS_S3_VERIFY=True
+# DEFAULT_FILE_STORAGE='storages.backends.s3boto3.S3Boto3Storage'
 
 
 # Static and media settings (optional)
 
-MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
+# MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
 
 

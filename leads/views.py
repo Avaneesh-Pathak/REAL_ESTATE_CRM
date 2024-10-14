@@ -12,6 +12,8 @@ from django.views.generic import ListView
 from .models import Property, Sale, Salary, Bonus
 from leads.models import Category
 from agents.mixins import OrganisorAndLoginRequiredMixin
+from django.forms import modelformset_factory
+
 from .models import Lead, Agent, Category, FollowUp
 from .forms import (
     LeadForm, 
@@ -598,25 +600,59 @@ class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
         return Property.objects.filter(agent__user=self.request.user)
 
         
-class PropertyCreateView(LoginRequiredMixin, generic.CreateView):
-    template_name = 'property/property_create.html'  # Update with your template path
-    form_class = PropertyModelForm
+# views.py
+from django.views import View
+from django.forms import modelformset_factory
+
+class PropertyCreateView(LoginRequiredMixin, View):
+    template_name = 'property/property_create.html'
+
+    def get(self, request):
+        # Render the initial form for number of properties and common attributes
+        return render(request, self.template_name)
+
+    def post(self, request):
+        # Get the number of properties to create and common attributes
+        num_properties = int(request.POST.get('num_properties', 1))
+        property_name = request.POST.get('property_name', '')
+
+        # Create the properties in the database
+        for _ in range(num_properties):
+            Property.objects.create(
+                title=property_name,
+                description=100,  # Example size, modify as needed
+                address='Default Location',  # Example location, modify as needed
+                price=100000.00  # Example price, modify as needed
+            )
+
+        return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('leads:property_list')  # Redirect to property list after successful creation
-    
-    def form_valid(self, form):
-        property = form.save(commit=False)
-        
-        # Check if the user has an agent
-        if hasattr(self.request.user, 'agent'):
-            property.agent = self.request.user.agent  # Assign the user's agent if it exists
-        else:
-            property.agent = None  # Explicitly set to None if the user has no agent
+        return reverse('leads:property_list')  # Redirect to property list after creation  # Redirect to property list after successful update
 
-        property.save()  # Save the property, even if no agent is assigned
-        messages.success(self.request, "Property Added successfully.")
-        return super(PropertyCreateView, self).form_valid(form)
+def add_property(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        desc = request.POST.get('desc')
+        address = request.POST.get('address')
+        price = request.POST.get('price')
+        # agent = request.POST.get('agent')
+        # organisation = request.POST.get('organisation')
+
+        # Create and save the new Property
+        new_property = Property(
+            title=title,
+            description=desc,
+            address=address,
+            price=price,
+            # agent=agent,
+            # organisation=organisation
+        )
+        new_property.save()
+        return HttpResponse("Property added successfully!")
+
+    return render(request, 'property_list.html')  # Adjust to your template
+
 
 class PropertyUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = 'property/property_update.html'  # Update with your template path

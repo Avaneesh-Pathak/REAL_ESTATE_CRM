@@ -61,7 +61,6 @@ class FollowUp(models.Model):
 
 
 
-
 class Agent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     organisation = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
@@ -110,6 +109,10 @@ class Sale(models.Model):
         return f"Sale of {self.property.address} by {self.agent.username} for ${self.sale_price}"
 
 class Property(models.Model):
+    # project_name = models.CharField(max_length=255,default='Untitled Property')
+    # block_code = models.CharField(max_length=1)
+    # from_plot=models.IntegerField
+    # to_plot=models.IntegerField
     title = models.CharField(max_length=255,default='Untitled Property')
     address = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=15, decimal_places=2)

@@ -2,7 +2,7 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<div class="max-w-lg mx-auto">
+<!-- <div class="max-w-lg mx-auto">
     <a class="hover:text-blue-500" href="{% url 'leads:property_list' %}">Go back to Property List</a>
     <div class="py-5 border-t border-gray-200">
         <h1 class="text-4xl text-gray-800">Add a New Property</h1>
@@ -12,6 +12,21 @@
             {{ form.as_p }}
             <button type="submit" class="mt-5 btn btn-primary">Create</button>
         </form>
-    </div>
+    </div> -->
+    <!-- property_create.html -->
+<!-- property_create.html -->
+<!-- property_create.html -->
+<form method="post">
+    {% csrf_token %}
+    <label for="num_properties">Number of Properties:</label>
+    <input type="number" name="num_properties" min="1" required>
+    
+    <label for="property_name">Common Property Name:</label>
+    <input type="text" name="property_name" required>
+
+    <button type="submit">Create Properties</button>
+</form>
+
+
 {% endblock content %}
 
