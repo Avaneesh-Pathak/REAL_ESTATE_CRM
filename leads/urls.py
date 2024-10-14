@@ -6,7 +6,7 @@ from .views import (
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,
-    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create
+    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,add_promoter,update_delete_promoter,promoter_list
 )
 
 app_name = "leads"
@@ -48,4 +48,8 @@ urlpatterns = [
     #DAYBOOK
     path('daybook/', daybook_list, name='daybook_list'),  # URL for listing expenses
     path('daybook/create/', daybook_create, name='daybook_create'),
+    #PROMOTER
+    path('promoters/', views.promoter_list, name='promoter_list'),
+    path('promoter/<int:promoter_id>/update-delete/', views.update_delete_promoter, name='update_delete_promoter'),
+     path('promoter/add/', add_promoter, name='add_promoter'),  # URL for adding a promoter
 ]

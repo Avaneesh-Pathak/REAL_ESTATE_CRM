@@ -13,8 +13,8 @@ from .models import Property, Sale, Salary, Bonus
 from leads.models import Category
 from agents.mixins import OrganisorAndLoginRequiredMixin
 from django.forms import modelformset_factory
-
-from .models import Lead, Agent, Category, FollowUp
+from django.db import models
+from .models import Lead, Agent, Category, FollowUp,Promoter
 from .forms import (
     LeadForm, 
     LeadModelForm, 
@@ -22,7 +22,8 @@ from .forms import (
     AssignAgentForm, 
     LeadCategoryUpdateForm,
     CategoryModelForm,
-    FollowUpModelForm,SalaryForm,SaleForm,PropertyModelForm
+    FollowUpModelForm,SalaryForm,SaleForm,
+    PropertyModelForm,PromoterForm
 )
 
 
@@ -814,19 +815,30 @@ def calculate_emi(request):
     return render(request, 'EMI/emi_calculation.html', {'emi': emi, 'error_message': error_message})
 
 # DAYBOOK
-from django.shortcuts import render, redirect
 from .models import Daybook
+from django.utils import timezone
 from .forms import DaybookEntryForm  # Update the import statement
 from django.db.models import Sum
 
+
 def daybook_list(request):
-    expenses = Daybook.objects.all()
-    total_balance = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+    # Get today's date
+    today = timezone.now().date()
+
+    # Calculate today's expenses
+    todays_expenses = Daybook.objects.filter(date=today)
+    total_todays_expenses = sum(expense.amount for expense in todays_expenses)
+
+    # Get current balance (assuming it's stored in a variable or model)
+    current_balance = 25000  # Replace this with your actual current balance logic
+    updated_balance = current_balance - total_todays_expenses
+
     context = {
-        'expenses': expenses,
-        'total_balance': total_balance,
+        'expenses': todays_expenses,
+        'total_balance': updated_balance,
+        'todays_expense': total_todays_expenses,
     }
-    return render(request,'Daybook/daybook_list.html', context)
+    return render(request, 'Daybook/daybook_list.html', context)
 
 def daybook_create(request):
     if request.method == 'POST':
@@ -837,3 +849,46 @@ def daybook_create(request):
     else:
         form = DaybookEntryForm()  # Update to use the new form name
     return render(request, 'Daybook/daybook_form.html', {'form': form})
+
+
+# PROMOTER 
+
+# Promoter List View
+# leads/views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Promoter  # Import the Promoter model
+from .forms import PromoterForm  # Import the PromoterForm
+
+def promoter_list(request):
+    promoters = Promoter.objects.all()
+    return render(request, 'promoter/promoter_list.html', {'promoters': promoters})
+
+def update_delete_promoter(request, promoter_id):
+    promoter = get_object_or_404(Promoter, id=promoter_id)
+
+    if request.method == 'POST':
+        if 'update' in request.POST:  # Handle update request
+            form = PromoterForm(request.POST, instance=promoter)
+            if form.is_valid():
+                form.save()
+                return redirect('leads:promoter_list')  # Ensure this redirects to the correct URL
+        elif 'delete' in request.POST:  # Handle delete request
+            promoter.delete()
+            return redirect('leads:promoter_list')  # Ensure this redirects to the correct URL
+
+    else:
+        form = PromoterForm(instance=promoter)
+
+    return render(request, 'promoter/update_delete_promoter.html', {'form': form, 'promoter': promoter})
+
+
+def add_promoter(request):
+    if request.method == 'POST':
+        form = PromoterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('leads:promoter_list')  # Redirect to the promoter list after adding
+    else:
+        form = PromoterForm()
+
+    return render(request, 'promoter/add_promoter.html', {'form': form})

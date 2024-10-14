@@ -194,3 +194,20 @@ class Daybook(models.Model):
 
     def __str__(self):
         return f"{self.date} - {self.activity} - {self.amount}"
+
+# PROMOTER MODEL
+
+class Promoter(models.Model):
+    # Personal Information
+    name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255)
+    mobile_number = models.CharField(max_length=15)
+    address = models.TextField()
+
+    # Legal and Joining Information
+    pan_no = models.CharField(max_length=15)
+    id_card_number = models.CharField(max_length=20)
+    joining_percentage = models.DecimalField(max_digits=5, decimal_places=2)  # Percentage of joining
+
+    def __str__(self):
+        return self.name

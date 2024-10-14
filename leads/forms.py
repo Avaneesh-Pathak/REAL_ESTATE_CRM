@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
-from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property
+from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter
 
 User = get_user_model()
 
@@ -174,3 +174,25 @@ class DaybookEntryForm(forms.ModelForm):
             raise forms.ValidationError("Please enter the custom activity.")
 
         return cleaned_data
+    
+# PROMOTER FORM
+
+
+
+
+class PromoterForm(forms.ModelForm):
+    class Meta:
+        model = Promoter  # Use the model from models.py
+        fields = [
+            'name', 'email', 'mobile_number', 'address',
+            'pan_no', 'id_card_number', 'joining_percentage'
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'mobile_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.Textarea(attrs={'class': 'form-control'}),
+            'pan_no': forms.TextInput(attrs={'class': 'form-control'}),
+            'id_card_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'joining_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
