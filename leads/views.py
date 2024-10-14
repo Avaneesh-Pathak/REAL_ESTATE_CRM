@@ -73,7 +73,9 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         
         # Total properties managed by the organisation
         total_properties = Property.objects.count()
-        
+        # Total Promoters 
+        total_promoters = Promoter.objects.count()
+
         total_in_past30 = Lead.objects.filter(
             organisation=user.userprofile,
             date_added__gte=thirty_days_ago
@@ -94,6 +96,7 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
             "total_salaries": total_salaries,
             "total_sales": total_sales,
             "total_properties": total_properties,
+            "total_promoters": total_promoters,
         })
         return context
 

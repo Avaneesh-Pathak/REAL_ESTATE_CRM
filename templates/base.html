@@ -6,10 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DJCRM</title>
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
+        /* General styles */
+        body {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
         /* Sidebar styles */
         .sidebar {
             position: fixed;
@@ -49,9 +54,24 @@
             margin: 15px; /* Some margin for the icon */
             text-align: right; /* Align to the right */
         }
+
+        /* Alert styles */
+        .alert-messages {
+            margin: 20px 0; /* Add margin to alert messages */
+        }
+
+        .close-alert {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f56565; /* Change color if needed */
+        }
+
+        .close-alert:hover {
+            color: #c53030; /* Darker on hover */
+        }
     </style>
 </head>
-<body class="bg-white text-black dark:bg-gray-800 dark:text-white">
+<body>
     <div class="max-w-7xl mx-auto">
         {% include 'navbar.html' %}
 
@@ -65,12 +85,11 @@
             <div class="close-btn" id="close-btn">&times;</div> <!-- Close button -->
             <a href="{% url 'dashboard' %}">Home</a>
             <a href="{% url 'leads:lead-list' %}">Leads</a>
-            {% comment %} <a href="{% url 'leads:property_list' %}" >Daybook</a> {% endcomment %}
             <a href="{% url 'leads:sale_list' %}">Sales</a>
-            <a href="{% url 'leads:property_list' %}" >Properties</a>
+            <a href="{% url 'leads:property_list' %}">Properties</a>
             <a href="{% url 'leads:salary_list' %}">Salary</a>
-            <a href="{% url 'leads:create_project' %}" >Create Project</a>
-            <a href="{% url 'leads:plot_status' %}" >Project Status</a>
+            <a href="{% url 'leads:create_project' %}">Create Project</a>
+            <a href="{% url 'leads:plot_status' %}">Project Status</a>
             <a href="{% url 'leads:daybook_list' %}">Daybook</a>
             <a href="{% url 'leads:calculate_emi' %}">Calculate EMI</a>
             <a href="{% url 'leads:promoter_list' %}">Promoter List</a>
@@ -101,17 +120,6 @@
               }
             }, 5000); // 5000 milliseconds = 5 seconds
           </script>
-
-          <style>
-            .close-alert {
-              font-size: 20px;
-              font-weight: bold;
-              color: #f56565; /* Change color if needed */
-            }
-            .close-alert:hover {
-              color: #c53030; /* Darker on hover */
-            }
-          </style>
         {% endif %}
 
         {% block content %}
