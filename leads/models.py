@@ -114,9 +114,9 @@ class Property(models.Model):
     # from_plot=models.IntegerField
     # to_plot=models.IntegerField
     title = models.CharField(max_length=255,default='Untitled Property')
-    address = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=15, decimal_places=2)
-    description = models.TextField(null=True, blank=True)
+    project_name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    block = models.TextField(null=True, blank=True)
     agent = models.ForeignKey(Agent, null=True, blank=True, on_delete=models.SET_NULL)
     # Add any other fields necessary for the property model
     organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
@@ -124,6 +124,9 @@ class Property(models.Model):
     def __str__(self):
         return self.title
     
+class Project_Name(models.Model):
+    project_code= models.OneToOneField(User, on_delete=models.CASCADE)
+
 
 
 class Bonus(models.Model):
@@ -208,56 +211,6 @@ class Promoter(models.Model):
     pan_no = models.CharField(max_length=15)
     id_card_number = models.CharField(max_length=20)
     joining_percentage = models.DecimalField(max_digits=5, decimal_places=2)  # Percentage of joining
-
-    def __str__(self):
-        return self.name
-    
-
-# PLOT REGISTRATION
-
-
-class PlotBooking(models.Model):
-    GENDER_CHOICES = [
-        ('male', 'Male'),
-        ('female', 'Female'),
-        ('other', 'Other'),
-    ]
-
-    PAYMENT_MODES = [
-        ('cheque', 'Cheque'),
-        ('rtgs_neft', 'RTGS/NEFT'),
-        ('cash', 'Cash'),
-    ]
-
-    PAYMENT_TYPES = [
-        ('custom_payment', 'Custom Payment'),
-        ('installment', 'Installment'),
-    ]
-
-    booking_date = models.DateField()
-    name = models.CharField(max_length=100)
-    father_husband_name = models.CharField(max_length=100)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    dob = models.DateField()
-    mobile_no = models.CharField(max_length=15)
-    address = models.TextField()
-    bank_name = models.CharField(max_length=100)
-    account_no = models.CharField(max_length=50)
-    email = models.EmailField()
-    nominee_name = models.CharField(max_length=100)
-    corner_plot_10 = models.BooleanField(default=False)
-    corner_plot_5 = models.BooleanField(default=False)
-    full_pay_discount = models.BooleanField(default=False)
-    location = models.CharField(max_length=100)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    associate_detail = models.BooleanField(default=False)
-    promoter = models.ForeignKey(Promoter, null=True, blank=True, on_delete=models.SET_NULL)
-    basic_price = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPES)
-    booking_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    mode_of_payment = models.CharField(max_length=20, choices=PAYMENT_MODES)
-    payment_date = models.DateField()
-    remark = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name

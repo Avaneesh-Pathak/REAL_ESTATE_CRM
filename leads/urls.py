@@ -6,8 +6,7 @@ from .views import (
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,
-    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,
-    daybook_create,add_promoter,update_delete_promoter,promoter_list,plot_registration
+    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,add_promoter,update_delete_promoter,promoter_list
 )
 
 app_name = "leads"
@@ -20,7 +19,7 @@ urlpatterns = [
     path('create_sale/', create_sale, name='create_sale'),
     path('manage_salary/<int:salary_id>/', manage_salary, name='manage_salary'),
     path('sale/manage/<int:sale_id>/', manage_sale, name='manage_sale'),
-    path('leads/', LeadListView.as_view(), name='lead-list'),
+    path('', LeadListView.as_view(), name='lead-list'),
     path('<int:pk>/',LeadDetailView.as_view(),name='lead-detail'),
     path('<int:pk>/update/',LeadUpdateView.as_view(), name='lead-update'),
     path('<int:pk>/delete/',LeadDeleteView.as_view(), name='lead-delete'),
@@ -52,6 +51,5 @@ urlpatterns = [
     #PROMOTER
     path('promoters/', views.promoter_list, name='promoter_list'),
     path('promoter/<int:promoter_id>/update-delete/', views.update_delete_promoter, name='update_delete_promoter'),
-    path('promoter/add/', add_promoter, name='add_promoter'),  # URL for adding a promoter
-    path('register-plot/', views.plot_registration, name='plot_registration'),
+     path('promoter/add/', add_promoter, name='add_promoter'),  # URL for adding a promoter
 ]

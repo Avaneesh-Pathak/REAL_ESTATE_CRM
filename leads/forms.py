@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
-from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter,PlotBooking,Daybook
+from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter
 
 User = get_user_model()
 
@@ -107,7 +107,7 @@ class SaleForm(forms.ModelForm):
 class PropertyModelForm(forms.ModelForm):
     class Meta:
         model = Property
-        fields = ['title', 'address', 'price', 'description', 'agent', 'organisation']
+        fields = ['title', 'project_name', 'price', 'block', 'agent', 'organisation']
 
 # PROJECT
 
@@ -170,6 +170,9 @@ class DaybookEntryForm(forms.ModelForm):
     
 # PROMOTER FORM
 
+
+
+
 class PromoterForm(forms.ModelForm):
     class Meta:
         model = Promoter  # Use the model from models.py
@@ -186,32 +189,3 @@ class PromoterForm(forms.ModelForm):
             'id_card_number': forms.TextInput(attrs={'class': 'form-control'}),
             'joining_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
         }
-
-# PLOT REGISTRATION
-
-
-class PlotBookingForm(forms.ModelForm):
-    class Meta:
-        model = PlotBooking
-        fields = [
-            'booking_date', 'name', 'father_husband_name', 'gender', 'dob', 
-            'mobile_no', 'address', 'bank_name', 'account_no', 'email', 
-            'nominee_name', 'corner_plot_10', 'corner_plot_5', 'full_pay_discount', 
-            'location', 'project', 'associate_detail', 'promoter', 'basic_price', 
-            'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark'
-        ]
-        widgets = {
-            'dob': forms.DateInput(attrs={'type': 'date'}),
-            'booking_date': forms.DateInput(attrs={'type': 'date'}),
-            'payment_date': forms.DateInput(attrs={'type': 'date'}),
-        }
-
-    # Override clean method to make promoter optional if associate_detail is False
-    def clean(self):
-        cleaned_data = super().clean()
-        associate_detail = cleaned_data.get('associate_detail')
-        promoter = cleaned_data.get('promoter')
-
-        if associate_detail and not promoter:
-            raise forms.ValidationError("Please select a promoter if associate detail is provided.")
-        return cleaned_data

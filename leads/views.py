@@ -688,17 +688,17 @@ class PropertyDeleteView(LoginRequiredMixin, generic.DeleteView):
         return super(PropertyDeleteView, self).delete(request, *args, **kwargs)
 
 
-class SaleListView(LoginRequiredMixin, generic.ListView):
+class SaleListView(ListView):
     model = Sale
     template_name = 'sale/sale_list.html'  # Update with your template path
     context_object_name = 'sales'
 
-class SalaryListView(LoginRequiredMixin, generic.ListView):
+class SalaryListView(ListView):
     model = Salary
     template_name = 'salary/salary_list.html'  # Update with your template path
     context_object_name = 'salaries'
 
-class BonusInfoView(LoginRequiredMixin, generic.ListView):
+class BonusInfoView(ListView):
     model = Bonus
     template_name = 'leads/bonus_info.html'  # Update with your template path
     context_object_name = 'bonuses'
@@ -895,19 +895,3 @@ def add_promoter(request):
         form = PromoterForm()
 
     return render(request, 'promoter/add_promoter.html', {'form': form})
-
-#PLOT REGISTRATION
-
-
-from .forms import PlotBookingForm
-from .models import Project, Promoter
-
-def plot_registration(request):
-    if request.method == 'POST':
-        form = PlotBookingForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('success')  # Redirect to a success page after saving
-    else:
-        form = PlotBookingForm()
-    return render(request, 'plot_registration/plot_registration.html', {'form': form})
