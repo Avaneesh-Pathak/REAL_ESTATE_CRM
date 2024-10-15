@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Plot Registration</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <div>
+        <label for="associate_detail">Associate Detail:</label>
+        {{ form.associate_detail }}
+    </div>
+    <div id="promoter_list" style="display: none;">
+        <label for="promoter">Promoter:</label>
+        {{ form.promoter }}
+    </div>
+
+    <div id="gender_manual" style="display: none;">
+        <label for="manual_gender">Enter Gender:</label>
+        <input type="text" id="manual_gender" name="manual_gender" placeholder="Enter gender">
+    </div>
+
+    <div id="installment_section" style="display: none;">
+        <!-- EMI Calculator section here -->
+        <h4>EMI Calculator</h4>
+        <!-- Your EMI fields should go here -->
+    </div>
+
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    // Show/hide promoter list based on Associate Detail
+    document.getElementById('id_associate_detail').addEventListener('change', function() {
+        const promoterList = document.getElementById('promoter_list');
+        if (this.checked) {
+            promoterList.style.display = 'block';
+        } else {
+            promoterList.style.display = 'none';
+        }
+    });
+
+    // Show/hide manual gender input based on gender selection
+    document.getElementById('id_gender').addEventListener('change', function() {
+        const genderManual = document.getElementById('gender_manual');
+        if (this.value === 'other') {
+            genderManual.style.display = 'block';
+        } else {
+            genderManual.style.display = 'none';
+        }
+    });
+
+    // Show/hide EMI section based on Payment Type
+    document.getElementById('id_payment_type').addEventListener('change', function() {
+        const installmentSection = document.getElementById('installment_section');
+        if (this.value === 'installment') {
+            installmentSection.style.display = 'block';
+        } else {
+            installmentSection.style.display = 'none';
+        }
+    });
+</script>
+
+{% endblock %}
