@@ -1,0 +1,19 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.max-w-7xl {
+    padding: 20px; /* Adjust padding */
+}
+
+.sidebar {
+    padding-top: 60px; /* Pushes sidebar content down */
+}
+
+.alert-messages {
+    margin: 20px 0; /* Spacing for alert messages */
+}
+
+.content {
+    padding: 20px; /* Add some padding to the content area */
+}
