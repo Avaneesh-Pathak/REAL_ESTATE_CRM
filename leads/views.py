@@ -2,6 +2,7 @@ import logging
 import datetime
 from django import contrib
 from django.contrib import messages
+from django.views import View
 from django.core.mail import send_mail
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect, reverse,get_object_or_404
@@ -604,9 +605,6 @@ class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
         return Property.objects.filter(agent__user=self.request.user)
 
         
-# views.py
-from django.views import View
-from django.forms import modelformset_factory
 
 class PropertyCreateView(LoginRequiredMixin, View):
     template_name = 'property/property_create.html'
@@ -636,58 +634,59 @@ class PropertyCreateView(LoginRequiredMixin, View):
     def get_success_url(self):
         return reverse('leads:property_list')  # Redirect to property list after creation  # Redirect to property list after successful update
 
-# def add_property(request):
-#     if request.method == 'POST':
-#         title = request.POST.get('title')
-#         block = request.POST.get('block')
-#         project_name = request.POST.get('project_name')
-#         price = request.POST.get('price')
-#         # agent = request.POST.get('agent')
-#         # organisation = request.POST.get('organisation')
+def select_properties_view(request):
+    properties = Property.objects.all()  # Fetch all properties
 
-#         # Create and save the new Property
-#         new_property = Property(
-#             title=title,
-#             block=block,
-#             project_name=project_name,
-#             price=price,
-#             # agent=agent,
-#             # organisation=organisation
-#         )
-#         new_property.save()
-#         return HttpResponse("Property added successfully!")
+    if request.method == 'POST':
+        selected_ids = request.POST.getlist('properties')  # Get list of selected IDs
+        # Redirect to the update view with the selected IDs print
+        return redirect('leads:property-update', ids=','.join(selected_ids))  # Join IDs as a comma-separated string
 
-#     return render(request, 'property_list.html')  # Adjust to your template
+    return render(request, 'property/select_properties.html', {'properties': properties})
 
+# View to edit selected properties
+class PropertyUpdateView(View):
+    template_name = 'property/property_update.html'  # Update with your template 
 
-class PropertyUpdateView(LoginRequiredMixin, generic.UpdateView):
-    template_name = 'property/property_update.html'  # Update with your template path
-    form_class = PropertyModelForm
+    def get(self, request, ids):
+        property_ids = ids.split(',')  # Convert the comma-separated string back to a list
+        properties = Property.objects.filter(id__in=property_ids)  # Fetch selected properties
+        return render(request, self.template_name, {'properties': properties})
 
-    def get_queryset(self):
-        return Property.objects.filter(agent__user=self.request.user)
+    def post(self, request, ids):
+        property_ids = ids.split(',')  # Convert the comma-separated string back to a list
+        project_name = request.POST.get('project_name', '')
+        price = request.POST.get('price', '')
+        block = request.POST.get('block', '')
+        print(project_name)
+        print(block)
+        print(price)
+
+        for prop_id in property_ids:
+            property_instance = Property.objects.get(id=prop_id)
+            # Update the instance based on the form data (make sure to handle input correctly)
+            property_instance.project_name = project_name
+            property_instance.price = float(price)
+            property_instance.block = block 
+            property_instance.save()
+        return redirect(self.get_success_url())
+    
+    def get_success_url(self):
+        return reverse('leads:property_list')
+
+   
+class PropertyDeleteView(View):
+    def post(self, request, ids):
+        property_ids = ids.split(',')  # Convert the comma-separated string back to a list
+
+        for prop_id in property_ids:
+            property_instance = get_object_or_404(Property, id=prop_id)
+            property_instance.delete()  # Delete the property
+
+        return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('property_list')  # Redirect to property list after successful update
-
-    def form_valid(self, form):
-        form.save()
-        messages.info(self.request, "Property updated successfully.")
-        return super(PropertyUpdateView, self).form_valid(form)
-
-class PropertyDeleteView(LoginRequiredMixin, generic.DeleteView):
-    model = Property
-    template_name = 'property/property_delete.html'  # Update with your template path
-
-    def get_queryset(self):
-        return Property.objects.filter(agent__user=self.request.user)
-
-    def get_success_url(self):
-        return reverse('property_list')  # Redirect to property list after successful deletion
-
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, "Property deleted successfully.")
-        return super(PropertyDeleteView, self).delete(request, *args, **kwargs)
+        return reverse('leads:property_list')
 
 
 class SaleListView(ListView):

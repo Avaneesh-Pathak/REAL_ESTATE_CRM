@@ -5,9 +5,8 @@ from .views import (
     AssignAgentView, CategoryListView, CategoryDetailView, LeadCategoryUpdateView,
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
-    create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,
-    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,
-    add_promoter,update_delete_promoter,promoter_list,load_properties,plot_registration
+    create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
+    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,add_promoter,update_delete_promoter,promoter_list
 )
 
 app_name = "leads"
@@ -37,12 +36,17 @@ urlpatterns = [
     path('categories/<int:pk>/update/', CategoryUpdateView.as_view(), name='category-update'),
     path('categories/<int:pk>/delete/', CategoryDeleteView.as_view(), name='category-delete'),
     path('create-category/', CategoryCreateView.as_view(), name='category-create'),
+    #properties
+    path('properties/select/', select_properties_view, name='select_properties'),
     path('properties/', PropertyListView.as_view(), name='property_list'),
-    path('properties/create/', PropertyCreateView.as_view(), name='property_create'),
+    path('properties/create/', PropertyCreateView.as_view(), name='property-create'),
     path('properties/<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
-    path('properties/<int:pk>/update/', PropertyUpdateView.as_view(), name='property-update'),
-    path('properties/<int:pk>/delete/', PropertyDeleteView.as_view(), name='property-delete'),
- 
+    path('properties/update/<str:ids>/', PropertyUpdateView.as_view(), name='property-update'),
+    path('properties/delete/<str:ids>/', PropertyDeleteView.as_view(), name='delete_properties'),
+    # URL for creating a new project
+    path('create-project/', views.create_project_view, name='create_project'),
+    path('create-project/project/plot_status/', views.plot_status_view, name='plot_status'),
+    path('calculate-emi/', calculate_emi, name='calculate_emi'), 
     #DAYBOOK
     path('daybook/', daybook_list, name='daybook_list'),  # URL for listing expenses
     path('daybook/create/', daybook_create, name='daybook_create'),
