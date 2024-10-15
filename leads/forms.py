@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
-from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter
+from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter, Daybook,PlotBooking
 
 User = get_user_model()
 
@@ -189,3 +189,35 @@ class PromoterForm(forms.ModelForm):
             'id_card_number': forms.TextInput(attrs={'class': 'form-control'}),
             'joining_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+
+# PLOT REGISTRATION
+
+
+
+
+class PlotBookingForm(forms.ModelForm):
+    class Meta:
+        model = PlotBooking
+        fields = [
+            'booking_date', 'name', 'father_husband_name', 'gender', 'custom_gender', 'dob', 'mobile_no',
+            'address', 'bank_name', 'account_no', 'email', 'nominee_name', 'corner_plot_10', 'corner_plot_5',
+            'full_pay_discount', 'location', 'project_name', 'associate_detail', 'promoter', 'basic_price',
+            'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark'
+        ]
+    
+    # Custom initialization to include only the relevant promoters
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['promoter'].queryset = Promoter.objects.all()  # Fetch all promoters
+
+    def clean(self):
+        cleaned_data = super().clean()
+        gender = cleaned_data.get('gender')
+        custom_gender = cleaned_data.get('custom_gender')
+
+        # Check if custom gender is required
+        if gender == 'other' and not custom_gender:
+            self.add_error('custom_gender', 'Please specify your gender if "Other" is selected.')
+
+        return cleaned_data

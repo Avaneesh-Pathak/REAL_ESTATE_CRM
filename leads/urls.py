@@ -6,7 +6,8 @@ from .views import (
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,
-    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,add_promoter,update_delete_promoter,promoter_list
+    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,
+    add_promoter,update_delete_promoter,promoter_list,load_properties
 )
 
 app_name = "leads"
@@ -51,5 +52,8 @@ urlpatterns = [
     #PROMOTER
     path('promoters/', views.promoter_list, name='promoter_list'),
     path('promoter/<int:promoter_id>/update-delete/', views.update_delete_promoter, name='update_delete_promoter'),
-     path('promoter/add/', add_promoter, name='add_promoter'),  # URL for adding a promoter
+    path('promoter/add/', add_promoter, name='add_promoter'),  # URL for adding a promoter
+    path('register-plot/', views.plot_registration, name='plot_registration'),
+    path('buyers-list/', views.buyers_list, name='buyers_list'),
+    path('ajax/load-properties/', load_properties, name='ajax_load_properties'),
 ]

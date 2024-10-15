@@ -14,7 +14,7 @@ from leads.models import Category
 from agents.mixins import OrganisorAndLoginRequiredMixin
 from django.forms import modelformset_factory
 from django.db import models
-from .models import Lead, Agent, Category, FollowUp,Promoter
+from .models import Lead, Agent, Category, FollowUp,Promoter,PlotBooking
 from .forms import (
     LeadForm, 
     LeadModelForm, 
@@ -23,7 +23,7 @@ from .forms import (
     LeadCategoryUpdateForm,
     CategoryModelForm,
     FollowUpModelForm,SalaryForm,SaleForm,
-    PropertyModelForm,PromoterForm
+    PropertyModelForm,PromoterForm,PlotBookingForm
 )
 
 
@@ -895,3 +895,22 @@ def add_promoter(request):
         form = PromoterForm()
 
     return render(request, 'promoter/add_promoter.html', {'form': form})
+
+
+
+# PLOT REGISTRATIOn
+
+
+
+def plot_registration(request):
+    form = PlotBookingForm()
+    return render(request, 'plot_registration/plot_registration.html', {'form': form})
+
+def load_properties(request):
+    project_id = request.GET.get('project_name')
+    properties = Property.objects.filter(project_name_id=project_id).values('id', 'title')
+    return JsonResponse(list(properties), safe=False)
+
+def buyers_list(request):
+    buyers = PlotBooking.objects.all()  # Fetch all plot bookings
+    return render(request, 'plot_registration/buyers_list.html', {'buyers': buyers})

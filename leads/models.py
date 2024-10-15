@@ -214,3 +214,44 @@ class Promoter(models.Model):
 
     def __str__(self):
         return self.name
+    
+# PLOT BOOKING
+
+
+class PlotBooking(models.Model):
+    booking_date = models.DateField()
+    
+    # Personal Information
+    name = models.CharField(max_length=100)
+    father_husband_name = models.CharField(max_length=100, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')], null=True)
+    custom_gender = models.CharField(max_length=100, blank=True, null=True)  # If "Other" is selected
+    dob = models.DateField()
+    mobile_no = models.CharField(max_length=15)
+    address = models.TextField()
+    bank_name = models.CharField(max_length=100, blank=True, null=True)
+    account_no = models.CharField(max_length=50, blank=True, null=True)
+    email = models.EmailField()
+    nominee_name = models.CharField(max_length=100, blank=True, null=True)
+    
+    # PLC Charges
+    corner_plot_10 = models.BooleanField(default=False)  # 10% additional charge
+    corner_plot_5 = models.BooleanField(default=False)   # 5% additional charge
+    full_pay_discount = models.BooleanField(default=False)  # 5% discount for full payment
+
+    # Booking Details
+    location = models.CharField(max_length=255)
+    project_name = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='properties')  
+    associate_detail = models.BooleanField(default=False)
+    promoter = models.ForeignKey('Promoter', on_delete=models.SET_NULL, null=True, blank=True)
+    basic_price = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_type = models.CharField(max_length=50, choices=[('custom', 'Custom Payment'), ('installment', 'Installments')])
+    booking_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    # Payment Information
+    mode_of_payment = models.CharField(max_length=50, choices=[('cheque', 'Cheque'), ('rtgs', 'RTGS/NEFT'), ('cash', 'Cash')])
+    payment_date = models.DateField()
+    remark = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Plot Booking - {self.name} - {self.booking_date}"
