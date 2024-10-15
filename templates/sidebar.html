@@ -1,0 +1,60 @@
+<!-- sidebar.html -->
+{% load static %}
+
+<div class="relative">
+    <div id="sidebar" class="bg-gray-100 dark:bg-gray-700 w-64 h-screen fixed inset-y-0 left-0 transform -translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="p-4">
+            <h2 class="text-lg font-semibold mb-4">Dashboard</h2>
+            <ul class="space-y-2">
+                <li>
+                    <a href="{% url 'home' %}" class="block py-2 px-4 rounded hover:bg-blue-300 dark:hover:bg-blue-600">Home</a>
+                </li>
+                <li>
+                    <a href="{% url 'daybook' %}" class="block py-2 px-4 rounded hover:bg-blue-300 dark:hover:bg-blue-600">Daybook</a>
+                </li>
+                <li>
+                    <a href="{% url 'leads' %}" class="block py-2 px-4 rounded hover:bg-blue-300 dark:hover:bg-blue-600">Leads</a>
+                </li>
+                <li>
+                <a href="{% url 'create_project' %}" class="block py-2 px-4 rounded hover:bg-blue-300">Add Project</a>
+            </li>
+            <li>
+                <a href="{% url 'plot_status' %}" class="block py-2 px-4 rounded hover:bg-blue-300">Check Project Status</a>
+            </li>
+                <!-- Add more links as needed -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Overlay when sidebar is open -->
+    <div id="overlay" class="fixed inset-0 bg-black opacity-50 transition-opacity duration-300 ease-in-out hidden"></div>
+
+    <!-- Button to toggle sidebar -->
+    <button id="toggle-sidebar" class="absolute top-4 left-4 p-2 bg-blue-500 text-white rounded focus:outline-none">
+        Toggle Sidebar
+    </button>
+</div>
+
+<!-- Include this script at the end of the sidebar.html -->
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const toggleButton = document.getElementById('toggle-sidebar');
+
+    toggleButton.addEventListener('click', () => {
+        const isOpen = sidebar.classList.contains('-translate-x-full');
+
+        if (isOpen) {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+    });
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+    });
+</script>

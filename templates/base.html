@@ -88,10 +88,8 @@
             <a href="{% url 'leads:sale_list' %}">Sales</a>
             <a href="{% url 'leads:property_list' %}">Properties</a>
             <a href="{% url 'leads:salary_list' %}">Salary</a>
-            <a href="{% url 'leads:create_project' %}">Create Project</a>
-            <a href="{% url 'leads:plot_status' %}">Project Status</a>
             <a href="{% url 'leads:daybook_list' %}">Daybook</a>
-            <a href="{% url 'leads:calculate_emi' %}">Calculate EMI</a>
+            {% comment %} <a href="{% url 'leads:calculate_emi' %}">Calculate EMI</a> {% endcomment %}
             <a href="{% url 'leads:promoter_list' %}">Promoter List</a>
             <a href="{% url 'leads:add_promoter' %}">Add Promoter</a>
             <a href="{% url 'leads:plot_registration' %}">Register Plot</a>

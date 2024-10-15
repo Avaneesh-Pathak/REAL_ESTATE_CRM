@@ -112,27 +112,6 @@ class PropertyModelForm(forms.ModelForm):
 # PROJECT
 
 
-from .models import Project, Plot
-
-
-class ProjectForm(forms.Form):
-    name = forms.CharField(max_length=100, label="Project Name")
-    block_code = forms.CharField(max_length=10, label="Block Code")
-    start_plot = forms.IntegerField(label="Start Plot Number")
-    end_plot = forms.IntegerField(label="End Plot Number")
-
-
-
-    def save(self, project, commit=True):
-        block = super().save(commit=False)
-        block.project = project
-        if commit:
-            block.save()
-            # Create plots for this block
-            for plot_num in range(self.cleaned_data['from_plot'], self.cleaned_data['to_plot'] + 1):
-                Plot.objects.create(block=block, plot_number=plot_num)
-        return block
-
 # EMI
 
 class EmiCalculationForm(forms.Form):
@@ -192,9 +171,7 @@ class PromoterForm(forms.ModelForm):
 
 
 # PLOT REGISTRATION
-
-
-
+from decimal import Decimal
 
 class PlotBookingForm(forms.ModelForm):
     class Meta:
@@ -202,22 +179,50 @@ class PlotBookingForm(forms.ModelForm):
         fields = [
             'booking_date', 'name', 'father_husband_name', 'gender', 'custom_gender', 'dob', 'mobile_no',
             'address', 'bank_name', 'account_no', 'email', 'nominee_name', 'corner_plot_10', 'corner_plot_5',
-            'full_pay_discount', 'location', 'project_name', 'associate_detail', 'promoter', 'basic_price',
-            'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark'
+            'full_pay_discount', 'location', 'project', 'associate_detail', 'promoter', 'basic_price',
+            'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark','emi_tenure', 'interest_rate'
         ]
-    
-    # Custom initialization to include only the relevant promoters
+        widgets = {
+            'booking_date': forms.DateInput(attrs={'type': 'date'}),
+            'dob': forms.DateInput(attrs={'type': 'date'}),
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['promoter'].queryset = Promoter.objects.all()  # Fetch all promoters
+        self.fields['promoter'].queryset = Promoter.objects.all()
+        self.fields['project'].queryset = Property.objects.all()
 
+        # Ensure only one of the corner plot or full pay options can be selected
+        for field in ['corner_plot_10', 'corner_plot_5', 'full_pay_discount']:
+            self.fields[field].widget.attrs.update({'onclick': 'limitSelection(this)'})
+
+    # Adding clean method to validate and calculate EMI
     def clean(self):
         cleaned_data = super().clean()
-        gender = cleaned_data.get('gender')
-        custom_gender = cleaned_data.get('custom_gender')
+        basic_price = cleaned_data.get('basic_price', 0)
+        booking_amount = cleaned_data.get('booking_amount', 0)
+        corner_plot_10 = cleaned_data.get('corner_plot_10')
+        corner_plot_5 = cleaned_data.get('corner_plot_5')
+        full_pay_discount = cleaned_data.get('full_pay_discount')
 
-        # Check if custom gender is required
-        if gender == 'other' and not custom_gender:
-            self.add_error('custom_gender', 'Please specify your gender if "Other" is selected.')
+        # Apply percentage-based increases or discount on basic price
+        if corner_plot_10:
+            basic_price *= Decimal('1.10') # 10% increase
+        elif corner_plot_5:
+            basic_price *= 1.05  # 5% increase
+        elif full_pay_discount:
+            basic_price *= 0.95  # 5% discount
+
+        # EMI Calculation if installment is selected
+        payment_type = cleaned_data.get('payment_type')
+        if payment_type == 'installment':
+            emi_tenure = cleaned_data.get('emi_tenure')
+            interest_rate = cleaned_data.get('interest_rate')
+
+            remaining_amount = basic_price - booking_amount
+            if remaining_amount > 0 and emi_tenure and interest_rate:
+                monthly_interest_rate = interest_rate / 100 / 12
+                emi_amount = remaining_amount * (monthly_interest_rate * (1 + monthly_interest_rate) ** emi_tenure) / ((1 + monthly_interest_rate) ** emi_tenure - 1)
+                cleaned_data['emi_amount'] = emi_amount  # Save calculated EMI
 
         return cleaned_data

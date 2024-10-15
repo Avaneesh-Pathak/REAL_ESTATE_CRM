@@ -7,7 +7,7 @@ from .views import (
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,
     PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,
-    add_promoter,update_delete_promoter,promoter_list,load_properties
+    add_promoter,update_delete_promoter,promoter_list,load_properties,plot_registration
 )
 
 app_name = "leads"
@@ -42,10 +42,7 @@ urlpatterns = [
     path('properties/<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
     path('properties/<int:pk>/update/', PropertyUpdateView.as_view(), name='property-update'),
     path('properties/<int:pk>/delete/', PropertyDeleteView.as_view(), name='property-delete'),
-    # URL for creating a new project
-    path('create-project/', views.create_project_view, name='create_project'),
-    path('create-project/project/plot_status/', views.plot_status_view, name='plot_status'),
-    path('calculate-emi/', calculate_emi, name='calculate_emi'), 
+ 
     #DAYBOOK
     path('daybook/', daybook_list, name='daybook_list'),  # URL for listing expenses
     path('daybook/create/', daybook_create, name='daybook_create'),
@@ -54,6 +51,7 @@ urlpatterns = [
     path('promoter/<int:promoter_id>/update-delete/', views.update_delete_promoter, name='update_delete_promoter'),
     path('promoter/add/', add_promoter, name='add_promoter'),  # URL for adding a promoter
     path('register-plot/', views.plot_registration, name='plot_registration'),
-    path('buyers-list/', views.buyers_list, name='buyers_list'),
+    path('register/plot_registration/buyers_list/', views.buyers_list, name='buyers_list'), 
     path('ajax/load-properties/', load_properties, name='ajax_load_properties'),
+    path('register/', plot_registration, name='plot_registration'),
 ]

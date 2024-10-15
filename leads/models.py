@@ -143,8 +143,8 @@ class Property(models.Model):
             self.__class__.objects.filter(pk=self.pk).update(title=self.title)
 
 
-class Project_Name(models.Model):
-    project_code= models.OneToOneField(User, on_delete=models.CASCADE)
+# class Project_Name(models.Model):
+#     project_code= models.OneToOneField(User, on_delete=models.CASCADE)
 
 
 
@@ -159,24 +159,6 @@ class Bonus(models.Model):
 
 # PROJECT
 
-
-class Project(models.Model):
-    name = models.CharField(max_length=100)
-    block_code = models.CharField(max_length=10,default='NA')
-
-    def __str__(self):
-        return self.name
-
-class Plot(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
-    plot_no = models.CharField(max_length=10,default=0)
-    status = models.CharField(max_length=10, choices=[('Available', 'Available'), ('Booked', 'Booked'), ('Hold', 'Hold'), ('Sold Out', 'Sold Out')], default='Available')
-    buyer_name = models.CharField(max_length=100, null=True, blank=True)
-    booking_date = models.DateField(null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.project.name} - {self.plot_no}"
-    
 
 # EMI
 from django.db import models
@@ -236,15 +218,12 @@ class Promoter(models.Model):
     
 # PLOT BOOKING
 
-
 class PlotBooking(models.Model):
     booking_date = models.DateField()
-    
-    # Personal Information
     name = models.CharField(max_length=100)
     father_husband_name = models.CharField(max_length=100, blank=True, null=True)
     gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')], null=True)
-    custom_gender = models.CharField(max_length=100, blank=True, null=True)  # If "Other" is selected
+    custom_gender = models.CharField(max_length=100, blank=True, null=True)
     dob = models.DateField()
     mobile_no = models.CharField(max_length=15)
     address = models.TextField()
@@ -252,24 +231,22 @@ class PlotBooking(models.Model):
     account_no = models.CharField(max_length=50, blank=True, null=True)
     email = models.EmailField()
     nominee_name = models.CharField(max_length=100, blank=True, null=True)
-    
     # PLC Charges
-    corner_plot_10 = models.BooleanField(default=False)  # 10% additional charge
-    corner_plot_5 = models.BooleanField(default=False)   # 5% additional charge
-    full_pay_discount = models.BooleanField(default=False)  # 5% discount for full payment
-
-    # Booking Details
+    corner_plot_10 = models.BooleanField(default=False)
+    corner_plot_5 = models.BooleanField(default=False)
+    full_pay_discount = models.BooleanField(default=False)
     location = models.CharField(max_length=255)
-    project_name = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='properties')  
+    project = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='project', null=True, blank=True)
     associate_detail = models.BooleanField(default=False)
-    promoter = models.ForeignKey('Promoter', on_delete=models.SET_NULL, null=True, blank=True)
+    promoter = models.ForeignKey(Promoter, on_delete=models.SET_NULL, null=True, blank=True)
     basic_price = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=50, choices=[('custom', 'Custom Payment'), ('installment', 'Installments')])
     booking_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    
-    # Payment Information
     mode_of_payment = models.CharField(max_length=50, choices=[('cheque', 'Cheque'), ('rtgs', 'RTGS/NEFT'), ('cash', 'Cash')])
     payment_date = models.DateField()
+    emi_tenure = models.IntegerField(blank=True, null=True)  # EMI tenure in months
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # Interest rate as a percentage
+    emi_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)  # Calculated EMI amount
     remark = models.TextField(blank=True, null=True)
 
     def __str__(self):

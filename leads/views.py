@@ -707,56 +707,6 @@ class BonusInfoView(ListView):
 
 
 
-# Project
-from django.shortcuts import render
-from .models import Plot
-
-def plot_status_view(request):
-    projects = Project.objects.all()  # Fetch all project names
-    project_name = request.GET.get('project_name', None)
-    block_code = request.GET.get('block_code', 'All')
-    
-    plots = Plot.objects.none()  # Initialize with no plots
-    if project_name:
-        plots = Plot.objects.filter(project__name=project_name)
-        if block_code != 'All':
-            plots = plots.filter(project__block_code=block_code)
-
-    return render(request, 'project\plot_status.html', {
-        'projects': projects, 
-        'plots': plots,
-        'selected_project': project_name,
-        'block_code': block_code
-    })
-from django.shortcuts import render, redirect
-from .forms import ProjectForm
-from .models import Project, Plot
-
-def create_project_view(request):
-    if request.method == 'POST':
-        form = ProjectForm(request.POST)
-        if form.is_valid():
-            # Create the project
-            project_name = form.cleaned_data['name']
-            block_code = form.cleaned_data['block_code']
-            start_plot = form.cleaned_data['start_plot']
-            end_plot = form.cleaned_data['end_plot']
-
-            # Save the project
-            project = Project.objects.create(name=project_name, block_code=block_code)
-
-            # Create plots for the project
-            for plot_no in range(start_plot, end_plot + 1):
-                Plot.objects.create(project=project, plot_no=f"{block_code}-{plot_no}")
-
-            return redirect('project/plot_status')  # Redirect to project status page after creation
-    else:
-        form = ProjectForm()
-
-    return render(request, 'project/create_project.html', {'form': form})
-
-
-
 
 # EMI
 from decimal import Decimal, InvalidOperation, getcontext
@@ -903,16 +853,21 @@ def add_promoter(request):
 # PLOT REGISTRATIOn
 
 
-
 def plot_registration(request):
-    form = PlotBookingForm()
+    form = PlotBookingForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            return redirect('plot_registration/buyers_list')
+        else:
+            print(form.errors)
     return render(request, 'plot_registration/plot_registration.html', {'form': form})
 
 def load_properties(request):
-    project_id = request.GET.get('project_name')
-    properties = Property.objects.filter(project_name_id=project_id).values('id', 'title')
+    project_name = request.GET.get('project_name')
+    properties = Property.objects.filter(project_name_id=project_name).values('id', 'title')
     return JsonResponse(list(properties), safe=False)
 
 def buyers_list(request):
-    buyers = PlotBooking.objects.all()  # Fetch all plot bookings
+    buyers = PlotBooking.objects.all()
     return render(request, 'plot_registration/buyers_list.html', {'buyers': buyers})

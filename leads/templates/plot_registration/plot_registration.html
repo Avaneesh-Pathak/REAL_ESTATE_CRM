@@ -1,267 +1,237 @@
-<!-- plot_registration.html -->
 {% extends 'base.html' %}
 
-{% load static %}
-
 {% block content %}
-<div class="container mx-auto mt-8">
-    <h1 class="text-2xl font-bold mb-4">Plot Registration Form</h1>
-    <form method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+<div class="container mt-5 mb-5">
+    <h2 class="text-center">Plot Registration</h2>
+    
+    <form method="POST" class="form-horizontal p-4 border rounded shadow-sm bg-light">
         {% csrf_token %}
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="booking_date">
-                Booking Date
-            </label>
-            <input type="date" name="booking_date" id="booking_date" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <h2 class="text-xl font-semibold mb-2">Personal Information</h2>
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
-                Name <span class="text-red-500">*</span>
-            </label>
-            <input type="text" name="name" id="name" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="father_husband_name">
-                Father/Husband Name
-            </label>
-            <input type="text" name="father_husband_name" id="father_husband_name"
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Gender <span class="text-red-500">*</span></label>
-            <div>
-                <label class="inline-flex items-center">
-                    <input type="radio" name="gender" value="male" class="form-radio" required>
-                    <span class="ml-2">Male</span>
-                </label>
-                <label class="inline-flex items-center ml-6">
-                    <input type="radio" name="gender" value="female" class="form-radio">
-                    <span class="ml-2">Female</span>
-                </label>
-                <label class="inline-flex items-center ml-6">
-                    <input type="radio" name="gender" value="other" class="form-radio" id="other_gender">
-                    <span class="ml-2">Other</span>
-                </label>
-                <input type="text" id="other_gender_input" name="other_gender" placeholder="Please specify"
-                    class="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hidden">
+        
+        <!-- Booking Date -->
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.booking_date.label }}</label>
+            <div class="col-sm-10">
+                {{ form.booking_date }}
             </div>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="date_of_birth">
-                Date of Birth <span class="text-red-500">*</span>
-            </label>
-            <input type="date" name="date_of_birth" id="date_of_birth" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <!-- Personal Information -->
+        <h4 class="mt-4">Personal Information</h4>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.name.label }}</label>
+            <div class="col-sm-10">
+                {{ form.name }}
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="mobile_no">
-                Mobile No. <span class="text-red-500">*</span>
-            </label>
-            <input type="text" name="mobile_no" id="mobile_no" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.father_husband_name.label }}</label>
+            <div class="col-sm-10">
+                {{ form.father_husband_name }}
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="address">
-                Address <span class="text-red-500">*</span>
-            </label>
-            <textarea name="address" id="address" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.gender.label }}</label>
+            <div class="col-sm-10">
+                {{ form.gender }}
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="bank_detail">
-                Bank Detail (Name and Account Number) <span class="text-red-500">*</span>
-            </label>
-            <input type="text" name="bank_detail" id="bank_detail" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <div class="form-group row" id="custom-gender-field" style="display:none;">
+            <label class="col-sm-2 col-form-label">{{ form.custom_gender.label }}</label>
+            <div class="col-sm-10">
+                {{ form.custom_gender }}
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
-                Email <span class="text-red-500">*</span>
-            </label>
-            <input type="email" name="email" id="email" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.dob.label }}</label>
+            <div class="col-sm-10">
+                {{ form.dob }}
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="nominee_name">
-                Nominee Name
-            </label>
-            <input type="text" name="nominee_name" id="nominee_name"
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.mobile_no.label }}</label>
+            <div class="col-sm-10">
+                {{ form.mobile_no }}
+            </div>
         </div>
-
-        <h2 class="text-xl font-semibold mb-2">Booking Details</h2>
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="location_applied_for">
-                Location Applied For <span class="text-red-500">*</span>
-            </label>
-            <input type="text" name="location_applied_for" id="location_applied_for" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.address.label }}</label>
+            <div class="col-sm-10">
+                {{ form.address }}
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="project_name">
-                Project Name <span class="text-red-500">*</span>
-            </label>
-            <select name="project_name" id="project_name" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                <option value="">Select Project</option>
-                {% for project in projects %}
-                <option value="{{ property.project_name }}">{{ project }}</option>
-                {% endfor %}
-            </select>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.bank_name.label }}</label>
+            <div class="col-sm-10">
+                {{ form.bank_name }}
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Associate Detail</label>
-            <div>
-                <label class="inline-flex items-center">
-                    <input type="radio" name="associate_detail" value="yes" class="form-radio" id="associate_yes">
-                    <span class="ml-2">YES (Listed Associates)</span>
-                </label>
-                <label class="inline-flex items-center ml-6">
-                    <input type="radio" name="associate_detail" value="no" class="form-radio" id="associate_no" checked>
-                    <span class="ml-2">NO</span>
-                </label>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.account_no.label }}</label>
+            <div class="col-sm-10">
+                {{ form.account_no }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.email.label }}</label>
+            <div class="col-sm-10">
+                {{ form.email }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.nominee_name.label }}</label>
+            <div class="col-sm-10">
+                {{ form.nominee_name }}
             </div>
         </div>
 
-        <div id="promoter_selection" class="hidden mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="promoter">
-                Select Promoter <span class="text-red-500">*</span>
-            </label>
-            <select name="promoter" id="promoter" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                <option value="">Select Promoter</option>
-                {% for promoter in promoters %}
-                <option value="{{ promoter.id }}">{{ promoter.name }}</option>
-                {% endfor %}
-            </select>
+        <!-- PLC Charges -->
+        <h4 class="mt-4">PLC Charges</h4>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.corner_plot_10.label }}</label>
+            <div class="col-sm-10">
+                {{ form.corner_plot_10 }}
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="basic_price">
-                Basic Price (Per Square Foot) <span class="text-red-500">*</span>
-            </label>
-            <input type="number" name="basic_price" id="basic_price" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.corner_plot_5.label }}</label>
+            <div class="col-sm-10">
+                {{ form.corner_plot_5 }}
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Payment Type <span class="text-red-500">*</span></label>
-            <div>
-                <label class="inline-flex items-center">
-                    <input type="radio" name="payment_type" value="installment" class="form-radio" required>
-                    <span class="ml-2">Installment</span>
-                </label>
-                <label class="inline-flex items-center ml-6">
-                    <input type="radio" name="payment_type" value="custom" class="form-radio">
-                    <span class="ml-2">Custom Payment</span>
-                </label>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.full_pay_discount.label }}</label>
+            <div class="col-sm-10">
+                {{ form.full_pay_discount }}
             </div>
         </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="booking_amount">
-                Booking Amount <span class="text-red-500">*</span>
-            </label>
-            <input type="number" name="booking_amount" id="booking_amount" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Mode of Payment <span class="text-red-500">*</span></label>
-            <select name="mode_of_payment" id="mode_of_payment" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                <option value="">Select Mode</option>
-                <option value="cheque">Cheque</option>
-                <option value="RTGS/NEFT">RTGS/NEFT</option>
-                <option value="cash">Cash</option>
-            </select>
-        </div>
-
-        <div id="emi_calculator" class="hidden mb-4">
-            <h2 class="text-xl font-semibold mb-2">EMI Calculator</h2>
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="down_payment">
-                    Down Payment <span class="text-red-500">*</span>
-                </label>
-                <input type="number" name="down_payment" id="down_payment" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <!-- Booking Details -->
+        <h4 class="mt-4">Booking Details</h4>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.location.label }}</label>
+            <div class="col-sm-10">
+                {{ form.location }}
             </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="interest_rate">
-                    Interest Rate (%) <span class="text-red-500">*</span>
-                </label>
-                <input type="number" name="interest_rate" id="interest_rate" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.project.label }}</label>
+            <div class="col-sm-10">
+                {{ form.project }}
             </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="tenure">
-                    Tenure (Months) <span class="text-red-500">*</span>
-                </label>
-                <input type="number" name="tenure" id="tenure" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.associate_detail.label }}</label>
+            <div class="col-sm-10">
+                {{ form.associate_detail }}
+            </div>
+        </div>
+        <div class="form-group row" id="promoter-field" style="display:none;">
+            <label class="col-sm-2 col-form-label">{{ form.promoter.label }}</label>
+            <div class="col-sm-10">
+                {{ form.promoter }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.basic_price.label }}</label>
+            <div class="col-sm-10">
+                {{ form.basic_price }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.payment_type.label }}</label>
+            <div class="col-sm-10">
+                {{ form.payment_type }}
             </div>
         </div>
 
-        <div class="flex items-center justify-between">
-            <button type="submit"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Register Plot
-            </button>
+        <!-- EMI Options -->
+        <div id="emi-options" style="display:none;">
+            <h4 class="mt-4">EMI Details</h4>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">{{ form.emi_tenure.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.emi_tenure }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">{{ form.interest_rate.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.interest_rate }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Calculated EMI:</label>
+                <div class="col-sm-10">
+                    <input type="text" id="calculated-emi" readonly class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <h4 class="mt-4">Payment Information</h4>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.booking_amount.label }}</label>
+            <div class="col-sm-10">
+                {{ form.booking_amount }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.mode_of_payment.label }}</label>
+            <div class="col-sm-10">
+                {{ form.mode_of_payment }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.payment_date.label }}</label>
+            <div class="col-sm-10">
+                {{ form.payment_date }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.remark.label }}</label>
+            <div class="col-sm-10">
+                {{ form.remark }}
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-group text-center mt-4">
+            <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
 </div>
 
+<!-- JavaScript -->
 <script>
-    // Show/hide custom gender input
-    document.getElementById('other_gender').addEventListener('change', function () {
-        document.getElementById('other_gender_input').classList.toggle('hidden', !this.checked);
+    // Show custom gender field if 'Other' is selected
+    document.getElementById("id_gender").addEventListener("change", function() {
+        const customGenderField = document.getElementById("custom-gender-field");
+        customGenderField.style.display = this.value === "other" ? "block" : "none";
     });
 
-    // Show/hide EMI calculator
-    const paymentTypeRadios = document.querySelectorAll('input[name="payment_type"]');
-    const emiCalculator = document.getElementById('emi_calculator');
-
-    paymentTypeRadios.forEach(radio => {
-        radio.addEventListener('change', function () {
-            if (this.value === 'installment') {
-                emiCalculator.classList.remove('hidden');
-            } else {
-                emiCalculator.classList.add('hidden');
-            }
-        });
+    // Show promoter field if 'Associate Detail' is checked
+    document.getElementById("id_associate_detail").addEventListener("change", function() {
+        const promoterField = document.getElementById("promoter-field");
+        promoterField.style.display = this.checked ? "block" : "none";
     });
 
-    // Show/hide promoter selection based on associate detail
-    const associateYesRadio = document.getElementById('associate_yes');
-    const associateNoRadio = document.getElementById('associate_no');
-    const promoterSelection = document.getElementById('promoter_selection');
-
-    associateYesRadio.addEventListener('change', function () {
-        if (this.checked) {
-            promoterSelection.classList.remove('hidden');
-        }
+    // Show EMI options if 'Installment' is selected for payment type
+    document.getElementById("id_payment_type").addEventListener("change", function() {
+        const emiOptions = document.getElementById("emi-options");
+        emiOptions.style.display = this.value === "installment" ? "block" : "none";
     });
 
-    associateNoRadio.addEventListener('change', function () {
-        if (this.checked) {
-            promoterSelection.classList.add('hidden');
-        }
-    });
+    // Calculate EMI dynamically
+    function calculateEMI() {
+        const bookingAmount = parseFloat(document.getElementById("id_booking_amount").value);
+        const emiTenure = parseInt(document.getElementById("id_emi_tenure").value);
+        const interestRate = parseFloat(document.getElementById("id_interest_rate").value);
+        const emi = (bookingAmount * interestRate / 100 * Math.pow((1 + interestRate / 100), emiTenure)) / (Math.pow((1 + interestRate / 100), emiTenure) - 1);
+        document.getElementById("calculated-emi").value = emi.toFixed(2);
+    }
+
+    document.getElementById("id_emi_tenure").addEventListener("input", calculateEMI);
+    document.getElementById("id_interest_rate").addEventListener("input", calculateEMI);
 </script>
+
 {% endblock %}

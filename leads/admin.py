@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (User, Lead, Agent, UserProfile, Category, FollowUp, Salary, Sale,
-                     Property, Bonus, Project, Plot, EmiPlan, Daybook, Promoter)
+                     Property, Bonus, EmiPlan, Daybook, Promoter)
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -22,20 +22,6 @@ class BonusAdmin(admin.ModelAdmin):
     list_display = ['agent', 'bonus_amount', 'date_awarded']
     search_fields = ['agent__username']
     list_filter = ['date_awarded']
-
-
-# Admin class for Project model
-class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['name', 'block_code']
-    search_fields = ['name']
-
-
-# Admin class for Plot model
-class PlotAdmin(admin.ModelAdmin):
-    list_display = ['project', 'plot_no', 'status', 'buyer_name', 'booking_date']
-    list_filter = ['status', 'booking_date', 'project']
-    search_fields = ['buyer_name', 'plot_no']
-
 
 # Admin class for EmiPlan model
 class EmiPlanAdmin(admin.ModelAdmin):
@@ -68,8 +54,6 @@ admin.site.register(Agent)
 admin.site.register(FollowUp)
 admin.site.register(Property, PropertyAdmin)
 admin.site.register(Bonus, BonusAdmin)
-admin.site.register(Project, ProjectAdmin)
-admin.site.register(Plot, PlotAdmin)
 admin.site.register(EmiPlan, EmiPlanAdmin)
 admin.site.register(Daybook, DaybookAdmin)
 admin.site.register(Promoter, PromoterAdmin)
