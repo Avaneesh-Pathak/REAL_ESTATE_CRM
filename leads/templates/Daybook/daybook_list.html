@@ -1,0 +1,40 @@
+{% extends 'base.html' %}  <!-- Adjust to your base template if different -->
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-8">
+    <h2 class="text-3xl font-semibold mb-4">Daily Expenses</h2>
+    <p class="text-lg text-gray-600 mb-6">Current Balance: <span class="font-bold text-green-600">{{ total_balance }}</span></p>
+
+    <!-- Button to add a new expense -->
+    <a href="{% url 'leads:daybook_create' %}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 mb-4">
+        Add New Expense
+    </a>
+
+    <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+        <thead>
+            <tr class="bg-gray-200 text-gray-700">
+                <th class="py-3 px-4 text-left text-sm font-medium">Date</th>
+                <th class="py-3 px-4 text-left text-sm font-medium">Activity</th>
+                <th class="py-3 px-4 text-left text-sm font-medium">Amount</th>
+                <th class="py-3 px-4 text-left text-sm font-medium">Remark</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr class="hover:bg-gray-100 transition duration-300">
+                <td class="py-2 px-4 border-b border-gray-200 text-sm">{{ expense.date }}</td>
+                <td class="py-2 px-4 border-b border-gray-200 text-sm">
+                    {{ expense.activity }} {% if expense.custom_activity %} ({{ expense.custom_activity }}) {% endif %}
+                </td>
+                <td class="py-2 px-4 border-b border-gray-200 text-sm">{{ expense.amount }}</td>
+                <td class="py-2 px-4 border-b border-gray-200 text-sm">{{ expense.remark }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="py-2 px-4 text-center text-gray-500">No expenses recorded.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

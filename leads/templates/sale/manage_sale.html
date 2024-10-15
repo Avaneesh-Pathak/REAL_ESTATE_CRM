@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center text-primary">
+        {% if sale %}Update Sale{% else %}Create Sale{% endif %}
+    </h1>
+
+    <form method="POST" class="bg-light p-4 rounded shadow">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg">Save</button>
+            
+            {% if sale %}
+                <div class="mt-4"> <!-- Add margin top for spacing -->
+                    <button type="submit" name="delete" class="btn btn-danger btn-lg">Delete Sale</button>  <!-- Delete button -->
+                </div>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="text-center mt-4">
+        {% if sale %}
+            <a href="{% url 'leads:sale_list' %}" class="btn btn-secondary">Cancel</a>  <!-- Link back to sale list -->
+        {% else %}
+            <a href="{% url 'leads:sale_list' %}" class="btn btn-secondary">Back to Sale List</a>  <!-- Link back to sale list -->
+        {% endif %}
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    body {
+        background-color: #f8f9fa;  /* Light background for contrast */
+    }
+    h1 {
+        font-weight: 300;
+    }
+    .btn {
+        min-width: 120px; /* Ensures buttons are a uniform size */
+    }
+</style>
+
+{% endblock %}

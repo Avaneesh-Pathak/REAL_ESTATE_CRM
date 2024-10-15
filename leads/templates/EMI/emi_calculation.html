@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Calculation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f9fafb; /* Light background */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">EMI Calculator</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="total_amount" class="block text-sm font-medium text-gray-700">Total Amount:</label>
+                <input type="number" name="total_amount" step="0.001" required placeholder="Enter total amount" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" 
+                />
+            </div>
+            <div class="mb-4">
+                <label for="down_payment" class="block text-sm font-medium text-gray-700">Down Payment:</label>
+                <input type="number" name="down_payment" step="0.001" required placeholder="Enter down payment" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" 
+                />
+            </div>
+            <div class="mb-4">
+                <label for="interest_rate" class="block text-sm font-medium text-gray-700">Interest Rate (%):</label>
+                <input type="number" name="interest_rate" step="0.001" required placeholder="Enter interest rate" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" 
+                />
+            </div>
+            <div class="mb-4">
+                <label for="tenure" class="block text-sm font-medium text-gray-700">Select Tenure:</label>
+            
+                    <select name="tenure" id="tenure" required 
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300">
+                        <option value="3">3 Months</option>
+                        <option value="6">6 Months</option>
+                        <option value="9">9 Months</option>
+                        <option value="12">1 Year</option>
+                        <option value="18">1.5 Years</option>
+                        <option value="24">2 Years</option>
+                        <option value="36">3 Years</option>
+                        <option value="48">4 Years</option>
+                        <option value="60">5 Years</option>
+                        <option value="other">Other (Enter months)</option>
+                    </select>
+                <input type="number" name="custom_tenure" placeholder="Enter months" style="display:none;" min="1" step="1" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300" 
+                />
+            </div>
+            <div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-md">Calculate EMI</button>
+            </div>
+        </form>
+
+        {% if emi %}
+            <h2 class="mt-6 text-xl font-semibold text-gray-800 text-center">Calculated EMI: <span class="text-blue-600">{{ emi }}</span></h2>
+        {% endif %}
+        {% if error_message %}
+            <p class="mt-4 text-red-600 text-center">{{ error_message }}</p>
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById('tenure').addEventListener('change', function () {
+            var customTenureInput = document.querySelector('input[name="custom_tenure"]');
+            if (this.value === 'other') {
+                customTenureInput.style.display = 'block';
+            } else {
+                customTenureInput.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

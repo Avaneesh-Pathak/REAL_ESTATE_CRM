@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load tailwind_filters %}
+
+{% block content %}
+<h2 class="text-2xl font-bold">Delete Property</h2>
+<p class="mt-5">Are you sure you want to delete {{ property.name }}?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="mt-5 btn btn-danger">Delete</button>
+</form>
+<a href="{% url 'property_list' %}" class="mt-5 btn btn-secondary">Cancel</a>
+{% endblock content %}

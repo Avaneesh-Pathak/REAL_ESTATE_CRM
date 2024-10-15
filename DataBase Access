@@ -1,0 +1,17 @@
+psql -U postgres
+
+-- Change the password for crm_u
+ALTER USER crm_u WITH PASSWORD 'your_new_password';
+
+-- Grant privileges to crm_u on a specific database
+GRANT ALL PRIVILEGES ON DATABASE your_database_name TO crm_u;
+
+-- Create a new database
+CREATE DATABASE my_new_database;
+
+-- Connect to the newly created database
+\c my_new_database;
+
+-- List tables in the database
+\dt;
+
