@@ -618,15 +618,17 @@ class PropertyCreateView(LoginRequiredMixin, View):
     def post(self, request):
         # Get the number of properties to create and common attributes
         num_properties = int(request.POST.get('num_properties', 1))
-        property_name = request.POST.get('property_name', '')
+        price = request.POST.get('price', '')
+        project_name = request.POST.get('project_name', '')
+        
+        block = request.POST.get('block', '')
 
         # Create the properties in the database
         for _ in range(num_properties):
             Property.objects.create(
-                title=property_name,
-                description=100,  # Example size, modify as needed
-                address='Default Location',  # Example location, modify as needed
-                price=100000.00  # Example price, modify as needed
+                project_name=project_name,
+                block=block,  # Example size, modify as needed
+                price=price  # Example price, modify as needed
             )
 
         return redirect(self.get_success_url())
@@ -634,28 +636,28 @@ class PropertyCreateView(LoginRequiredMixin, View):
     def get_success_url(self):
         return reverse('leads:property_list')  # Redirect to property list after creation  # Redirect to property list after successful update
 
-def add_property(request):
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        desc = request.POST.get('desc')
-        address = request.POST.get('address')
-        price = request.POST.get('price')
-        # agent = request.POST.get('agent')
-        # organisation = request.POST.get('organisation')
+# def add_property(request):
+#     if request.method == 'POST':
+#         title = request.POST.get('title')
+#         block = request.POST.get('block')
+#         project_name = request.POST.get('project_name')
+#         price = request.POST.get('price')
+#         # agent = request.POST.get('agent')
+#         # organisation = request.POST.get('organisation')
 
-        # Create and save the new Property
-        new_property = Property(
-            title=title,
-            description=desc,
-            address=address,
-            price=price,
-            # agent=agent,
-            # organisation=organisation
-        )
-        new_property.save()
-        return HttpResponse("Property added successfully!")
+#         # Create and save the new Property
+#         new_property = Property(
+#             title=title,
+#             block=block,
+#             project_name=project_name,
+#             price=price,
+#             # agent=agent,
+#             # organisation=organisation
+#         )
+#         new_property.save()
+#         return HttpResponse("Property added successfully!")
 
-    return render(request, 'property_list.html')  # Adjust to your template
+#     return render(request, 'property_list.html')  # Adjust to your template
 
 
 class PropertyUpdateView(LoginRequiredMixin, generic.UpdateView):
