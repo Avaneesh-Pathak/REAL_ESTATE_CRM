@@ -113,17 +113,36 @@ class Property(models.Model):
     # block_code = models.CharField(max_length=1)
     # from_plot=models.IntegerField
     # to_plot=models.IntegerField
-    title = models.CharField(max_length=255,default='Untitled Property')
+    id = models.AutoField(primary_key=True) 
     project_name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     block = models.TextField(null=True, blank=True)
     agent = models.ForeignKey(Agent, null=True, blank=True, on_delete=models.SET_NULL)
     # Add any other fields necessary for the property model
     organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
+    title = models.CharField(max_length=7)
 
     def __str__(self):
         return self.title
     
+    def create_composite_key(self):
+        letters = "PRP"  # Ensure uppercase
+        # Format the number to be 3 digits
+        formatted_number = f"{self.id:03}"  # Pads with zeros if necessary
+        # Construct the composite key
+        composite_key = f"{letters}-{formatted_number}"
+        return composite_key
+
+    def save(self, *args, **kwargs):
+        # Call the original save method
+        super().save(*args, **kwargs)
+
+        if not self.title:
+            self.title = self.create_composite_key()
+            # Update the instance in the database without calling save() again
+            self.__class__.objects.filter(pk=self.pk).update(title=self.title)
+
+
 class Project_Name(models.Model):
     project_code= models.OneToOneField(User, on_delete=models.CASCADE)
 
