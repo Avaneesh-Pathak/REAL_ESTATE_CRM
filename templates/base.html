@@ -8,11 +8,18 @@
     <title>DJCRM</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link id="theme-style" rel="stylesheet" href="{% static 'CSS/styles.css' %}"> <!-- Main CSS -->
     <style>
         /* General styles */
         body {
             background-color: #ffffff;
             color: #000000;
+        }
+
+        /* Night mode styles */
+        body.night-mode {
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* Light text */
         }
 
         /* Sidebar styles */
@@ -55,6 +62,20 @@
             text-align: right; /* Align to the right */
         }
 
+        /* Night mode toggle button */
+        #toggle-theme {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 24px; /* Adjust icon size */
+            margin: 10px; /* Add some margin */
+        }
+
+        .theme-icon {
+            display: inline-block;
+            transition: transform 0.3s; /* Smooth icon change */
+        }
+
         /* Alert styles */
         .alert-messages {
             margin: 20px 0; /* Add margin to alert messages */
@@ -89,13 +110,17 @@
             <a href="{% url 'leads:property_list' %}">Properties</a>
             <a href="{% url 'leads:salary_list' %}">Salary</a>
             <a href="{% url 'leads:daybook_list' %}">Daybook</a>
-            {% comment %} <a href="{% url 'leads:calculate_emi' %}">Calculate EMI</a> {% endcomment %}
             <a href="{% url 'leads:promoter_list' %}">Promoter List</a>
             <a href="{% url 'leads:add_promoter' %}">Add Promoter</a>
             <a href="{% url 'leads:plot_registration' %}">Register Plot</a>
             <a href="{% url 'leads:buyers_list' %}">Buyers List</a>
             <!-- Add more links as needed -->
         </div>
+
+        <!-- Night Mode Toggle Button -->
+        <button id="toggle-theme" class="btn btn-secondary">
+            <span id="theme-icon" class="theme-icon">&#9728;</span> <!-- Default to Sun Icon -->
+        </button>
 
         <!-- Message block -->
         {% if messages %}
@@ -157,6 +182,32 @@
                     $('#sidebar').removeClass('active');
                 }
             });
+
+            // Night Mode Toggle
+            const themeStyle = document.getElementById('theme-style');
+            const themeIcon = document.getElementById('theme-icon');
+
+            $('#toggle-theme').click(function() {
+                if (themeStyle.getAttribute('href') === "{% static 'CSS/styles.css' %}") {
+                    themeStyle.setAttribute('href', "{% static 'CSS/night_mode.css' %}");
+                    $('body').addClass('night-mode'); // Add night mode class
+                    themeIcon.innerHTML = '&#9729;'; // Change to Moon Icon
+                    localStorage.setItem('theme', 'night');
+                } else {
+                    themeStyle.setAttribute('href', "{% static 'CSS/styles.css' %}");
+                    $('body').removeClass('night-mode'); // Remove night mode class
+                    themeIcon.innerHTML = '&#9728;'; // Change to Sun Icon
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+
+            // On page load, check for saved theme preference
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme === 'night') {
+                themeStyle.setAttribute('href', "{% static 'CSS/night_mode.css' %}");
+                $('body').addClass('night-mode'); // Set body class to night mode
+                themeIcon.innerHTML = '&#9729;'; // Set icon to Moon
+            }
         });
     </script>
 </body>

@@ -239,7 +239,7 @@ class PlotBooking(models.Model):
     project = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='project', null=True, blank=True)
     associate_detail = models.BooleanField(default=False)
     promoter = models.ForeignKey(Promoter, on_delete=models.SET_NULL, null=True, blank=True)
-    basic_price = models.DecimalField(max_digits=10, decimal_places=2)
+    Plot_price = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=50, choices=[('custom', 'Custom Payment'), ('installment', 'Installments')])
     booking_amount = models.DecimalField(max_digits=10, decimal_places=2)
     mode_of_payment = models.CharField(max_length=50, choices=[('cheque', 'Cheque'), ('rtgs', 'RTGS/NEFT'), ('cash', 'Cash')])
@@ -251,3 +251,35 @@ class PlotBooking(models.Model):
 
     def __str__(self):
         return f"Plot Booking - {self.name} - {self.booking_date}"
+    
+
+class EMIPayment(models.Model):
+    plot_booking = models.ForeignKey(PlotBooking, on_delete=models.CASCADE, related_name='emi_payments')
+    due_date = models.DateField()
+    emi_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Paid', 'Paid')], default='Pending')
+
+    def remaining_amount(self):
+        return self.emi_amount - self.amount_paid
+
+    def pay_emi(self, amount):
+        """Pay the EMI with the specified amount."""
+        if amount <= 0:
+            raise ValueError("Payment amount must be greater than zero.")
+        self.amount_paid += amount
+
+        # Check if the payment meets or exceeds the EMI amount
+        if self.amount_paid >= self.emi_amount:
+            self.amount_paid = self.emi_amount
+            self.status = 'Paid'
+        else:
+            self.status = 'Pending'  # Update to pending if not fully paid
+
+        self.save()  # Save the changes to the database
+
+    def __str__(self):
+        return f"EMI Payment for {self.plot_booking} - Due: {self.due_date} - Status: {self.status}"
+
+    class Meta:
+        ordering = ['due_date']  # Order EMI payments by due date

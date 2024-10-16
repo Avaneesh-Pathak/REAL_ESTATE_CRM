@@ -173,18 +173,36 @@ class PromoterForm(forms.ModelForm):
 # PLOT REGISTRATION
 from decimal import Decimal
 
+
+def calculate_emi(principal, booking_amount, tenure, interest_rate):
+    # Handle cases where tenure or interest_rate is None or zero
+    if tenure <= 0 or interest_rate < 0:
+        return 0  # No EMI if tenure is zero or interest rate is negative
+
+    # Convert interest rate from percentage to a decimal
+    monthly_interest_rate = interest_rate / (12 * 100)
+    
+    # Calculate EMI using the formula
+    emi = (principal - booking_amount) * monthly_interest_rate * ((1 + monthly_interest_rate) ** tenure) / \
+          (((1 + monthly_interest_rate) ** tenure) - 1)
+    
+    return round(emi, 2)  # Round to two decimal places
+
+
+
 class PlotBookingForm(forms.ModelForm):
     class Meta:
         model = PlotBooking
         fields = [
             'booking_date', 'name', 'father_husband_name', 'gender', 'custom_gender', 'dob', 'mobile_no',
             'address', 'bank_name', 'account_no', 'email', 'nominee_name', 'corner_plot_10', 'corner_plot_5',
-            'full_pay_discount', 'location', 'project', 'associate_detail', 'promoter', 'basic_price',
+            'full_pay_discount', 'location', 'project', 'associate_detail', 'promoter', 'Plot_price',
             'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark','emi_tenure', 'interest_rate'
         ]
         widgets = {
             'booking_date': forms.DateInput(attrs={'type': 'date'}),
             'dob': forms.DateInput(attrs={'type': 'date'}),
+            'payment_date':forms.DateInput(attrs={'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -199,30 +217,28 @@ class PlotBookingForm(forms.ModelForm):
     # Adding clean method to validate and calculate EMI
     def clean(self):
         cleaned_data = super().clean()
-        basic_price = cleaned_data.get('basic_price', 0)
+        plot_price = cleaned_data.get('plot_price', 0)
         booking_amount = cleaned_data.get('booking_amount', 0)
+        emi_tenure = cleaned_data.get('emi_tenure')
+        interest_rate = cleaned_data.get('interest_rate')
+        
+        # Handle percentage-based adjustments
         corner_plot_10 = cleaned_data.get('corner_plot_10')
         corner_plot_5 = cleaned_data.get('corner_plot_5')
         full_pay_discount = cleaned_data.get('full_pay_discount')
 
-        # Apply percentage-based increases or discount on basic price
+        # Apply percentage-based increases or discounts on the plot price
         if corner_plot_10:
-            basic_price *= Decimal('1.10') # 10% increase
+            plot_price *= Decimal('1.10')  # 10% increase for corner plot (10)
         elif corner_plot_5:
-            basic_price *= Decimal('1.05')  # 5% increase
+            plot_price *= Decimal('1.05')   # 5% increase for corner plot (5)
         elif full_pay_discount:
-            basic_price *= Decimal('0.95')  # 5% discount
+            plot_price *= Decimal('0.95')   # 5% discount for full payment
 
-        # EMI Calculation if installment is selected
+        # Calculate EMI if installment is selected
         payment_type = cleaned_data.get('payment_type')
         if payment_type == 'installment':
-            emi_tenure = cleaned_data.get('emi_tenure')
-            interest_rate = cleaned_data.get('interest_rate')
-
-            remaining_amount = basic_price - booking_amount
-            if remaining_amount > 0 and emi_tenure and interest_rate:
-                monthly_interest_rate = interest_rate / 100 / 12
-                emi_amount = remaining_amount * (monthly_interest_rate * (1 + monthly_interest_rate) ** emi_tenure) / ((1 + monthly_interest_rate) ** emi_tenure - 1)
-                cleaned_data['emi_amount'] = emi_amount  # Save calculated EMI
+            emi_amount = calculate_emi(plot_price, booking_amount, emi_tenure, interest_rate)
+            cleaned_data['emi_amount'] = emi_amount  # Save calculated EMI
 
         return cleaned_data

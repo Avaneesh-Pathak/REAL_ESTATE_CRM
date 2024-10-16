@@ -1,5 +1,6 @@
 import logging
 import datetime
+from datetime import timedelta
 from django import contrib
 from django.contrib import messages
 from django.views import View
@@ -15,7 +16,7 @@ from leads.models import Category
 from agents.mixins import OrganisorAndLoginRequiredMixin
 from django.forms import modelformset_factory
 from django.db import models
-from .models import Lead, Agent, Category, FollowUp,Promoter,PlotBooking
+from .models import Lead, Agent, Category, FollowUp,Promoter,PlotBooking,EMIPayment
 from .forms import (
     LeadForm, 
     LeadModelForm, 
@@ -851,13 +852,41 @@ def add_promoter(request):
 
 # PLOT REGISTRATIOn
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from datetime import timedelta
+from decimal import Decimal
+from .forms import PlotBookingForm
+from .models import PlotBooking, EMIPayment, Property
 
 def plot_registration(request):
     form = PlotBookingForm(request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
-            return redirect('plot_registration/buyers_list')
+            plot_booking = form.save()
+            
+            # Retrieve EMI amount and tenure from the form
+            emi_amount = form.cleaned_data.get('emi_amount')  # Fetch from cleaned_data
+            tenure = form.cleaned_data.get('emi_tenure')
+
+            # Ensure emi_amount is a Decimal and tenure is an integer
+            if emi_amount is not None and tenure is not None and tenure > 0:
+                monthly_emi = emi_amount / tenure  # EMI per month
+
+                # Generate EMI payment records
+                for month in range(tenure):
+                    due_date = plot_booking.payment_date + timedelta(days=30 * month)
+                    EMIPayment.objects.create(
+                        plot_booking=plot_booking,
+                        due_date=due_date,
+                        emi_amount=monthly_emi  # Store calculated EMI
+                    )
+            else:
+                # Handle missing or invalid EMI amount or tenure
+                form.add_error(None, 'Invalid EMI amount or tenure.')
+                return render(request, 'plot_registration/plot_registration.html', {'form': form})
+
+            return redirect('plot_registration/buyers_list')  # Ensure this matches your URL configuration
         else:
             print(form.errors)
     return render(request, 'plot_registration/plot_registration.html', {'form': form})
@@ -871,17 +900,12 @@ def buyers_list(request):
     buyers = PlotBooking.objects.all()
     return render(request, 'plot_registration/buyers_list.html', {'buyers': buyers})
 
-from django.shortcuts import render, get_object_or_404
-
 def buyer_print_view(request, buyer_id):
     buyer = get_object_or_404(PlotBooking, id=buyer_id)
     context = {'buyer': buyer}
     return render(request, 'plot_registration/buyer_print_template.html', context)
 
-
-# views.py
 def update_delete_buyer(request, id):
-    # Fetch the PlotBooking instance or return 404 if not found
     plot_booking = get_object_or_404(PlotBooking, id=id)
 
     if request.method == 'POST':
@@ -897,3 +921,30 @@ def update_delete_buyer(request, id):
         form = PlotBookingForm(instance=plot_booking)  # Pre-fill the form with the existing data
 
     return render(request, 'plot_registration/update_delete_buyer.html', {'form': form})
+
+def buyer_detail_view(request, buyer_id):
+    buyer = get_object_or_404(PlotBooking, id=buyer_id)
+    emi_payments = buyer.emi_payments.all()  # Fetch EMI payments linked to this buyer
+
+    context = {
+        'buyer': buyer,
+        'emi_payments': emi_payments,  # Pass the EMI payments to the template
+    }
+    return render(request, 'plot_registration/buyer_detail.html', context)
+
+def mark_as_paid(request, payment_id):
+    payment = get_object_or_404(EMIPayment, id=payment_id)  # Fetch the EMI payment record
+    if payment.status == 'Pending':
+        payment.pay_emi(payment.emi_amount)  # Pay the full EMI amount
+    return redirect('leads:buyer_detail', buyer_id=payment.plot_booking.id)
+
+def pay_emi(request, emi_id):
+    emi_payment = get_object_or_404(EMIPayment, id=emi_id)
+
+    if request.method == 'POST':
+        amount_paid = request.POST.get('amount_paid', 0)
+        emi_payment.pay_emi(Decimal(amount_paid))  # Update the EMI payment
+
+        return redirect('leads:buyers_list')  # Redirect after updating
+
+    return render(request, 'plot_registration/pay_emi.html', {'emi_payment': emi_payment})

@@ -1,4 +1,6 @@
-{% load static %}  <!-- Load static template tag library -->
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}  <!-- Load static template tag library -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,3 +130,5 @@
     </div>
 </body>
 </html>
+{%endblock content%}
+

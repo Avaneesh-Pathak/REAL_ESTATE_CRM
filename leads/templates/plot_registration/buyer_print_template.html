@@ -1,56 +1,89 @@
 <html>
 <head>
-    <title>Buyer Details</title>
+    <title>Buyer Registration Receipt</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f4f7fa;
             color: #333;
-            background-color: #f8f8f8;
         }
         .container {
             max-width: 800px;
             margin: auto;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        h2 {
+        h2, h4 {
             text-align: center;
+            color: #333;
+            margin: 10px 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #0056b3;
+            padding-bottom: 5px;
+        }
+        .header .company-logo img {
+            max-width: 100px; /* Reduced logo size */
+        }
+        .header .receipt-title {
+            font-size: 20px;
+            font-weight: bold;
             color: #0056b3;
-            margin-bottom: 20px;
+        }
+        .receipt-info {
+            margin-bottom: 15px;
+        }
+        .receipt-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
         }
         .details-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-bottom: 10px;
         }
         .details-table th, .details-table td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 8px; /* Reduced padding */
             text-align: left;
+            font-size: 14px; /* Reduced font size */
         }
         .details-table th {
             background-color: #0056b3;
             color: white;
-            font-weight: bold;
         }
         .details-table tr:hover {
             background-color: #f1f1f1;
         }
-        .details-table td {
-            background-color: #fafafa;
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 15px;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
+        }
+        .footer p {
+            margin: 3px 0;
         }
         .print-button {
-            margin-top: 20px;
-            padding: 10px 20px;
+            margin-top: 10px;
+            padding: 8px 15px;
             background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             transition: background-color 0.3s;
         }
         .print-button:hover {
@@ -63,87 +96,125 @@
             .print-button {
                 display: none;
             }
+            .container {
+                box-shadow: none;
+                padding: 0; /* Minimize padding for print */
+            }
+            .details-table th, .details-table td {
+                font-size: 12px; /* Further reduce font size for print */
+                padding: 6px;
+            }
+            .details-table tr {
+                page-break-inside: avoid; /* Prevent table rows from breaking */
+            }
+            h2, h4 {
+                font-size: 18px; /* Smaller headers for print */
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Buyer Details</h2>
+        <div class="header">
+            <div class="company-logo">
+                <img src="logo-placeholder.png" alt="Company Logo"> <!-- Replace with actual logo -->
+            </div>
+            <div class="receipt-title">Registration Receipt</div>
+        </div>
+
+        <div class="receipt-info">
+            <p><strong>Date:</strong> {{ receipt_date }}</p>
+            <p><strong>Receipt No:</strong> {{ receipt_number }}</p>
+            <p><strong>Buyer Name:</strong> {{ buyer.name }}</p>
+        </div>
+
+        <h4>Buyer Details</h4>
         <table class="details-table">
             <tr>
-                <th>Name:</th>
-                <td>{{ buyer.name }}</td>
-            </tr>
-            <tr>
-                <th>Father/Husband Name:</th>
+                <th>Father/Husband Name</th>
                 <td>{{ buyer.father_husband_name }}</td>
             </tr>
             <tr>
-                <th>Gender:</th>
+                <th>Gender</th>
                 <td>{{ buyer.gender }}</td>
             </tr>
             <tr>
-                <th>Date of Birth:</th>
-                <td>{{ buyer.dob }}</td> <!-- Ensure to use the correct attribute for date of birth -->
+                <th>Date of Birth</th>
+                <td>{{ buyer.dob }}</td>
             </tr>
             <tr>
-                <th>Mobile No.:</th>
+                <th>Mobile No.</th>
                 <td>{{ buyer.mobile_no }}</td>
             </tr>
             <tr>
-                <th>Address:</th>
+                <th>Address</th>
                 <td>{{ buyer.address }}</td>
             </tr>
             <tr>
-                <th>Bank Name:</th>
-                <td>{{ buyer.bank_name }}</td> <!-- Update based on your model attribute -->
+                <th>Bank Name</th>
+                <td>{{ buyer.bank_name }}</td>
             </tr>
             <tr>
-                <th>Email:</th>
+                <th>Email</th>
                 <td>{{ buyer.email }}</td>
             </tr>
             <tr>
-                <th>Nominee Name:</th>
+                <th>Nominee Name</th>
                 <td>{{ buyer.nominee_name }}</td>
             </tr>
+        </table>
+
+        <h4>Property Details</h4>
+        <table class="details-table">
             <tr>
-                <th>Location Applied For:</th>
-                <td>{{ buyer.location }}</td> <!-- Update based on your model attribute -->
+                <th>Location Applied For</th>
+                <td>{{ buyer.location }}</td>
             </tr>
             <tr>
-                <th>Property Name:</th>
-                <td>{{ buyer.project.title }}</td> <!-- Update based on your model -->
+                <th>Property Name</th>
+                <td>{{ buyer.project.title }}</td>
             </tr>
             <tr>
-                <th>Promoter Name:</th>
-                <td>{{ buyer.promoter.name }}</td> <!-- Update based on your model -->
+                <th>Promoter Name</th>
+                <td>{{ buyer.promoter.name }}</td>
             </tr>
+        </table>
+
+        <h4>Payment Details</h4>
+        <table class="details-table">
             <tr>
-                <th>Basic Price:</th>
-                <td>{{ buyer.basic_price }}</td>
+                <th>Plot Price</th>
+                <td>{{ buyer.Plot_price }}</td>
             </tr>
-            <tr>
-                <th>Payment Type:</th>
+            <tr>        
+                <th>Payment Type</th>
                 <td>{{ buyer.payment_type }}</td>
             </tr>
             <tr>
-                <th>Booking Amount:</th>
+                <th>Booking Amount</th>
                 <td>{{ buyer.booking_amount }}</td>
             </tr>
             <tr>
-                <th>Mode of Payment:</th>
+                <th>Mode of Payment</th>
                 <td>{{ buyer.mode_of_payment }}</td>
             </tr>
             <tr>
-                <th>Payment Date:</th>
-                <td>{{ buyer.payment_date }}</td> <!-- Ensure to use the correct attribute -->
+                <th>Payment Date</th>
+                <td>{{ buyer.payment_date }}</td>
             </tr>
             <tr>
-                <th>Remarks:</th>
+                <th>Remarks</th>
                 <td>{{ buyer.remark }}</td>
             </tr>
         </table>
+
         <button class="print-button" onclick="window.print()">Print</button>
+
+        <div class="footer">
+            <p>Thank you for your registration.</p>
+            <p>If you have any questions, contact us at (123) 456-7890 or support@company.com</p>
+            <p>Company Address: 1234, Main Street, City, Country</p>
+        </div>
     </div>
 </body>
 </html>
