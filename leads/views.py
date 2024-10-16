@@ -863,10 +863,37 @@ def plot_registration(request):
     return render(request, 'plot_registration/plot_registration.html', {'form': form})
 
 def load_properties(request):
-    project_name = request.GET.get('project_name')
-    properties = Property.objects.filter(project_name_id=project_name).values('id', 'title')
+    project_name = request.GET.get('property.title')
+    properties = Property.objects.filter(project_name_id=project_name).values('id', 'property.title')
     return JsonResponse(list(properties), safe=False)
 
 def buyers_list(request):
     buyers = PlotBooking.objects.all()
     return render(request, 'plot_registration/buyers_list.html', {'buyers': buyers})
+
+from django.shortcuts import render, get_object_or_404
+
+def buyer_print_view(request, buyer_id):
+    buyer = get_object_or_404(PlotBooking, id=buyer_id)
+    context = {'buyer': buyer}
+    return render(request, 'plot_registration/buyer_print_template.html', context)
+
+
+# views.py
+def update_delete_buyer(request, id):
+    # Fetch the PlotBooking instance or return 404 if not found
+    plot_booking = get_object_or_404(PlotBooking, id=id)
+
+    if request.method == 'POST':
+        if 'update' in request.POST:
+            form = PlotBookingForm(request.POST, instance=plot_booking)
+            if form.is_valid():
+                form.save()
+                return redirect('leads:buyers_list')  # Redirect after updating
+        elif 'delete' in request.POST:
+            plot_booking.delete()
+            return redirect('leads:buyers_list')  # Redirect after deleting
+    else:
+        form = PlotBookingForm(instance=plot_booking)  # Pre-fill the form with the existing data
+
+    return render(request, 'plot_registration/update_delete_buyer.html', {'form': form})

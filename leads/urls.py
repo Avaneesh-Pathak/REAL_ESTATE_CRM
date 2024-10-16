@@ -6,7 +6,8 @@ from .views import (
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
-    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,add_promoter,update_delete_promoter,promoter_list
+    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,add_promoter,update_delete_promoter,
+    promoter_list,load_properties,plot_registration,update_delete_buyer
 )
 
 app_name = "leads"
@@ -44,8 +45,6 @@ urlpatterns = [
     path('properties/update/<str:ids>/', PropertyUpdateView.as_view(), name='property-update'),
     path('properties/delete/<str:ids>/', PropertyDeleteView.as_view(), name='delete_properties'),
     # URL for creating a new project
-    path('create-project/', views.create_project_view, name='create_project'),
-    path('create-project/project/plot_status/', views.plot_status_view, name='plot_status'),
     path('calculate-emi/', calculate_emi, name='calculate_emi'), 
     #DAYBOOK
     path('daybook/', daybook_list, name='daybook_list'),  # URL for listing expenses
@@ -58,4 +57,7 @@ urlpatterns = [
     path('register/plot_registration/buyers_list/', views.buyers_list, name='buyers_list'), 
     path('ajax/load-properties/', load_properties, name='ajax_load_properties'),
     path('register/', plot_registration, name='plot_registration'),
+    path('buyer/<int:buyer_id>/print/', views.buyer_print_view, name='buyer_print'),
+    path('buyer/update-delete/<int:id>/', update_delete_buyer, name='update_delete_buyer'),
+   
 ]

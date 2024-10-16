@@ -209,9 +209,9 @@ class PlotBookingForm(forms.ModelForm):
         if corner_plot_10:
             basic_price *= Decimal('1.10') # 10% increase
         elif corner_plot_5:
-            basic_price *= 1.05  # 5% increase
+            basic_price *= Decimal('1.05')  # 5% increase
         elif full_pay_discount:
-            basic_price *= 0.95  # 5% discount
+            basic_price *= Decimal('0.95')  # 5% discount
 
         # EMI Calculation if installment is selected
         payment_type = cleaned_data.get('payment_type')

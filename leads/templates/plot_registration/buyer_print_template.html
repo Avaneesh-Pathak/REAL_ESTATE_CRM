@@ -1,0 +1,149 @@
+<html>
+<head>
+    <title>Buyer Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+            background-color: #f8f8f8;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .details-table th, .details-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .details-table th {
+            background-color: #0056b3;
+            color: white;
+            font-weight: bold;
+        }
+        .details-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .details-table td {
+            background-color: #fafafa;
+        }
+        .print-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .print-button:hover {
+            background-color: #218838;
+        }
+        @media print {
+            body {
+                background: none;
+            }
+            .print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Buyer Details</h2>
+        <table class="details-table">
+            <tr>
+                <th>Name:</th>
+                <td>{{ buyer.name }}</td>
+            </tr>
+            <tr>
+                <th>Father/Husband Name:</th>
+                <td>{{ buyer.father_husband_name }}</td>
+            </tr>
+            <tr>
+                <th>Gender:</th>
+                <td>{{ buyer.gender }}</td>
+            </tr>
+            <tr>
+                <th>Date of Birth:</th>
+                <td>{{ buyer.dob }}</td> <!-- Ensure to use the correct attribute for date of birth -->
+            </tr>
+            <tr>
+                <th>Mobile No.:</th>
+                <td>{{ buyer.mobile_no }}</td>
+            </tr>
+            <tr>
+                <th>Address:</th>
+                <td>{{ buyer.address }}</td>
+            </tr>
+            <tr>
+                <th>Bank Name:</th>
+                <td>{{ buyer.bank_name }}</td> <!-- Update based on your model attribute -->
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <td>{{ buyer.email }}</td>
+            </tr>
+            <tr>
+                <th>Nominee Name:</th>
+                <td>{{ buyer.nominee_name }}</td>
+            </tr>
+            <tr>
+                <th>Location Applied For:</th>
+                <td>{{ buyer.location }}</td> <!-- Update based on your model attribute -->
+            </tr>
+            <tr>
+                <th>Property Name:</th>
+                <td>{{ buyer.project.title }}</td> <!-- Update based on your model -->
+            </tr>
+            <tr>
+                <th>Promoter Name:</th>
+                <td>{{ buyer.promoter.name }}</td> <!-- Update based on your model -->
+            </tr>
+            <tr>
+                <th>Basic Price:</th>
+                <td>{{ buyer.basic_price }}</td>
+            </tr>
+            <tr>
+                <th>Payment Type:</th>
+                <td>{{ buyer.payment_type }}</td>
+            </tr>
+            <tr>
+                <th>Booking Amount:</th>
+                <td>{{ buyer.booking_amount }}</td>
+            </tr>
+            <tr>
+                <th>Mode of Payment:</th>
+                <td>{{ buyer.mode_of_payment }}</td>
+            </tr>
+            <tr>
+                <th>Payment Date:</th>
+                <td>{{ buyer.payment_date }}</td> <!-- Ensure to use the correct attribute -->
+            </tr>
+            <tr>
+                <th>Remarks:</th>
+                <td>{{ buyer.remark }}</td>
+            </tr>
+        </table>
+        <button class="print-button" onclick="window.print()">Print</button>
+    </div>
+</body>
+</html>

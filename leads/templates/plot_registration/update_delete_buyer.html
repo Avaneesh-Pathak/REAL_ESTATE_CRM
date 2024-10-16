@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h2 class="text-center">Update/Delete Buyer</h2>
+
+    <form method="POST" class="form-horizontal p-4 border rounded shadow-sm bg-light">
+        {% csrf_token %}
+
+        <!-- Booking Date -->
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.booking_date.label }}</label>
+            <div class="col-sm-10">
+                {{ form.booking_date }}
+            </div>
+        </div>
+
+        <!-- Personal Information -->
+        <h4 class="mt-4">Personal Information</h4>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.name.label }}</label>
+            <div class="col-sm-10">
+                {{ form.name }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.father_husband_name.label }}</label>
+            <div class="col-sm-10">
+                {{ form.father_husband_name }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.gender.label }}</label>
+            <div class="col-sm-10">
+                {{ form.gender }}
+            </div>
+        </div>
+        <div class="form-group row" id="custom-gender-field" style="display:none;">
+            <label class="col-sm-2 col-form-label">{{ form.custom_gender.label }}</label>
+            <div class="col-sm-10">
+                {{ form.custom_gender }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.dob.label }}</label>
+            <div class="col-sm-10">
+                {{ form.dob }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.mobile_no.label }}</label>
+            <div class="col-sm-10">
+                {{ form.mobile_no }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.address.label }}</label>
+            <div class="col-sm-10">
+                {{ form.address }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.bank_name.label }}</label>
+            <div class="col-sm-10">
+                {{ form.bank_name }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.account_no.label }}</label>
+            <div class="col-sm-10">
+                {{ form.account_no }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.email.label }}</label>
+            <div class="col-sm-10">
+                {{ form.email }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.nominee_name.label }}</label>
+            <div class="col-sm-10">
+                {{ form.nominee_name }}
+            </div>
+        </div>
+
+        <!-- PLC Charges -->
+        <h4 class="mt-4">PLC Charges</h4>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.corner_plot_10.label }}</label>
+            <div class="col-sm-10">
+                {{ form.corner_plot_10 }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.corner_plot_5.label }}</label>
+            <div class="col-sm-10">
+                {{ form.corner_plot_5 }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.full_pay_discount.label }}</label>
+            <div class="col-sm-10">
+                {{ form.full_pay_discount }}
+            </div>
+        </div>
+
+        <!-- Booking Details -->
+        <h4 class="mt-4">Booking Details</h4>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.location.label }}</label>
+            <div class="col-sm-10">
+                {{ form.location }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.project.label }}</label>
+            <div class="col-sm-10">
+                {{ form.project }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.associate_detail.label }}</label>
+            <div class="col-sm-10">
+                {{ form.associate_detail }}
+            </div>
+        </div>
+        <div class="form-group row" id="promoter-field" style="display:none;">
+            <label class="col-sm-2 col-form-label">{{ form.promoter.label }}</label>
+            <div class="col-sm-10">
+                {{ form.promoter }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.basic_price.label }}</label>
+            <div class="col-sm-10">
+                {{ form.basic_price }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.payment_type.label }}</label>
+            <div class="col-sm-10">
+                {{ form.payment_type }}
+            </div>
+        </div>
+
+        <!-- EMI Options -->
+        <div id="emi-options" style="display:none;">
+            <h4 class="mt-4">EMI Details</h4>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">{{ form.emi_tenure.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.emi_tenure }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">{{ form.interest_rate.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.interest_rate }}
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Calculated EMI:</label>
+                <div class="col-sm-10">
+                    <input type="text" id="calculated-emi" readonly class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <h4 class="mt-4">Payment Information</h4>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.booking_amount.label }}</label>
+            <div class="col-sm-10">
+                {{ form.booking_amount }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.mode_of_payment.label }}</label>
+            <div class="col-sm-10">
+                {{ form.mode_of_payment }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.payment_date.label }}</label>
+            <div class="col-sm-10">
+                {{ form.payment_date }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.remark.label }}</label>
+            <div class="col-sm-10">
+                {{ form.remark }}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-group text-center mt-4">
+            <button type="submit" name="update" class="btn btn-success">Update</button>
+            <button type="submit" name="delete" class="btn btn-danger">Delete</button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript for dynamic fields -->
+<script>
+    // Show custom gender field if 'Other' is selected
+    document.getElementById("id_gender").addEventListener("change", function() {
+        const customGenderField = document.getElementById("custom-gender-field");
+        customGenderField.style.display = this.value === "other" ? "block" : "none";
+    });
+
+    // Show promoter field if 'Associate Detail' is checked
+    document.getElementById("id_associate_detail").addEventListener("change", function() {
+        const promoterField = document.getElementById("promoter-field");
+        promoterField.style.display = this.checked ? "block" : "none";
+    });
+
+    // Show EMI options if 'Installment' is selected for payment type
+    document.getElementById("id_payment_type").addEventListener("change", function() {
+        const emiOptions = document.getElementById("emi-options");
+        emiOptions.style.display = this.value === "installment" ? "block" : "none";
+    });
+</script>
+
+{% endblock %}

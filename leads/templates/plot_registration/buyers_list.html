@@ -9,49 +9,38 @@
     <table class="min-w-full bg-white border border-gray-200">
         <thead>
             <tr class="bg-gray-200">
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Name</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Father/Husband Name</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Gender</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Date of Birth</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Name</th>               
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Gender</th>               
                 <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Mobile No.</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Address</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Bank Detail</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Address</th>                
                 <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Email</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Nominee Name</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">PLC Charges</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Location Applied For</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Project Name</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Property ID</th>
                 <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Associate Detail</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Basic Price</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Payment Type</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Booking Amount</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Mode of Payment</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Date</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Remarks</th>
             </tr>
         </thead>
         <tbody>
             {% for buyer in buyers %}
             <tr class="hover:bg-gray-100">
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.name }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.father_husband_name }}</td>
+                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    <a href="{% url 'leads:update_delete_buyer' buyer.id %}" class="text-blue-500 hover:underline">
+                         {{ buyer.name }}
+                    </a>
+                </td>
+                
                 <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.gender }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.date_of_birth }}</td>
+                
                 <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.mobile_no }}</td>
                 <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.address }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.bank_detail }}</td>
+                
                 <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.email }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.nominee_name }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.plc_charges }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.location_applied_for }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.project_name }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.associate_detail }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.basic_price }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.payment_type }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.booking_amount }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.mode_of_payment }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.date }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.remark }}</td>
+                
+                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.project.title }}</td>
+                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.promoter.name }}</td>
+                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    <a href="{% url 'leads:buyer_print' buyer.id %}" class=" hover:bg-Blue text-lightblue font-bold py-0 px-1">
+                        View Details
+                    </a>
+                </td>
             </tr>
             {% empty %}
             <tr>
