@@ -9,6 +9,10 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link id="theme-style" rel="stylesheet" href="{% static 'CSS/styles.css' %}"> <!-- Main CSS -->
+    
+    <!-- Add Chart.js CDN here -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         /* General styles */
         body {
@@ -135,7 +139,6 @@
               </div>
             {% endfor %}
           </div>
-
           <script>
             // Automatically hide the alert after 5 seconds
             setTimeout(function() {

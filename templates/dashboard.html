@@ -3,57 +3,115 @@
 
 {% block content %}
 <section class="text-gray-700 body-font">
-    <div class="container mx-auto flex px-5 py-12 items-center justify-center flex-col"> <!-- Reduced padding -->
+    <div class="container mx-auto flex px-5 py-12 items-center justify-center flex-col">
         <div class="text-center lg:w-2/3 w-full">
             <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">
                 CRM Dashboard
             </h1>
 
-            <div class="flex flex-wrap -m-2 text-center"> <!-- Adjusted margin -->
+            <div class="flex flex-wrap -m-2 text-center">
                 <!-- Total Leads -->
-                <div class="p-2 md:w-1/3 sm:w-1/2 w-full"> <!-- Adjusted padding -->
+                <div class="p-2 md:w-1/3 sm:w-1/2 w-full">
                     <a href="{% url 'leads:lead-list' %}" class="block border-2 border-gray-200 px-4 py-6 rounded-lg hover:bg-gray-100 transition">
                         <h2 class="title-font font-medium text-3xl text-gray-900">{{ total_lead_count }}</h2>
                         <p class="leading-relaxed">Total Leads</p>
                     </a>
                 </div>
+
                 <!-- Leads added in last 30 days -->
-                <div class="p-2 md:w-1/3 sm:w-1/2 w-full"> <!-- Adjusted padding -->
+                <div class="p-2 md:w-1/3 sm:w-1/2 w-full">
                     <a href="#" class="block border-2 border-gray-200 px-4 py-6 rounded-lg hover:bg-gray-100 transition">
                         <h2 class="title-font font-medium text-3xl text-gray-900">{{ total_in_past30 }}</h2>
                         <p class="leading-relaxed">Leads added in last 30 days</p>
                     </a>
                 </div>
+
                 <!-- Converted in last 30 days -->
-                <div class="p-2 md:w-1/3 sm:w-1/2 w-full"> <!-- Adjusted padding -->
+                <div class="p-2 md:w-1/3 sm:w-1/2 w-full">
                     <a href="#" class="block border-2 border-gray-200 px-4 py-6 rounded-lg hover:bg-gray-100 transition">
                         <h2 class="title-font font-medium text-3xl text-gray-900">{{ converted_in_past30 }}</h2>
                         <p class="leading-relaxed">Converted in last 30 days</p>
                     </a>
                 </div>
+
                 <!-- Total Salaries -->
-                <div class="p-2 md:w-1/3 sm:w-1/2 w-full"> <!-- Adjusted padding -->
+                <div class="p-2 md:w-1/3 sm:w-1/2 w-full">
                     <a href="{% url 'leads:salary_list' %}" class="block border-2 border-gray-200 px-4 py-6 rounded-lg hover:bg-gray-100 transition">
                         <h2 class="title-font font-medium text-3xl text-gray-900">{{ total_salaries }}</h2>
                         <p class="leading-relaxed">Total Salaries</p>
                     </a>
                 </div>
+
                 <!-- Total Sales -->
-                <div class="p-2 md:w-1/3 sm:w-1/2 w-full"> <!-- Adjusted padding -->
+                <div class="p-2 md:w-1/3 sm:w-1/2 w-full">
                     <a href="{% url 'leads:sale_list' %}" class="block border-2 border-gray-200 px-4 py-6 rounded-lg hover:bg-gray-100 transition">
                         <h2 class="title-font font-medium text-3xl text-gray-900">{{ total_sales }}</h2>
                         <p class="leading-relaxed">Total Sales</p>
                     </a>
                 </div>
+
                 <!-- Total Properties -->
-                <div class="p-2 md:w-1/3 sm:w-1/2 w-full"> <!-- Adjusted padding -->
+                <div class="p-2 md:w-1/3 sm:w-1/2 w-full">
                     <a href="{% url 'leads:property_list' %}" class="block border-2 border-gray-200 px-4 py-6 rounded-lg hover:bg-gray-100 transition">
                         <h2 class="title-font font-medium text-3xl text-gray-900">{{ total_properties }}</h2>
                         <p class="leading-relaxed">Total Properties</p>
                     </a>
                 </div>
+
+                <!-- Total Buyers -->
+                <div class="p-2 md:w-1/3 sm:w-1/2 w-full">
+                    <a href="{% url 'leads:buyers_list' %}" class="block border-2 border-gray-200 px-4 py-6 rounded-lg hover:bg-gray-100 transition">
+                        <h2 class="title-font font-medium text-3xl text-gray-900">{{ total_promoters }}</h2>
+                        <p class="leading-relaxed">Total Buyers</p>
+                    </a>
+                </div>
+
+                <!-- Sales Graph -->
+                <div class="p-2 md:w-full w-full">
+                    <h2 class="title-font font-medium text-3xl text-gray-900 mb-4">Properties Sold Over Time</h2>
+                    <canvas id="salesChart" width="400" height="200"></canvas>  <!-- Canvas for the chart -->
+                </div>
             </div>
         </div>
     </div>
 </section>
-{% endblock content %}
+<!-- Chart.js script -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const labels = {{ labels|safe }};
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: 'Properties Sold',
+            data: {{ data|safe }},
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    const config = {
+        type: 'line', // or 'line', depending on your preference
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Properties Sold Over Time'
+                }
+            }
+        },
+    };
+
+    const salesChart = new Chart(
+        document.getElementById('salesChart'),
+        config
+    );
+</script>
+
+{% endblock %}

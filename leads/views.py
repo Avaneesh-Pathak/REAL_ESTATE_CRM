@@ -1,7 +1,7 @@
 import logging
 import datetime
 from datetime import timedelta
-from django import contrib
+from django.db.models import Count
 from django.contrib import messages
 from django.views import View
 from django.core.mail import send_mail
@@ -60,12 +60,14 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
-
         user = self.request.user
 
         # How many leads we have in total
         total_lead_count = Lead.objects.filter(organisation=user.userprofile).count()
-
+        # Sales Report
+        sales_data = Sale.objects.values('sale_date').annotate(properties_sold=Count('id')).order_by('sale_date')
+        labels = [sale['sale_date'].strftime("%Y-%m-%d") for sale in sales_data]  # Format dates
+        data = [sale['properties_sold'] for sale in sales_data] 
         # How many new leads in the last 30 days
         thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
         # Total sales for the organisation          
@@ -92,13 +94,16 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         ).count()
 
         context.update({
-            "total_lead_count": total_lead_count,
-            "total_in_past30": total_in_past30,
-            "converted_in_past30": converted_in_past30,
-            "total_salaries": total_salaries,
-            "total_sales": total_sales,
-            "total_properties": total_properties,
-            "total_promoters": total_promoters,
+                'labels': labels,
+                'data': data,
+                # Add other context variables like total_lead_count, total_sales, etc.
+                'total_lead_count': total_lead_count,
+                'total_in_past30': total_in_past30,
+                'converted_in_past30': converted_in_past30,
+                'total_salaries': total_salaries,
+                'total_sales': total_sales,
+                'total_properties': total_properties,
+                'total_promoters': total_promoters,
         })
         return context
 
