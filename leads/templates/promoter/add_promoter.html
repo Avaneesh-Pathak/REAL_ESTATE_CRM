@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
+
 {% load static %}
-{% block content %}  <!-- Load static template tag library -->
+
+{% block content %} 
+
+<!-- Load static template tag library -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,17 +17,17 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 20px;
+            padding: 50px;
         }
 
         /* Container Styles */
         .container {
-            max-width: 600px;
+            max-width: 6000px;
             margin: auto;
             background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
         }
 
         /* Header Styles */
@@ -34,12 +38,12 @@
 
         /* Form Styles */
         .promoter-form {
-            display: flex;
-            flex-direction: column;
+            display: flex justify-center;
+            flex-direction:row;              
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
 
         label {
@@ -52,9 +56,9 @@
         input[type="email"],
         input[type="number"],
         textarea {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 5px;
+            border: 2px solid #ccc;
+            border-radius: 50px;
             font-size: 14px;
             width: 100%;
             box-sizing: border-box; /* Ensure padding doesn't affect overall width */
@@ -62,13 +66,14 @@
 
         /* Submit Button Styles */
         .submit-button {
+            display: flex;
             padding: 10px;
             background-color: #28a745;
             color: #fff;
-            border: none;
+            border: 5px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 20px;
             transition: background-color 0.3s; /* Smooth transition */
         }
 
@@ -79,22 +84,24 @@
         /* Back Button Styles */
         .back-button {
             display: inline-block;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             color: #007bff;
-            text-decoration: none;
+            text-decoration-color:black;
             font-size: 14px;
             transition: color 0.3s; /* Smooth transition */
         }
 
         .back-button:hover {
             text-decoration: underline;
+            text-decoration-color:black;
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>Add New Promoter</h1>
-        <a href="{% url 'leads:promoter_list' %}" class="back-button">Back to Promoter List</a>
+        <h1 class="text-4xl" style="color: hsl(240, 100%, 60%)">Add New Promoter</h1>
+        <a href="{% url 'leads:promoter_list' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">Back to Promoter List</a>
         <form method="POST" class="promoter-form">
             {% csrf_token %}
             <div class="form-group">
@@ -130,5 +137,6 @@
     </div>
 </body>
 </html>
+
 {%endblock content%}
 

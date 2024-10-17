@@ -8,10 +8,10 @@
     </div>
     {% if request.user.is_organisor %}
     <div>
-        <a class="text-gray-500 hover:text-blue-500" href="{% url 'leads:property-create' %}">
+        <a class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" href="{% url 'leads:property-create' %}">
             Create a new property
         </a>
-        <a class="text-gray-500 hover:text-blue-500" href="{% url 'leads:select_properties' %}">
+        <a class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" href="{% url 'leads:select_properties' %}">
             update
         </a>
     </div>
