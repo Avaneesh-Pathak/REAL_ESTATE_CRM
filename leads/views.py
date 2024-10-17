@@ -1,6 +1,7 @@
 import logging
 import datetime
 from django import contrib
+from django.db import IntegrityError , models
 from django.contrib import messages
 from django.views import View
 from django.core.mail import send_mail
@@ -14,8 +15,7 @@ from .models import Property, Sale, Salary, Bonus
 from leads.models import Category
 from agents.mixins import OrganisorAndLoginRequiredMixin
 from django.forms import modelformset_factory
-from django.db import models
-from .models import Lead, Agent, Category, FollowUp,Promoter,PlotBooking
+from .models import Lead, Agent, Category, FollowUp,Promoter,PlotBooking,Project
 from .forms import (
     LeadForm, 
     LeadModelForm, 
@@ -606,26 +606,61 @@ class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
 
         
 
-class PropertyCreateView(LoginRequiredMixin, View):
-    template_name = 'property/property_create.html'
+class ProjectCreateView(LoginRequiredMixin, View):
+    model = Project
+    template_name = 'property/create_project.html'
+
 
     def get(self, request):
         # Render the initial form for number of properties and common attributes
         return render(request, self.template_name)
 
+    
+    def post(self, request):
+        # Get the number of properties to create and common attributes
+        project_name = request.POST.get('project_name', )
+        block = request.POST.get('block', '')
+        try:
+            # Assuming you have a Project model
+            Project.objects.create(
+                project_name=project_name,
+                block=block,  # Example size, modify as needed
+            ) 
+            messages.success(request, 'Project created successfully!')
+        except IntegrityError:
+            # Catch the unique constraint error and send a message to the user
+            messages.error(request, 'A project with this name already exists!')
+        
+
+        return redirect(self.get_success_url())
+
+        
+    def get_success_url(self):
+        return reverse('leads:project-create')
+    
+class PropertyCreateView(LoginRequiredMixin, View):
+    template_name = 'property/property_create.html'
+    projects = Project.objects.all()
+
+    def get(self, request):
+        # Render the initial form for number of properties and common attributes
+        return render(request, self.template_name,{'projects':  self.projects})
+
+
     def post(self, request):
         # Get the number of properties to create and common attributes
         num_properties = int(request.POST.get('num_properties', 1))
         price = request.POST.get('price', '')
-        project_name = request.POST.get('project_name', '')
-        
-        block = request.POST.get('block', '')
+
+        key = int(request.POST.get('project_id', ''))
+                # Fetch the Project instance using `get_object_or_404`
+        project = get_object_or_404(Project, id=key)
+
 
         # Create the properties in the database
         for _ in range(num_properties):
             Property.objects.create(
-                project_name=project_name,
-                block=block,  # Example size, modify as needed
+                project_id = project , # Example size, modify as needed
                 price=price  # Example price, modify as needed
             )
 
@@ -635,14 +670,22 @@ class PropertyCreateView(LoginRequiredMixin, View):
         return reverse('leads:property_list')  # Redirect to property list after creation  # Redirect to property list after successful update
 
 def select_properties_view(request):
-    properties = Property.objects.all()  # Fetch all properties
-
     if request.method == 'POST':
+        print(1)
         selected_ids = request.POST.getlist('properties')  # Get list of selected IDs
         # Redirect to the update view with the selected IDs print
         return redirect('leads:property-update', ids=','.join(selected_ids))  # Join IDs as a comma-separated string
+    else:
+        id = request.GET.get('project_id')
+        projects = Project.objects.all()
+        properties = Property.objects.filter(project_id= id)
+        return render(request,'property/select_properties.html',{'projects':projects,'properties':properties})
+    
+def get_properties_by_project(request, project_id):
+    properties = Property.objects.filter(project_id=project_id)  # Correct usage
+    properties_data = [{'id': prop.id, 'project_name': prop.property_name} for prop in properties]
 
-    return render(request, 'property/select_properties.html', {'properties': properties})
+    return JsonResponse({'properties': properties_data})
 
 # View to edit selected properties
 class PropertyUpdateView(View):

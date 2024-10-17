@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load tailwind_filters %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <label for="num_properties">Name of Project:</label>
+    <input type="text" name="project_name" required>
+    <br>
+    <label for="block">Name of Block:</label>
+    <input type="text" name="block" required><br>
+
+    <button type="submit">Create project</button>
+</form>
+{% for pro in project %}
+{{  pro.block }}
+
+
+{% endfor %}
+
+{% endblock content %}
+

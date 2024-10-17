@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (User, Lead, Agent, UserProfile, Category, FollowUp, Salary, Sale,
+from .models import (User, Lead, Agent, UserProfile, Category, FollowUp, Salary, Sale,Project,
                      Property, Bonus, EmiPlan, Daybook, Promoter)
 
 
@@ -29,6 +29,10 @@ class EmiPlanAdmin(admin.ModelAdmin):
     list_filter = ['tenure_months', 'interest_rate']
     search_fields = ['name']
 
+#Admin class for project model
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ['project_name','block']
+    # list_filter = ['project_name','block']
 
 # Admin class for Daybook model
 class DaybookAdmin(admin.ModelAdmin):
@@ -51,7 +55,7 @@ admin.site.register(User)
 admin.site.register(UserProfile)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(Agent)
-admin.site.register(FollowUp)
+admin.site.register(Project)
 admin.site.register(Property, PropertyAdmin)
 admin.site.register(Bonus, BonusAdmin)
 admin.site.register(EmiPlan, EmiPlanAdmin)

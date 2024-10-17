@@ -17,16 +17,20 @@
 <!-- property_create.html -->
 <!-- property_create.html -->
 <form method="post">
+    <a href="{% url 'leads:project-create' %}">create project</a><br>
     {% csrf_token %}
     <label for="num_properties">Number of Properties:</label>
     <input type="number" name="num_properties" min="1" required>
-    
-    <label for="project_name">Common Project Name:</label>
-    <input type="text" name="project_name" required>
-    <label for="price">Common Price Name:</label>
-    <input type="number" name="price" required>
-    <label for="block">Common block Name:</label>
-    <input type="text" name="block" required>
+    <br>
+    <label for="project_id">Select Project:</label>
+    <select id="project_id" name="project_id" required>
+        <option value="">Choose a project</option>
+        {% for project in projects %}
+            <option value="{{ project.id }}">{{ project.title }}</option>
+        {% endfor %}
+    </select>
+    <br><label for="price">Common Price Name:</label>
+    <input type="number" name="price" required><br>
 
     <button type="submit">Create Properties</button>
 </form>

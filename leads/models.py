@@ -108,16 +108,46 @@ class Sale(models.Model):
     def __str__(self):
         return f"Sale of {self.property.address} by {self.agent.username} for ${self.sale_price}"
 
+
+## Project
+class  Project(models.Model):
+    project_name = models.CharField(max_length=255)
+    block = models.CharField(max_length=2)
+
+    title = models.CharField(unique=True,max_length=255)
+    
+    def create_composite_key(self):
+        letters = f"{self.project_name[:]}" # Ensure uppercase
+        bl = f"{self.block[:]}" # Ensure uppercase
+        # Format the number to be 3 digits  
+        # Construct the composite key
+        composite_key = f"{letters}-{bl}"
+        return composite_key
+
+    def save(self, *args, **kwargs):
+        # Call the original save method
+        super().save(*args, **kwargs)
+
+    
+        self.title = self.create_composite_key()
+        # Update the instance in the database without calling save() again
+        self.__class__.objects.filter(pk=self.pk).update(title=self.title)
+
+    def __str__(self):
+        return self.project_name
+    
+
 class Property(models.Model):
     # project_name = models.CharField(max_length=255,default='Untitled Property')
     # block_code = models.CharField(max_length=1)
     # from_plot=models.IntegerField
     # to_plot=models.IntegerField
     id = models.AutoField(primary_key=True) 
-    project_name = models.CharField(max_length=255)
+    project_name = models.CharField(max_length=255,null=True,blank=True)
     price = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     block = models.TextField(null=True, blank=True)
     agent = models.ForeignKey(Agent, null=True, blank=True, on_delete=models.SET_NULL)
+    project_id = models.ForeignKey(Project, null=True, blank=True, on_delete=models.SET_NULL)
     # Add any other fields necessary for the property model
     organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=7)
@@ -141,12 +171,6 @@ class Property(models.Model):
             self.title = self.create_composite_key()
             # Update the instance in the database without calling save() again
             self.__class__.objects.filter(pk=self.pk).update(title=self.title)
-
-
-# class Project_Name(models.Model):
-#     project_code= models.OneToOneField(User, on_delete=models.CASCADE)
-
-
 
 class Bonus(models.Model):
     agent = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -215,7 +239,10 @@ class Promoter(models.Model):
 
     def __str__(self):
         return self.name
-    
+
+
+
+
 # PLOT BOOKING
 
 class PlotBooking(models.Model):

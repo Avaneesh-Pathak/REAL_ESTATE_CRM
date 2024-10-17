@@ -3,7 +3,7 @@ from . import views
 from .views import (
     LeadListView, LeadDetailView, LeadCreateView, LeadUpdateView, LeadDeleteView,
     AssignAgentView, CategoryListView, CategoryDetailView, LeadCategoryUpdateView,
-    CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,
+    CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,ProjectCreateView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
     PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,add_promoter,update_delete_promoter,
@@ -41,6 +41,7 @@ urlpatterns = [
     path('properties/select/', select_properties_view, name='select_properties'),
     path('properties/', PropertyListView.as_view(), name='property_list'),
     path('properties/create/', PropertyCreateView.as_view(), name='property-create'),
+    path('properties/create/createProject', ProjectCreateView.as_view(), name='project-create'),
     path('properties/<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
     path('properties/update/<str:ids>/', PropertyUpdateView.as_view(), name='property-update'),
     path('properties/delete/<str:ids>/', PropertyDeleteView.as_view(), name='delete_properties'),

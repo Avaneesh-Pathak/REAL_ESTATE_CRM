@@ -9,7 +9,13 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Select Properties to Edit</h1>
+        <h1>Select Properties to Edit</h1><form method="get">
+        <select id="project_id" name="project_id" required>
+        <option value="">Choose a project</option>
+        {% for project in projects %}
+            <option value="{{ project.id }}">{{ project.title}}</option>
+        {% endfor %}
+    </select><button type="submit">submit</button></form>
         <form method="POST">
             {% csrf_token %}
             <div class="form-group">
