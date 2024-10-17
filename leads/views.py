@@ -196,12 +196,12 @@ class LeadCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
         lead = form.save(commit=False)
         lead.organisation = self.request.user.userprofile
         lead.save()
-        send_mail(
-            subject="A lead has been created",
-            message="Go to the site to see the new lead",
-            from_email="test@test.com",
-            recipient_list=["test2@test.com"]
-        )
+        # send_mail(
+        #     subject="A lead has been created",
+        #     message="Go to the site to see the new lead",
+        #     from_email="test@test.com",
+        #     recipient_list=["test2@test.com"]
+        # )
         messages.success(self.request, "You have successfully created a lead")
         return super(LeadCreateView, self).form_valid(form)
 
@@ -648,11 +648,11 @@ class ProjectCreateView(LoginRequiredMixin, View):
     
 class PropertyCreateView(LoginRequiredMixin, View):
     template_name = 'property/property_create.html'
-    projects = Project.objects.all()
 
     def get(self, request):
+        projects = Project.objects.all()
         # Render the initial form for number of properties and common attributes
-        return render(request, self.template_name,{'projects':  self.projects})
+        return render(request, self.template_name,{'projects':  projects})
 
 
     def post(self, request):
@@ -823,7 +823,6 @@ def calculate_emi(request):
 from .models import Daybook
 from django.utils import timezone
 from .forms import DaybookEntryForm  # Update the import statement
-from django.db.models import Sum
 
 
 def daybook_list(request):
@@ -858,8 +857,6 @@ def daybook_create(request):
 
 # PROMOTER 
 
-# Promoter List View
-# leads/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Promoter  # Import the Promoter model
 from .forms import PromoterForm  # Import the PromoterForm
@@ -912,17 +909,18 @@ from .models import PlotBooking, EMIPayment, Property
 def plot_registration(request):
     form = PlotBookingForm(request.POST or None)
     if request.method == 'POST':
+        print("post")
         if form.is_valid():
             plot_booking = form.save()
-            
+            print("save")
             # Retrieve EMI amount and tenure from the form
             emi_amount = form.cleaned_data.get('emi_amount')  # Fetch from cleaned_data
             tenure = form.cleaned_data.get('emi_tenure')
-
+            print(emi_amount)
             # Ensure emi_amount is a Decimal and tenure is an integer
             if emi_amount is not None and tenure is not None and tenure > 0:
                 monthly_emi = emi_amount / tenure  # EMI per month
-
+                print("submit emi")
                 # Generate EMI payment records
                 for month in range(tenure):
                     due_date = plot_booking.payment_date + timedelta(days=30 * month)
@@ -931,14 +929,16 @@ def plot_registration(request):
                         due_date=due_date,
                         emi_amount=monthly_emi  # Store calculated EMI
                     )
-            else:
-                # Handle missing or invalid EMI amount or tenure
+            elif  emi_amount is None and tenure is None:
+                print("error")
+            #     # Handle missing or invalid EMI amount or tenure
                 form.add_error(None, 'Invalid EMI amount or tenure.')
-                return render(request, 'plot_registration/plot_registration.html', {'form': form})
+                # return redirect(request, 'plot_registration/buyers_list', {'form': form})
 
             return redirect('plot_registration/buyers_list')  # Ensure this matches your URL configuration
         else:
-            print(form.errors)
+            return redirect('plot_registration/buyers_list.html')
+    
     return render(request, 'plot_registration/plot_registration.html', {'form': form})
 
 def load_properties(request):

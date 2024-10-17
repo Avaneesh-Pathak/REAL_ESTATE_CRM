@@ -28,8 +28,8 @@
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                 </th>
-                <th scope="col" class="relative px-6 py-3">
-                    <span class="sr-only">Edit</span>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-xl text-gray-500 uppercase tracking-wider">
+                    Edit
                 </th>
             </tr>
         </thead>
@@ -40,7 +40,7 @@
                         {{ sale.id }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ sale.project.title }}  <!-- Display the property's address -->
+                        {{ sale.property}}  <!-- Display the property's address -->
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         ${{ sale.sale_price }}  <!-- Correct attribute for sale price -->
@@ -51,10 +51,8 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {{ sale.sale_date|date:"Y-m-d" }}  <!-- Correct attribute for sale date -->
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{% url 'leads:manage_sale' sale.id %}" class="text-indigo-600 hover:text-indigo-900">
-                            Edit
-                        </a>
+                    <td class="px-6 py-4 whitespace-nowrap text-indigo-600 hover:text-indigo-900">
+                        <a href="{% url 'leads:manage_sale' sale.id %}">Edit</a>
                     </td>
                 </tr>
             {% empty %}

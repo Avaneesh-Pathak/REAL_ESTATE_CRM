@@ -2,39 +2,40 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<!-- <div class="max-w-lg mx-auto">
-    <a class="hover:text-blue-500" href="{% url 'leads:property_list' %}">Go back to Property List</a>
-    <div class="py-5 border-t border-gray-200">
-        <h1 class="text-4xl text-gray-800">Add a New Property</h1>
+<div class="max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+    <div class="text-center mb-6">
+        <a href="{% url 'leads:project-create' %}" class="text-green-500 hover:text-green-700 underline">Create Project</a>
     </div>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="mt-5 btn btn-primary">Create</button>
-        </form>
-    </div> -->
-    <!-- property_create.html -->
-<!-- property_create.html -->
-<!-- property_create.html -->
-<form method="post">
-    <a href="{% url 'leads:project-create' %}">create project</a><br>
-    {% csrf_token %}
-    <label for="num_properties">Number of Properties:</label>
-    <input type="number" name="num_properties" min="1" required>
-    <br>
-    <label for="project_id">Select Project:</label>
-    <select id="project_id" name="project_id" required>
-        <option value="">Choose a project</option>
-        {% for project in projects %}
-            <option value="{{ project.id }}">{{ project.title }}</option>
-        {% endfor %}
-    </select>
-    <br><label for="price">Common Price Name:</label>
-    <input type="number" name="price" required><br>
 
-    <button type="submit">Create Properties</button>
-</form>
+    <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create New Properties</h1>
 
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <div>
+            <label for="num_properties" class="block text-gray-700 font-medium">Number of Properties:</label>
+            <input type="number" name="num_properties" min="1" required class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
 
+        <div>
+            <label for="project_id" class="block text-gray-700 font-medium">Select Project:</label>
+            <select id="project_id" name="project_id" required class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="">Choose a project</option>
+                {% for project in projects %}
+                    <option value="{{ project.id }}">{{ project.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="price" class="block text-gray-700 font-medium">Common Price Name:</label>
+            <input type="number" name="price" required class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md shadow-lg focus:outline-none">Create Properties</button>
+        </div>
+    </form>
+</div>
 {% endblock content %}
-
+ 

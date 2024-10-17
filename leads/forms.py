@@ -176,7 +176,7 @@ from decimal import Decimal
 
 def calculate_emi(principal, booking_amount, tenure, interest_rate):
     # Handle cases where tenure or interest_rate is None or zero
-    if tenure <= 0 or interest_rate < 0:
+    if tenure < 0 or interest_rate < 0:
         return 0  # No EMI if tenure is zero or interest rate is negative
 
     # Convert interest rate from percentage to a decimal

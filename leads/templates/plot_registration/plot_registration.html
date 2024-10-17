@@ -4,14 +4,16 @@
 <style>
     /* General styling */
     body {
-        background-color: #f8f9fa; /* Light background */
-        font-family: Arial, sans-serif; /* Font family */
+        background-color: #87CEEB; /* Light background */
+        font-family: 'Open Sans', sans-serif; /* Font family */
     }
 
     .container {
         background-color: #ffffff; /* White background for the form */
         border-radius: 10px; /* Rounded corners */
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+        padding: 20px; /* Padding inside the container */
+        box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
     }
 
     h2 {
@@ -32,17 +34,30 @@
     .col-form-label {
         font-weight: bold; /* Bold labels */
     }
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    textarea {
+            padding: 5px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box; /* Ensure padding doesn't affect overall width */
+    }
 
     .form-control {
-        border: 1px solid #ced4da; /* Border color */
-        border-radius: 5px; /* Rounded corners for inputs */
+        border: 2px solid #007bff !important; /* Change the border color and thickness */
+        border-radius: 5px; /* Rounded corners */
+        padding: 10px; /* Padding inside the inputs */
+        font-size: 16px; /* Larger font size for better readability */
         transition: border-color 0.3s; /* Smooth transition for border color */
     }
 
     .form-control:focus {
-        border-color: #007bff; /* Change border color on focus */
+        border-color: #0056b3; /* Change border color on focus */
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add shadow on focus */
-    }
+    } 
 
     .btn-primary {
         background-color: #007bff; /* Primary button color */
@@ -78,7 +93,7 @@
         }
 
         .form-group {
-            margin-bottom: 10px; /* Reduce space between form groups on smaller screens */
+            margin-bottom: 50px; /* Reduce space between form groups on smaller screens */
         }
     }
 </style>
@@ -107,9 +122,9 @@
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.father_husband_name.label }}</label>
+            <label class="col-sm-2 col-form-label"></label>
             <div class="col-sm-10">
-                {{ form.father_husband_name }}
+                <p><strong>Father's /Husband Name:</strong> {{ form.father_husband_name }}</p>
             </div>
         </div>
         <div class="form-group row">
@@ -190,7 +205,7 @@
         </div>
 
         <!-- Booking Details -->
-        <h4>Booking Details</h4>
+        <h4 class='text-2xl text-gray-800 text-center my-5'>Booking Details</h4>
         <div class="form-group row">
             <label class="col-sm-2 col-form-label">{{ form.location.label }}</label>
             <div class="col-sm-10">
@@ -252,7 +267,7 @@
         </div>
 
         <!-- Payment Information -->
-        <h4>Payment Information</h4>
+        <h4 class='text-2xl text-gray-800 text-center my-5'>Payment Information</h4>
         <div class="form-group row">
             <label class="col-sm-2 col-form-label">{{ form.booking_amount.label }}</label>
             <div class="col-sm-10">
@@ -307,7 +322,7 @@
 
     // Calculate EMI dynamically
     function calculateEMI() {
-        const plotPrice = 400000; // Replace with the actual plot price if dynamic
+        const plotPrice = parseFloat(document.getElementById("id_Plot_price").value) || 0; // Replace with the actual plot price if dynamic
         const downPayment = parseFloat(document.getElementById("id_booking_amount").value) || 0; // Ensure it's a number
         const emiTenure = parseInt(document.getElementById("id_emi_tenure").value) || 0; // Ensure it's a number
         const interestRate = parseFloat(document.getElementById("id_interest_rate").value) || 0; // Ensure it's a number

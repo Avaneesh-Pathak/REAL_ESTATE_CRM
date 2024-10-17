@@ -8,6 +8,8 @@
     <title>DJCRM</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
     <link id="theme-style" rel="stylesheet" href="{% static 'CSS/styles.css' %}"> <!-- Main CSS -->
     
     <!-- Add Chart.js CDN here -->
@@ -99,32 +101,6 @@
 <body>
     <div class="max-w-7xl mx-auto">
         {% include 'navbar.html' %}
-
-        <!-- Hamburger Icon -->
-        <div class="hamburger" id="hamburger">
-            &#9776; <!-- Unicode character for hamburger icon -->
-        </div>
-
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="close-btn" id="close-btn">&times;</div> <!-- Close button -->
-            <a href="{% url 'dashboard' %}">Home</a>
-            <a href="{% url 'leads:lead-list' %}">Leads</a>
-            <a href="{% url 'leads:sale_list' %}">Sales</a>
-            <a href="{% url 'leads:property_list' %}">Properties</a>
-            <a href="{% url 'leads:salary_list' %}">Salary</a>
-            <a href="{% url 'leads:daybook_list' %}">Daybook</a>
-            <a href="{% url 'leads:promoter_list' %}">Promoter List</a>
-            <a href="{% url 'leads:add_promoter' %}">Add Promoter</a>
-            <a href="{% url 'leads:plot_registration' %}">Register Plot</a>
-            <a href="{% url 'leads:buyers_list' %}">Buyers List</a>
-            <!-- Add more links as needed -->
-        </div>
-
-        <!-- Night Mode Toggle Button -->
-        <button id="toggle-theme" class="btn btn-secondary">
-            <span id="theme-icon" class="theme-icon">&#9728;</span> <!-- Default to Sun Icon -->
-        </button>
 
         <!-- Message block -->
         {% if messages %}

@@ -106,7 +106,7 @@ class Sale(models.Model):
     organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
     
     def __str__(self):
-        return f"Sale of {self.property.address} by {self.agent.username} for ${self.sale_price}"
+        return f"Sale by {self.agent.username} for ${self.sale_price}"
 
 
 ## Project
@@ -273,7 +273,7 @@ class PlotBooking(models.Model):
     payment_date = models.DateField()
     emi_tenure = models.IntegerField(blank=True, null=True)  # EMI tenure in months
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # Interest rate as a percentage
-    emi_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)  # Calculated EMI amount
+    emi_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=True)  # Calculated EMI amount
     remark = models.TextField(blank=True, null=True)
 
     def __str__(self):
