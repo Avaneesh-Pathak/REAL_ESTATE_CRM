@@ -7,7 +7,7 @@ from .views import (
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
     PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,add_promoter,update_delete_promoter,
-    promoter_list,load_properties,plot_registration,update_delete_buyer
+    promoter_list,load_properties,plot_registration,update_delete_buyer,pay_emi
 )
 
 app_name = "leads"
@@ -59,6 +59,8 @@ urlpatterns = [
     path('ajax/load-properties/', load_properties, name='ajax_load_properties'),
     path('register/', plot_registration, name='plot_registration'),
     path('buyer/<int:buyer_id>/print/', views.buyer_print_view, name='buyer_print'),
+    path('buyer/<int:buyer_id>/', views.buyer_detail_view, name='buyer_detail'),
     path('buyer/update-delete/<int:id>/', update_delete_buyer, name='update_delete_buyer'),
+    path('emi/pay/<int:emi_id>/', pay_emi, name='pay_emi'),
    
 ]

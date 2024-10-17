@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="text-primary">Buyer Details</h2>
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <p><strong>Name:</strong> {{ buyer.name }}</p>
+            <p><strong>Father's Name:</strong> {{ buyer.father_husband_name }}</p>  
+        </div>
+        <div class="d-flex justify-content-between">
+            <p><strong>Address:</strong> {{ buyer.address }}</p>
+            <p><strong>Email:</strong> {{ buyer.email }}</p>
+        </div>
+        <div class="d-flex justify-content-between">
+            <p><strong>Phone:</strong> {{ buyer.phone }}</p>
+            <p><strong>Property Location:</strong> {{ buyer.location }}</p>
+        </div>
+        <div class="d-flex justify-content-between">
+            <p><strong>Property ID:</strong> {{ buyer.project.title }}</p>
+            <p><strong>Promoter Name:</strong> {{ buyer.promoter.name }}</p>
+        </div>
+        <div class="d-flex justify-content-between">
+            <p><strong>Booking Amount:</strong> {{ buyer.booking_amount }}</p>
+            <p><strong>Property Price:</strong> {{ buyer.Plot_price }}</p>
+            <p><strong>Payment Date:</strong> {{ buyer.payment_date }}</p>
+        </div>
+    </div>
+</div>
+<h2 class="text-primary">EMI Payments</h2>
+<table class="table table-bordered table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>Due Date</th>
+            <th>EMI Amount</th>
+            <th>Amount Paid</th>
+            <th>Status</th>
+            <th>Pending Amount</th>
+            <th>Action</th> <!-- Added Action Column -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for payment in emi_payments %}
+        <tr {% if payment.status == 'Paid' %}class="table-success"{% elif payment.status == 'Pending' %}class="table-warning"{% endif %}>
+            <td>{{ payment.due_date }}</td>
+            <td>{{ payment.emi_amount|floatformat:2 }}</td>
+            <td>{{ payment.amount_paid|floatformat:2 }}</td>
+            <td>{{ payment.status }}</td>
+            <td>{{ payment.remaining_amount|floatformat:2 }}</td>
+            <td>
+                {% if payment.status == 'Pending' %}
+                <a href="{% url 'leads:pay_emi' payment.id %}" class="btn btn-success">Pay EMI</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">No EMI payments found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Bootstrap CSS and JS for better interaction -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<style>
+    /* Custom styling for the EMI payments table */
+    .table th {
+        background-color: #007bff;
+        color: white;
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .text-primary {
+        margin-top: 20px;
+        margin-bottom: 15px;
+        font-weight: bold;
+        text-align: center;
+    }
+    .table-success {
+        background-color: #d4edda !important; /* Light green for paid */
+    }
+    .table-warning {
+        background-color: #fff3cd !important; /* Light yellow for pending */
+    }
+</style>
+{%endblock content %}

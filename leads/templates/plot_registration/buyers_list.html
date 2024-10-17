@@ -4,7 +4,19 @@
 
 {% block content %}
 <div class="container mx-auto mt-8">
-    <h1 class="text-2xl font-bold mb-4">Buyers List</h1>
+    <div class="w-90 mb-6 py-6 flex justify-between items-center border-b border-black-100">
+        <div>
+            <h1 class="text-4xl text-gray-800">Buyers</h1>
+        </div>
+        {% if request.user.is_organisor %}
+        <div>
+            <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:plot_registration' %}">
+                Register New Plot
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
 
     <table class="min-w-full bg-white border border-gray-200">
         <thead>
@@ -15,7 +27,9 @@
                 <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Address</th>                
                 <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Email</th>
                 <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Property ID</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Associate Detail</th>
+                <th class="py-1 px-6 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Associate Detail</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Details</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Print Recipt</th>
             </tr>
         </thead>
         <tbody>
@@ -36,9 +50,14 @@
                 
                 <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.project.title }}</td>
                 <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.promoter.name }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">
-                    <a href="{% url 'leads:buyer_print' buyer.id %}" class=" hover:bg-Blue text-lightblue font-bold py-0 px-1">
+                <td class="py-2 px-4 border-b border-gray-200 text-sm text-blue-700">
+                    <a href="{% url 'leads:buyer_detail' buyer.id %}" class=" hover:bg-Blue text-lightblue font-bold py-0 px-1">
                         View Details
+                    </a>
+                </td>
+                <td class="py-2 px-4 border-b border-gray-200 text-sm text-blue-700">
+                    <a href="{% url 'leads:buyer_print' buyer.id %}" class=" hover:bg-Blue text-lightblue font-bold py-0 px-1">
+                        Print
                     </a>
                 </td>
             </tr>
@@ -49,12 +68,5 @@
             {% endfor %}
         </tbody>
     </table>
-
-    <div class="mt-4">
-        <a href="{% url 'leads:plot_registration' %}"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Register New Plot
-        </a>
-    </div>
 </div>
 {% endblock %}
