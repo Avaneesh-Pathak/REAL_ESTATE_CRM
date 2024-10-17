@@ -648,11 +648,11 @@ class ProjectCreateView(LoginRequiredMixin, View):
     
 class PropertyCreateView(LoginRequiredMixin, View):
     template_name = 'property/property_create.html'
-    projects = Project.objects.all()
 
     def get(self, request):
+        projects = Project.objects.all()
         # Render the initial form for number of properties and common attributes
-        return render(request, self.template_name,{'projects':  self.projects})
+        return render(request, self.template_name,{'projects':  projects})
 
 
     def post(self, request):
