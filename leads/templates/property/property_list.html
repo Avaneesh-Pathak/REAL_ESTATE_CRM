@@ -21,9 +21,10 @@
 <!-- Flexbox container for properties -->
 <div class="flex flex-wrap -mx-4">
     {% for property in properties %}
+
     <div class="w-full md:w-1/3 lg:w-1/4 px-4 mb-6 group">
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden relative {% if property.is_sold %} bg-red-200 {% else %} bg-green-200 {% endif %}">
-            <div class="px-6 py-4">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden relative">
+            <div style="{% if property.is_sold %}background-color:green;  {% else %} background-color:red; {% endif %}" class="px-6 py-4">
                 <h2 class="font-bold text-xl mb-2">{{ property.title }}</h2>
                 <p class="text-gray-700 text-base">Total Price: {{ property.totalprice }}</p>
                 <p class="text-gray-700 text-base">Plot type: {{ property.type }}</p>
