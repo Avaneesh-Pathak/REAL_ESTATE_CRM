@@ -281,6 +281,7 @@ class PlotBooking(models.Model):
     
 
 class EMIPayment(models.Model):
+
     plot_booking = models.ForeignKey(PlotBooking, on_delete=models.CASCADE, related_name='emi_payments')
     due_date = models.DateField()
     emi_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -310,3 +311,10 @@ class EMIPayment(models.Model):
 
     class Meta:
         ordering = ['due_date']  # Order EMI payments by due date
+
+class Level(models.Model):
+    level = models.CharField(max_length=222)
+    interest = models.IntegerField()
+
+    def __str__(self):
+        return  self.level
