@@ -18,29 +18,57 @@
     {% endif %}
 </div>
 
-<!-- Flexbox container for properties -->
-<div class="flex flex-wrap -mx-4">
-    {% for property in properties %}
-    <div class="w-full md:w-1/3 lg:w-1/4 px-4 mb-6 group">
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden relative">
-            <div class="px-6 py-4">
-                <h2 class="font-bold text-xl mb-2">{{ property.title }}</h2>
-                <p class="text-gray-700 text-base">Total Price: {{ property.totalprice }}</p>
-                <p class="text-gray-700 text-base">Plot type: {{ property.type }}</p>
-                <p class="text-gray-700 text-base">Price: ${{ property.price }}</p>
-            </div>
-
-            <!-- Hidden details to be shown on hover -->
-            <div class="absolute top-0 left-0 w-full h-full bg-white opacity-0 group-hover:opacity-100 p-6 transition-opacity duration-300 ease-in-out">
-                <h2 class="font-bold text-xl mb-2">{{ property.title }}</h2>
-                <p class="text-gray-700 text-base"><strong>Length:</strong> {{ property.length }}</p>
-                <p class="text-gray-700 text-base"><strong>Breadth:</strong> {{ property.breadth }}</p>
-                <p class="text-gray-700 text-base"><strong>Area:</strong> {{ property.area }} sq.ft.</p>
-                <p class="text-gray-700 text-base"><strong>Type:</strong> {{ property.type }}</p>
-                <p class="text-gray-700 text-base"><strong>Total Price:</strong> {{ property.totalprice }}</p>
-                <p class="text-gray-700 text-base"><strong>Project Name:</strong> {{ property.project_id }}</p>
-                <p class="text-gray-700 text-base"><strong>Price:</strong> ${{ property.price }}</p>
-                <p class="text-gray-700 text-base"><strong>Agent:</strong> ${{ property.agent }}</p>
+<div class="flex flex-col w-full">
+    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+            <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Property_id
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            dimension
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Block
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Price
+                            </th>
+                            <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Cell Phone Number
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Category
+                            </th> -->
+                            <!-- <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">Edit</span>
+                            </th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for property in properties %}
+                            <tr class="bg-white">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ property.title }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ property.project_name }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                     {{ property.block }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                     ${{ property.price }}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <li class="bg-red-100 p-4 rounded">No properties available.</li>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
