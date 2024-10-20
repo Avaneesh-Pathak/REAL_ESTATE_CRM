@@ -293,7 +293,7 @@ class PlotBooking(models.Model):
     location = models.CharField(max_length=255)
     project = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='project', null=True, blank=True)
     associate_detail = models.BooleanField(default=False)
-    Agent = models.ForeignKey(Promoter, on_delete=models.SET_NULL, null=True, blank=True, related_name='plot_bookings')  # Changed to lowercase
+    agent = models.ForeignKey(Agent, on_delete=models.SET_NULL, null=True, blank=True, related_name='plot_bookings')  # Changed to lowercase
     Plot_price = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=50, choices=[('custom', 'Custom Payment'), ('installment', 'Installments')])
     booking_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -303,6 +303,19 @@ class PlotBooking(models.Model):
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # Interest rate as a percentage
     emi_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=True)  # Calculated EMI amount
     remark = models.TextField(blank=True, null=True)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE,blank=False, null=True)
+
+    def save(self, *args, **kwargs):
+        print("Entering save method in PlotBooking.")
+        super().save(*args, **kwargs)  # Call the parent save method
+        if self.property:  # Check if the property is linked
+            print(f"Current property state before update: {self.property.is_sold}")
+            self.property.is_sold = True  # Set the property to sold
+            self.property.save()  # Save the property to update the status
+            print(f"Property {self.property.title} marked as sold.")
+        else:
+            print("No property linked to this PlotBooking.")
+
 
     def __str__(self):
         return f"Plot Booking - {self.name} - {self.booking_date}"

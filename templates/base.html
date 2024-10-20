@@ -180,7 +180,7 @@
             <div style="max-width: 100%;" class="container mx-auto flex flex-wrap p-2 flex-col md:flex-row items-center justify-between">
 
                 <!-- Hamburger Icon -->
-                <div class="hamburger cursor-pointer text-white" id="hamburger">
+                <div class="hamburger cursor-pointer text-white ml-4" id="hamburger">
                     &#9776; <!-- Unicode character for hamburger icon -->
                 </div>
 
@@ -209,11 +209,9 @@
 
                 <!-- Brand and Title -->
                 <a href="{% url 'dashboard' %}"
-                    class="flex title-font font-medium items-center text-white mb-4 md:mb-0">
-                    <svg id="Layer_1" class="w-10 h-10" enable-background="new 0 0 512 512" viewBox="0 0 512 512"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <g></g>
-                    </svg>
+                    class="flex w-320 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5">
+                    <img src="{% static 'images/Screenshot 2024-10-19 002628.png' %}" alt="Image" class="w-10 h-10">
+
                     <span class="ml-3 text-xl py-2">PMA Software</span>
                 </a>
 

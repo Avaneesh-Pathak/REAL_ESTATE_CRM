@@ -21,12 +21,11 @@
 <!-- Flexbox container for properties -->
 <div class="flex flex-wrap -mx-4">
     {% for property in properties %}
-
     <div class="w-full md:w-1/3 lg:w-1/4 px-4 mb-6 group">
         <div class="bg-white shadow-lg rounded-lg overflow-hidden relative">
-            <div style="{% if property.is_sold %}background-color:green;  {% else %} background-color:red; {% endif %}" class="px-6 py-4">
+            <div class="px-6 py-4" style="background-color: {% if property.is_sold %} red {% else %} green {% endif %};">
                 <h2 class="font-bold text-xl mb-2">{{ property.title }}</h2>
-                <p class="text-gray-700 text-base">Total Price: {{ property.totalprice }}</p>
+                <p class="text-gray-700 text-base">Total Price: ${{ property.totalprice }}</p>
                 <p class="text-gray-700 text-base">Plot type: {{ property.type }}</p>
                 <p class="text-gray-700 text-base">Price: ${{ property.price }}</p>
                 <p class="text-gray-700 text-base">Sold Status: {% if property.is_sold %} Sold {% else %} Available {% endif %}</p>
@@ -39,7 +38,7 @@
                 <p class="text-gray-700 text-base"><strong>Breadth:</strong> {{ property.breadth }}</p>
                 <p class="text-gray-700 text-base"><strong>Area:</strong> {{ property.area }} sq.ft.</p>
                 <p class="text-gray-700 text-base"><strong>Type:</strong> {{ property.type }}</p>
-                <p class="text-gray-700 text-base"><strong>Total Price:</strong> {{ property.totalprice }}</p>
+                <p class="text-gray-700 text-base"><strong>Total Price:</strong> ${{ property.totalprice }}</p>
                 <p class="text-gray-700 text-base"><strong>Project Name:</strong> {{ property.project_id }}</p>
                 <p class="text-gray-700 text-base"><strong>Price:</strong> ${{ property.price }}</p>
                 <p class="text-gray-700 text-base"><strong>Agent:</strong> {{ property.agent }}</p>

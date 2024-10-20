@@ -205,7 +205,7 @@ class PlotBookingForm(forms.ModelForm):
             'booking_date', 'name', 'father_husband_name', 'gender', 'custom_gender', 'dob', 'mobile_no',
             'address', 'bank_name', 'account_no', 'email', 'nominee_name', 'corner_plot_10', 'corner_plot_5',
             'full_pay_discount', 'location', 'project', 'associate_detail', 'agent', 'Plot_price',
-            'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark','emi_tenure', 'interest_rate'
+            'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark','emi_tenure', 'interest_rate','property',
         ]
         widgets = {
             'booking_date': forms.DateInput(attrs={'type': 'date'}),
@@ -258,3 +258,9 @@ class PlotBookingForm(forms.ModelForm):
             cleaned_data['emi_amount'] = emi_amount  # Save calculated EMI
 
         return cleaned_data
+    def save(self, *args, **kwargs):
+        plot_booking = super().save(*args, **kwargs)  # Call parent save
+        if plot_booking.property:  # Ensure the property is set
+            print(f"Marking property {plot_booking.property.title} as sold.")
+            plot_booking.property.is_sold = True  # Update sold status
+            plot_booking.property.save()  # Save the property

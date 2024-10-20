@@ -943,8 +943,7 @@ def add_promoter(request):
 
 
 
-# PLOT REGISTRATIOn
-
+# PLOT REGISTRATION
 
 
 
@@ -961,14 +960,24 @@ class PlotRegistrationView(LoginRequiredMixin, View):
         agents = Agent.objects.all()
 
         if form.is_valid():
-            plot_booking = form.save()
+            print("Form is valid. Saving PlotBooking...")
+            plot_booking = form.save(commit=False)  # Create the PlotBooking instance without saving it yet
+            
+            # Debug output to check the selected property
+            print(f"Selected property: {plot_booking.property}")
+
+            # Check if property is set before trying to access it
+            if plot_booking.property is None:
+                form.add_error('property', 'This field is required.')  # Add a custom error if no property is selected
+                return render(request, self.template_name, {'form': form, 'agents': agents})
+
             # Retrieve EMI amount and tenure from the form
             emi_amount = form.cleaned_data.get('emi_amount')
             tenure = form.cleaned_data.get('emi_tenure')
 
             # Ensure emi_amount is a Decimal and tenure is an integer
             if emi_amount is not None and tenure is not None and tenure > 0:
-                monthly_emi = emi_amount / tenure  # EMI per month
+                monthly_emi = emi_amount / tenure  # Calculate EMI per month
                 
                 # Generate EMI payment records
                 for month in range(tenure):
@@ -978,15 +987,23 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                         due_date=due_date,
                         emi_amount=monthly_emi  # Store calculated EMI
                     )
-            elif emi_amount is None and tenure is None:
+            else:
                 # Handle missing or invalid EMI amount or tenure
-                form.add_error(None, 'Invalid EMI amount or tenure.')
+                form.add_error(None, 'Invalid EMI amount or tenure.')  # Add error to form
 
-            return redirect('plot_registration/buyers_list')  # Ensure this matches your URL configuration
+            # Save the plot booking instance to the database
+            plot_booking.save()  # Ensure to save it before redirecting
+
+            # After saving the plot booking, we can mark the property as sold
+            if plot_booking.property:  # Check if the property is linked
+                plot_booking.property.is_sold = True  # Set the property to sold
+                plot_booking.property.save()  # Save the property to update the status
+                print(f"Property {plot_booking.property.title} marked as sold.")
+
+            return redirect('plot_registration:buyers_list')  # Ensure this matches your URL configuration
         else:
-            #return redirect('plot_registration/buyers_list.html')
+            print("Form is not valid. Errors:", form.errors)
             return render(request, self.template_name, {'form': form, 'agents': agents})
-
 def load_properties(request):
     project_name = request.GET.get('property.title')
     properties = Property.objects.filter(project_name_id=project_name).values('id', 'property.title')
@@ -996,7 +1013,7 @@ class BuyersListView(LoginRequiredMixin, View):
     template_name = 'plot_registration/buyers_list.html'
 
     def get(self, request, *args, **kwargs):
-        buyers = PlotBooking.objects.select_related('Agent').all()
+        buyers = PlotBooking.objects.select_related('agent').all()
         return render(request, self.template_name, {'buyers': buyers})
 
 def buyer_print_view(request, buyer_id):
@@ -1052,6 +1069,7 @@ def pay_emi(request, emi_id):
 
 
 class GetProjectPriceView(View):
+
     def get(self, request):
         project_id = request.GET.get('project_id')
         try:
@@ -1065,3 +1083,25 @@ class GetProjectPriceView(View):
                 return JsonResponse({'error': 'No properties found for this project.'})
         except Exception as e:
             return JsonResponse({'error': str(e)})
+        
+
+def book_plot(request, property_id):
+    # Assuming you're using a POST request to create a booking
+    if request.method == 'POST':
+        property_instance = get_object_or_404(Property, id=property_id)
+        
+        # Create a new PlotBooking instance
+        plot_booking = PlotBooking(
+            booking_date=request.POST['booking_date'],
+            name=request.POST['name'],
+            # Fill in other fields from the request
+            property=property_instance,
+        )
+        plot_booking.save()
+
+        # Mark the property as sold
+        property_instance.is_sold = True
+        property_instance.save()
+
+        # Redirect or return a response
+        return redirect('success_view')
