@@ -12,7 +12,7 @@ class User(AbstractUser):
 
 # Create your models here.
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.user.username
@@ -28,7 +28,7 @@ class Lead(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     age = models.IntegerField(default=0)
-    organisation = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
     agent = models.ForeignKey("Agent", null=True, blank=True, on_delete=models.SET_NULL)
     category = models.ForeignKey("Category",related_name="leads" ,null=True, blank=True, on_delete=models.SET_NULL)
     description = models.TextField()
@@ -49,7 +49,7 @@ def handle_upload_follow_ups(instance, filename):
 
 
 class FollowUp(models.Model):
-    lead = models.ForeignKey(Lead, related_name="followups", on_delete=models.CASCADE)
+    lead = models.ForeignKey(Lead, related_name="followups", on_delete=models.DO_NOTHING)
     date_added = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True, null=True)
     file = models.FileField(null=True, blank=True, upload_to=handle_upload_follow_ups)
@@ -60,8 +60,8 @@ class FollowUp(models.Model):
 
 
 class Agent(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    organisation = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
+    organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
     # New Addition Here
     parent_agent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='sub_agents')
     commission_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)  # Percentage of profit shared
@@ -74,7 +74,7 @@ class Agent(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=30)  # New, Contacted, Converted, Unconverted
-    organisation = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.name
@@ -90,11 +90,11 @@ post_save.connect(post_user_created_signal, sender=User)
 
 
 class Salary(models.Model):
-    agent = models.ForeignKey(User, on_delete=models.CASCADE)  # Or your Agent model
+    agent = models.ForeignKey(User, on_delete=models.DO_NOTHING)  # Or your Agent model
     base_salary = models.DecimalField(max_digits=10, decimal_places=2)
     bonus = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     payment_date = models.DateField()
-    organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
+    organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.DO_NOTHING)
 
     
     def __str__(self):
@@ -102,11 +102,11 @@ class Salary(models.Model):
 
 
 class Sale(models.Model):
-    property = models.ForeignKey('Property', on_delete=models.CASCADE)
-    agent = models.ForeignKey(User, on_delete=models.CASCADE)
+    property = models.ForeignKey('Property', on_delete=models.DO_NOTHING)
+    agent = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     sale_price = models.DecimalField(max_digits=15, decimal_places=2)
     sale_date = models.DateField()
-    organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
+    organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.DO_NOTHING)
     
     def __str__(self):
         return f"Sale by {self.agent.username} for ${self.sale_price}"
@@ -160,11 +160,11 @@ class Property(models.Model):
     type = models.CharField(max_length=200, null=True, blank=True)
     agent = models.ForeignKey('Agent', null=True, blank=True, on_delete=models.SET_NULL)
     project_id = models.ForeignKey('Project', null=True, blank=True, on_delete=models.SET_NULL)
-    organisation = models.ForeignKey('UserProfile', null=True, blank=True, on_delete=models.CASCADE)
+    organisation = models.ForeignKey('UserProfile', null=True, blank=True, on_delete=models.DO_NOTHING)
     title = models.CharField(max_length=7, blank=True)
     is_sold = models.BooleanField(default=False)
     # Removed the redundant ForeignKey to Property itself
-    related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.CASCADE)
+    related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.DO_NOTHING)
   # This line is not needed
    
     def if_sold(self):
@@ -188,7 +188,7 @@ class Property(models.Model):
 
 
 class Bonus(models.Model):
-    agent = models.ForeignKey(User, on_delete=models.CASCADE)
+    agent = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     bonus_amount = models.DecimalField(max_digits=10, decimal_places=2)
     date_awarded = models.DateField()
 
@@ -291,7 +291,7 @@ class PlotBooking(models.Model):
     corner_plot_5 = models.BooleanField(default=False)
     full_pay_discount = models.BooleanField(default=False)
     location = models.CharField(max_length=255)
-    project = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='project', null=True, blank=True)
+    project = models.ForeignKey(Property, on_delete=models.DO_NOTHING, related_name='project', unique=True,null=True, blank=True)
     associate_detail = models.BooleanField(default=False)
     Agent = models.ForeignKey(Promoter, on_delete=models.SET_NULL, null=True, blank=True, related_name='plot_bookings')  # Changed to lowercase
     Plot_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -310,7 +310,7 @@ class PlotBooking(models.Model):
 
 class EMIPayment(models.Model):
 
-    plot_booking = models.ForeignKey(PlotBooking, on_delete=models.CASCADE, related_name='emi_payments')
+    plot_booking = models.ForeignKey(PlotBooking, on_delete=models.DO_NOTHING, related_name='emi_payments')
     due_date = models.DateField()
     emi_amount = models.DecimalField(max_digits=10, decimal_places=2)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
