@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'crispy_tailwind',
     'tailwind',
     'theme',
+    'widget_tweaks',
     
     # Local Apps
     'leads',

@@ -4,38 +4,119 @@
 {% block content %}
 <div class="max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
     <div class="text-center mb-6">
-        <a href="{% url 'leads:project-create' %}" class="text-green-500 hover:text-green-700 underline">Create Project</a>
+        <a href="{% url 'leads:project-create' %}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md shadow-lg focus:outline-none">Create
+            Project</a>
     </div>
 
     <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create New Properties</h1>
 
     <form method="post" class="space-y-6">
         {% csrf_token %}
-        
+
         <div>
             <label for="num_properties" class="block text-gray-700 font-medium">Number of Properties:</label>
-            <input type="number" name="num_properties" min="1" required class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <input type="number" name="num_properties" min="1" required
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>
 
         <div>
             <label for="project_id" class="block text-gray-700 font-medium">Select Project:</label>
-            <select id="project_id" name="project_id" required class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <select id="project_id" name="project_id" required
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 <option value="">Choose a project</option>
                 {% for project in projects %}
-                    <option value="{{ project.id }}">{{ project.title }}</option>
+                <option value="{{ project.id }}">{{ project.title }}</option>
                 {% endfor %}
             </select>
         </div>
 
         <div>
-            <label for="price" class="block text-gray-700 font-medium">Common Price Name:</label>
-            <input type="number" name="price" required class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <label for="dimension" class="block text-gray-700 font-medium">Select Dimension:</label>
+            <select id="dimension" name="dimension" required
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                onchange="toggleCustomInputs()">
+                <option value="">Choose dimension</option>
+                {% for area in areas %}
+                <option value="{{ area.length }}*{{ area.breadth }}">{{ area.length }}*{{ area.breadth }}</option>
+                {% endfor %}
+                <option value="others">Others</option>
+            </select>
+        </div>
+
+        <!-- Custom Length and Breadth Inputs -->
+        <div id="custom-dimensions" class="hidden mt-4">
+            <label for="length" class="block text-gray-700 font-medium">Length:</label>
+            <input type="number" id="length" name="length" placeholder="Enter length"
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+            <label for="breadth" class="block text-gray-700 font-medium mt-4">Breadth:</label>
+            <input type="number" id="breadth" name="breadth" placeholder="Enter breadth"
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <script>
+            function toggleCustomInputs() {
+                const dimensionSelect = document.getElementById('dimension');
+                const customDimensionsDiv = document.getElementById('custom-dimensions');
+                const lengthInput = document.getElementById('length');
+                const breadthInput = document.getElementById('breadth');
+
+                if (dimensionSelect.value === 'others') {
+                    customDimensionsDiv.classList.remove('hidden'); // Show custom inputs
+                    lengthInput.setAttribute('required', 'required'); // Set length required
+                    breadthInput.setAttribute('required', 'required'); // Set breadth required
+                } else {
+                    customDimensionsDiv.classList.add('hidden'); // Hide custom inputs
+                    lengthInput.removeAttribute('required'); // Remove length required
+                    breadthInput.removeAttribute('required'); // Remove breadth required
+                }
+            }
+        </script>
+
+        <div>
+            <label for="type" class="block text-gray-700 font-medium">Select Type:</label>
+            <select id="type" name="type" required
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                onchange="toggleCustomTypeInput()">
+                <option value="">Choose Type</option>
+                {% for type in types %}
+                <option value="{{ type.type }}">{{ type.type }}</option>
+                {% endfor %}
+                <option value="others">Others</option>
+            </select>
+        </div>
+
+        <!-- Custom Type Input -->
+        <div id="custom-type-input" class="hidden mt-4">
+            <label for="new_type" class="block text-gray-700 font-medium">Enter New Type:</label>
+            <input type="text" id="new_type" name="new_type" placeholder="Enter new type"
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <script>
+            function toggleCustomTypeInput() {
+                const typeSelect = document.getElementById('type');
+                const customTypeInputDiv = document.getElementById('custom-type-input');
+
+                if (typeSelect.value === 'others') {
+                    customTypeInputDiv.classList.remove('hidden'); // Show custom type input
+                } else {
+                    customTypeInputDiv.classList.add('hidden'); // Hide custom type input
+                }
+            }
+        </script>
+
+        <div>
+            <label for="price" class="block text-gray-700 font-medium">Common Price:</label>
+            <input type="number" name="price" required
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>
 
         <div class="text-center">
-            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md shadow-lg focus:outline-none">Create Properties</button>
+            <button type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md shadow-lg focus:outline-none">Create
+                Properties</button>
         </div>
     </form>
 </div>
 {% endblock content %}
- 

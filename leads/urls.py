@@ -6,8 +6,8 @@ from .views import (
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,ProjectCreateView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
-    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,daybook_list,daybook_create,add_promoter,update_delete_promoter,
-    promoter_list,load_properties,plot_registration,update_delete_buyer,pay_emi
+    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,DaybookListView,daybook_create,add_promoter,update_delete_promoter,
+    PromoterListView,load_properties,PlotRegistrationView,update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView
 )
 
 app_name = "leads"
@@ -48,19 +48,21 @@ urlpatterns = [
     # URL for creating a new project
     path('calculate-emi/', calculate_emi, name='calculate_emi'), 
     #DAYBOOK
-    path('daybook/', daybook_list, name='daybook_list'),  # URL for listing expenses
+    path('daybook/', DaybookListView.as_view(), name='daybook_list'),  # URL for listing expenses
     path('daybook/create/', daybook_create, name='daybook_create'),
     #PROMOTER
-    path('promoters/', views.promoter_list, name='promoter_list'),
+    path('promoters/', PromoterListView.as_view(), name='promoter_list'),
     path('promoter/<int:promoter_id>/update-delete/', views.update_delete_promoter, name='update_delete_promoter'),
     path('promoter/add/', add_promoter, name='add_promoter'),  # URL for adding a promoter
-    path('register-plot/', views.plot_registration, name='plot_registration'),
+    path('register-plot/', PlotRegistrationView.as_view(), name='plot_registration'),
     path('ajax/load-properties/', load_properties, name='ajax_load_properties'),
-    path('register/', plot_registration, name='plot_registration'),
-    path('register/plot_registration/buyers_list/', views.buyers_list, name='buyers_list'), 
+    path('register/', PlotRegistrationView.as_view(), name='plot_registration'),
+    path('register/plot_registration/buyers_list/', BuyersListView.as_view(), name='buyers_list'), 
     path('buyer/<int:buyer_id>/print/', views.buyer_print_view, name='buyer_print'),
     path('buyer/<int:buyer_id>/', views.buyer_detail_view, name='buyer_detail'),
     path('buyer/update-delete/<int:id>/', update_delete_buyer, name='update_delete_buyer'),
     path('emi/pay/<int:emi_id>/', pay_emi, name='pay_emi'),
+
+     path('property/get_price/', GetProjectPriceView.as_view(), name='get_project_price'),
    
 ]
