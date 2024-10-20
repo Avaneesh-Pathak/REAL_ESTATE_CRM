@@ -3,6 +3,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    th{
+        background-color:rgb(58, 32, 142);
+    }
+</style>
 <div class="container mx-auto mt-8">
     <div class="w-90 mb-6 py-6 flex justify-between items-center border-b border-black-100">
         <div>
@@ -21,15 +26,15 @@
     <table class="min-w-full bg-white border border-gray-200">
         <thead>
             <tr class="bg-gray-200">
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Name</th>               
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Gender</th>               
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Mobile No.</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Address</th>                
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Email</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Property ID</th>
-                <th class="py-1 px-6 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Associate Detail</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Details</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-gray-700">Print Recipt</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Name</th>               
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Gender</th>               
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Mobile No.</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Address</th>                
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Email</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Property ID</th>
+                <th class="py-1 px-6 border-b border-gray-200 text-left text-sm font-semibold text-white">Associate Detail</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Details</th>
+                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Print Recipt</th>
             </tr>
         </thead>
         <tbody>
@@ -49,7 +54,7 @@
                 <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.email }}</td>
                 
                 <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.project.title }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.promoter.name }}</td>
+                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyers.Agent.username }}</td>
                 <td class="py-2 px-4 border-b border-gray-200 text-sm text-blue-700">
                     <a href="{% url 'leads:buyer_detail' buyer.id %}" class=" hover:bg-Blue text-lightblue font-bold py-0 px-1">
                         View Details

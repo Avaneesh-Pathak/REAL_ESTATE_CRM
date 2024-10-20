@@ -1,24 +1,20 @@
 import logging
 import datetime
-from django import contrib
-from django.db import IntegrityError , models
 from datetime import timedelta
+from decimal import Decimal
+from django.db import models, IntegrityError
 from django.db.models import Count
-from django.contrib import messages
-from django.views import View
 from django.core.mail import send_mail
-from django.http.response import JsonResponse
-from django.shortcuts import render, redirect, reverse,get_object_or_404
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
-from django.views import generic
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.contrib import messages
+from django.views import View, generic
 from django.views.generic import ListView
-from .models import Property, Sale, Salary, Bonus
-from leads.models import Category
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin # type: ignore
+from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot
 from agents.mixins import OrganisorAndLoginRequiredMixin
-from django.forms import modelformset_factory
-from .models import Lead, Agent, Category, FollowUp,Promoter,PlotBooking,Project,EMIPayment
-from django.db import models
+from .models import Property, Sale, Salary, Bonus
 from .forms import (
     LeadForm, 
     LeadModelForm, 
@@ -26,9 +22,14 @@ from .forms import (
     AssignAgentForm, 
     LeadCategoryUpdateForm,
     CategoryModelForm,
-    FollowUpModelForm,SalaryForm,SaleForm,
-    PropertyModelForm,PromoterForm,PlotBookingForm
+    FollowUpModelForm,
+    SalaryForm,
+    SaleForm,
+    PropertyModelForm,
+    PromoterForm,
+    PlotBookingForm
 )
+
 
 
 logger = logging.getLogger(__name__)
@@ -615,7 +616,7 @@ class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
         
 
 class ProjectCreateView(LoginRequiredMixin, View):
-    model = Project
+    model = Project,Area
     template_name = 'property/create_project.html'
 
 
@@ -644,32 +645,62 @@ class ProjectCreateView(LoginRequiredMixin, View):
 
         
     def get_success_url(self):
-        return reverse('leads:project-create')
+        return reverse('leads:property-create')
     
 class PropertyCreateView(LoginRequiredMixin, View):
     template_name = 'property/property_create.html'
 
     def get(self, request):
         projects = Project.objects.all()
+        areas = Area.objects.all()
+        types = Typeplot.objects.all()
         # Render the initial form for number of properties and common attributes
-        return render(request, self.template_name,{'projects':  projects})
+        return render(request, self.template_name,{'projects':  projects,'areas':areas,'types':types})
 
 
     def post(self, request):
         # Get the number of properties to create and common attributes
         num_properties = int(request.POST.get('num_properties', 1))
-        price = request.POST.get('price', '')
+        price = int(request.POST.get('price', ''))
+        type = request.POST.get('type', '')
+        dimension = request.POST.get('dimension', '')
+        # Split the string using '*' as the separator
+        if dimension == 'others':
+            l = int(request.POST.get('length'))
+            b = int(request.POST.get('breadth'))
+            area = float(l) * float(b)
+            Area.objects.create(
+            length = l,
+            breadth = b
+            )
 
+        else:
+            len, bre = dimension.split('*')
+            l = int(len)
+            b = int(bre)
+            area = l* b
+
+        if type == 'others':
+            newtype = request.POST.get('new_type')
+            Typeplot.objects.create(
+                type = newtype
+            )
+            type = newtype
         key = int(request.POST.get('project_id', ''))
                 # Fetch the Project instance using `get_object_or_404`
         project = get_object_or_404(Project, id=key)
-
+        tp = (l*b*price)
 
         # Create the properties in the database
         for _ in range(num_properties):
             Property.objects.create(
                 project_id = project , # Example size, modify as needed
-                price=price  # Example price, modify as needed
+                price=price , # Example price, modify as needed
+                type=type,  # Example price, modify as needed
+                area=area,  # Example price, modify as needed
+                breadth=b,  # Example price, modify as needed
+                length=l,  # Example price, modify as needed
+                totalprice=tp,  # Example price, modify as needed
             )
 
         return redirect(self.get_success_url())
@@ -696,7 +727,7 @@ def get_properties_by_project(request, project_id):
     return JsonResponse({'properties': properties_data})
 
 # View to edit selected properties
-class PropertyUpdateView(View):
+class PropertyUpdateView(LoginRequiredMixin,View):
     template_name = 'property/property_update.html'  # Update with your template 
 
     def get(self, request, ids):
@@ -726,7 +757,7 @@ class PropertyUpdateView(View):
         return reverse('leads:property_list')
 
    
-class PropertyDeleteView(View):
+class PropertyDeleteView(LoginRequiredMixin,View):
     def post(self, request, ids):
         property_ids = ids.split(',')  # Convert the comma-separated string back to a list
 
@@ -740,17 +771,17 @@ class PropertyDeleteView(View):
         return reverse('leads:property_list')
 
 
-class SaleListView(ListView):
+class SaleListView(LoginRequiredMixin,ListView):
     model = Sale
     template_name = 'sale/sale_list.html'  # Update with your template path
     context_object_name = 'sales'
 
-class SalaryListView(ListView):
+class SalaryListView(LoginRequiredMixin,ListView):
     model = Salary
     template_name = 'salary/salary_list.html'  # Update with your template path
     context_object_name = 'salaries'
 
-class BonusInfoView(ListView):
+class BonusInfoView(LoginRequiredMixin,ListView):
     model = Bonus
     template_name = 'leads/bonus_info.html'  # Update with your template path
     context_object_name = 'bonuses'
@@ -825,24 +856,27 @@ from django.utils import timezone
 from .forms import DaybookEntryForm  # Update the import statement
 
 
-def daybook_list(request):
-    # Get today's date
-    today = timezone.now().date()
+class DaybookListView(LoginRequiredMixin, View):
+    template_name = 'Daybook/daybook_list.html'
 
-    # Calculate today's expenses
-    todays_expenses = Daybook.objects.filter(date=today)
-    total_todays_expenses = sum(expense.amount for expense in todays_expenses)
+    def get(self, request, *args, **kwargs):
+        # Get today's date
+        today = timezone.now().date()
 
-    # Get current balance (assuming it's stored in a variable or model)
-    current_balance = 25000  # Replace this with your actual current balance logic
-    updated_balance = current_balance - total_todays_expenses
+        # Calculate today's expenses
+        todays_expenses = Daybook.objects.filter(date=today)
+        total_todays_expenses = sum(expense.amount for expense in todays_expenses)
 
-    context = {
-        'expenses': todays_expenses,
-        'total_balance': updated_balance,
-        'todays_expense': total_todays_expenses,
-    }
-    return render(request, 'Daybook/daybook_list.html', context)
+        # Get current balance (replace with your actual current balance logic)
+        current_balance = 25000
+        updated_balance = current_balance - total_todays_expenses
+
+        context = {
+            'expenses': todays_expenses,
+            'total_balance': updated_balance,
+            'todays_expense': total_todays_expenses,
+        }
+        return render(request, self.template_name, context)
 
 def daybook_create(request):
     if request.method == 'POST':
@@ -861,9 +895,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Promoter  # Import the Promoter model
 from .forms import PromoterForm  # Import the PromoterForm
 
-def promoter_list(request):
-    promoters = Promoter.objects.all()
-    return render(request, 'promoter/promoter_list.html', {'promoters': promoters})
+class PromoterListView(LoginRequiredMixin, ListView):
+    model = Promoter
+    template_name = 'promoter/promoter_list.html'
+    context_object_name = 'promoters'
 
 def update_delete_promoter(request, promoter_id):
     promoter = get_object_or_404(Promoter, id=promoter_id)
@@ -899,28 +934,31 @@ def add_promoter(request):
 
 # PLOT REGISTRATIOn
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
-from datetime import timedelta
-from decimal import Decimal
-from .forms import PlotBookingForm
-from .models import PlotBooking, EMIPayment, Property
 
-def plot_registration(request):
-    form = PlotBookingForm(request.POST or None)
-    if request.method == 'POST':
-        print("post")
+
+
+class PlotRegistrationView(LoginRequiredMixin, View):
+    template_name = 'plot_registration/plot_registration.html'
+
+    def get(self, request, *args, **kwargs):
+        form = PlotBookingForm()
+        agents = Agent.objects.all()
+        return render(request, self.template_name, {'form': form, 'agents': agents})
+
+    def post(self, request, *args, **kwargs):
+        form = PlotBookingForm(request.POST)
+        agents = Agent.objects.all()
+
         if form.is_valid():
             plot_booking = form.save()
-            print("save")
             # Retrieve EMI amount and tenure from the form
-            emi_amount = form.cleaned_data.get('emi_amount')  # Fetch from cleaned_data
+            emi_amount = form.cleaned_data.get('emi_amount')
             tenure = form.cleaned_data.get('emi_tenure')
-            print(emi_amount)
+
             # Ensure emi_amount is a Decimal and tenure is an integer
             if emi_amount is not None and tenure is not None and tenure > 0:
                 monthly_emi = emi_amount / tenure  # EMI per month
-                print("submit emi")
+                
                 # Generate EMI payment records
                 for month in range(tenure):
                     due_date = plot_booking.payment_date + timedelta(days=30 * month)
@@ -929,32 +967,33 @@ def plot_registration(request):
                         due_date=due_date,
                         emi_amount=monthly_emi  # Store calculated EMI
                     )
-            elif  emi_amount is None and tenure is None:
-                print("error")
-            #     # Handle missing or invalid EMI amount or tenure
+            elif emi_amount is None and tenure is None:
+                # Handle missing or invalid EMI amount or tenure
                 form.add_error(None, 'Invalid EMI amount or tenure.')
-                # return redirect(request, 'plot_registration/buyers_list', {'form': form})
 
             return redirect('plot_registration/buyers_list')  # Ensure this matches your URL configuration
         else:
-            return redirect('plot_registration/buyers_list.html')
-    
-    return render(request, 'plot_registration/plot_registration.html', {'form': form})
+            #return redirect('plot_registration/buyers_list.html')
+            return render(request, self.template_name, {'form': form, 'agents': agents})
 
 def load_properties(request):
     project_name = request.GET.get('property.title')
     properties = Property.objects.filter(project_name_id=project_name).values('id', 'property.title')
     return JsonResponse(list(properties), safe=False)
 
-def buyers_list(request):
-    buyers = PlotBooking.objects.all()
-    return render(request, 'plot_registration/buyers_list.html', {'buyers': buyers})
+class BuyersListView(LoginRequiredMixin, View):
+    template_name = 'plot_registration/buyers_list.html'
+
+    def get(self, request, *args, **kwargs):
+        buyers = PlotBooking.objects.select_related('Agent').all()
+        return render(request, self.template_name, {'buyers': buyers})
 
 def buyer_print_view(request, buyer_id):
     buyer = get_object_or_404(PlotBooking, id=buyer_id)
     context = {'buyer': buyer}
     return render(request, 'plot_registration/buyer_print_template.html', context)
 
+@login_required
 def update_delete_buyer(request, id):
     plot_booking = get_object_or_404(PlotBooking, id=id)
 
@@ -970,7 +1009,8 @@ def update_delete_buyer(request, id):
     else:
         form = PlotBookingForm(instance=plot_booking)  # Pre-fill the form with the existing data
 
-    return render(request, 'plot_registration/update_delete_buyer.html', {'form': form})
+    agents = Agent.objects.all()
+    return render(request, 'plot_registration/update_delete_buyer.html', {'form': form, 'agents': agents})
 
 def buyer_detail_view(request, buyer_id):
     buyer = get_object_or_404(PlotBooking, id=buyer_id)
@@ -998,3 +1038,19 @@ def pay_emi(request, emi_id):
         return redirect('leads:buyers_list')  # Redirect after updating
 
     return render(request, 'plot_registration/pay_emi.html', {'emi_payment': emi_payment})
+
+
+class GetProjectPriceView(View):
+    def get(self, request):
+        project_id = request.GET.get('project_id')
+        try:
+            # Fetch properties related to the selected project
+            properties = Property.objects.filter(project_id=project_id)
+            if properties.exists():
+                # Assuming you want the price of the first property; adjust if needed
+                total_price = properties.first().totalprice
+                return JsonResponse({'price': total_price})
+            else:
+                return JsonResponse({'error': 'No properties found for this project.'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)})

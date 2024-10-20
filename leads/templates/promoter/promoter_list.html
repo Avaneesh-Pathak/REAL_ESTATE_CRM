@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-
 <section class="text-gray-700 body-font">
     <div class="container px-1 py-8 mx-auto flex flex-wrap">
         <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-gray-200">
@@ -81,10 +80,8 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ promoter.joining_percentage }}%
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{% url 'leads:update_delete_promoter' promoter.id %}" class="text-indigo-600 hover:text-indigo-900">
-                                                Edit
-                                            </a>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <a href="{% url 'leads:update_delete_promoter' promoter.id %}">Edit</a>
                                         </td>
                                     </tr>
                                 {% empty %}

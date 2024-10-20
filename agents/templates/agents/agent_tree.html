@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Tree</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f9fc;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #0277bd; /* Professional Dark Blue */
+            font-size: 2.5em;
+        }
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .node {
+            margin: 20px 0;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .node:hover {
+            transform: scale(1.05);
+        }
+
+        .agent-info {
+            background-color: #e3f2fd; /* Soft Blue */
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1; /* Ensure the agent info appears above lines */
+        }
+
+        .agent-info strong {
+            display: block;
+            font-size: 1.4em;
+            margin-bottom: 5px;
+            color: #01579b; /* Darker Blue */
+        }
+
+        .agent-info p {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .children {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .children .node {
+            margin: 0 30px;
+        }
+
+        /* Connecting lines */
+        .node::before, .node::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            background-color: #5a9bd4; /* Soft Blue */
+            z-index: 0; /* Ensure lines are below agent info */
+        }
+
+        .node::before {
+            height: 100%; /* For parent lines */
+            margin-left: -1px; /* Center line */
+            top: 0; /* Start at the top of the node */
+        }
+
+        .children .node::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            width: 2px;
+            height: 10px;
+            background-color: #5a9bd4; /* Soft Blue */
+            z-index: 0; /* Ensure lines are below agent info */
+        }
+
+        /* Create connecting lines between nodes */
+        .children::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            border-top: 2px solid #5a9bd4; /* Soft Blue */
+            z-index: 0;
+        }
+
+        /* Buttons Styling */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #0277bd; /* Button Blue */
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            text-align: center;
+            margin: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #01579b; /* Darker Blue on hover */
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Agent Tree Structure</h1>
+
+    <!-- Button container for actions -->
+    <div class="btn-container">
+        <a href="{% url 'agents:agent-list' %}" class="btn">Go Back to Agents</a>
+        <a href="{% url 'agents:agent-create' %}" class="btn">Create New Agent</a>
+    </div>
+
+    <!-- Tree Structure -->
+    <div class="tree">
+        {% for agent in agents %}
+            <div class="node">
+                <div class="agent-info">
+                    <strong>{{ agent.user.username }}</strong>
+                    <p>Commission: {{ agent.commission_percentage }}%</p>
+                    <p>Level: {{ agent.level }}</p>
+                    <a href="{% url 'agents:agent-update' agent.id %}" class="btn">Update Agent</a> <!-- Update Button -->
+                </div>
+                {% if agent.sub_agents_list %}
+                    <div class="children">
+                        {% for sub_agent in agent.sub_agents_list %}
+                            <div class="node">
+                                <div class="agent-info">
+                                    <strong>{{ sub_agent.user.username }}</strong>
+                                    <p>Commission: {{ sub_agent.commission_percentage }}%</p>
+                                    <p>Level: {{ sub_agent.level }}</p>
+                                    <a href="{% url 'agents:agent-update' sub_agent.id %}" class="btn">Update Agent</a> <!-- Update Button -->
+                                </div>
+                                {% if sub_agent.sub_agents_list %}
+                                    <div class="children">
+                                        {% for sub_sub_agent in sub_agent.sub_agents_list %}
+                                            <div class="node">
+                                                <div class="agent-info">
+                                                    <strong>{{ sub_sub_agent.user.username }}</strong>
+                                                    <p>Commission: {{ sub_sub_agent.commission_percentage }}%</p>
+                                                    <p>Level: {{ sub_sub_agent.level }}</p>
+                                                    <a href="{% url 'agents:agent-update' sub_sub_agent.id %}" class="btn">Update Agent</a> <!-- Update Button -->
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
+{% endblock content %}

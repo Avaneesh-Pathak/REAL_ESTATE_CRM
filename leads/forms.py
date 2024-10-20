@@ -1,8 +1,7 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm, UsernameField
-from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter, Daybook,PlotBooking
+from django.contrib.auth.forms import UserCreationForm
+from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter, Daybook,PlotBooking,Agent
 
 User = get_user_model()
 
@@ -36,9 +35,13 @@ class LeadForm(forms.Form):
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
-        model = User
-        fields = ("username",)
-        field_classes = {'username': UsernameField}
+        model = User  # replace with your user model
+        fields = ['username', 'email', 'password']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'login__input'}),
+            'email': forms.EmailInput(attrs={'class': 'login__input'}),
+            'password': forms.PasswordInput(attrs={'class': 'login__input'}),
+        }
 
 
 
@@ -144,6 +147,10 @@ class DaybookEntryForm(forms.ModelForm):
 
         if activity == 'others' and not custom_activity:
             raise forms.ValidationError("Please enter the custom activity.")
+        # elif activity == 'others':
+        #     Daybook.objects.create(
+        #         activity = custom_activity
+            # )
 
         return cleaned_data
     
@@ -191,12 +198,13 @@ def calculate_emi(principal, booking_amount, tenure, interest_rate):
 
 
 class PlotBookingForm(forms.ModelForm):
+    agent = forms.ModelChoiceField(queryset=Agent.objects.all(), required=False)
     class Meta:
         model = PlotBooking
         fields = [
             'booking_date', 'name', 'father_husband_name', 'gender', 'custom_gender', 'dob', 'mobile_no',
             'address', 'bank_name', 'account_no', 'email', 'nominee_name', 'corner_plot_10', 'corner_plot_5',
-            'full_pay_discount', 'location', 'project', 'associate_detail', 'promoter', 'Plot_price',
+            'full_pay_discount', 'location', 'project', 'associate_detail', 'agent', 'Plot_price',
             'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark','emi_tenure', 'interest_rate'
         ]
         widgets = {
@@ -205,10 +213,18 @@ class PlotBookingForm(forms.ModelForm):
             'payment_date':forms.DateInput(attrs={'type': 'date'}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args,project=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['promoter'].queryset = Promoter.objects.all()
+        self.fields['agent'].queryset = Agent.objects.all()
         self.fields['project'].queryset = Property.objects.all()
+
+        if project:
+            try:
+                property_instance = Property.objects.get(project=project)
+                self.initial['Plot_price'] = property_instance.totalprice  # Set the initial price
+            except Property.DoesNotExist:
+                self.initial['Plot_price'] = 0
+
 
         # Ensure only one of the corner plot or full pay options can be selected
         for field in ['corner_plot_10', 'corner_plot_5', 'full_pay_discount']:

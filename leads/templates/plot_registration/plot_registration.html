@@ -2,343 +2,334 @@
 
 {% block content %}
 <style>
-    /* General styling */
+    /* General styling for the form page */
     body {
-        background-color: #87CEEB; /* Light background */
-        font-family: 'Open Sans', sans-serif; /* Font family */
+        background-color: #f4f6f9;
+        /* Soft gray background for improved readability */
+        font-family: 'Open Sans', sans-serif;
+        /* Clean and modern font */
+        margin: 0;
+        padding: 0;
     }
 
     .container {
-        background-color: #ffffff; /* White background for the form */
-        border-radius: 10px; /* Rounded corners */
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
-        padding: 20px; /* Padding inside the container */
-        box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
-    }
 
-    h2 {
-        color: #007bff; /* Primary color for headings */
-        margin-bottom: 20px; /* Space below heading */
-    }
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 
-    h4 {
-        color: #343a40; /* Darker color for subheadings */
-        margin-top: 20px; /* Space above subheadings */
-        margin-bottom: 10px; /* Space below subheadings */
+
+        margin: auto;
     }
 
     .form-group {
-        margin-bottom: 15px; /* Space between form groups */
+        margin-bottom: 20px;
     }
 
-    .col-form-label {
-        font-weight: bold; /* Bold labels */
+    label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333333;
+        display: block;
     }
+
     input[type="text"],
     input[type="email"],
+    input[type="date"],
     input[type="number"],
+    select,
     textarea {
-            padding: 5px;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box; /* Ensure padding doesn't affect overall width */
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: border-color 0.3s, box-shadow 0.3s;
     }
 
-    .form-control {
-        border: 2px solid #007bff !important; /* Change the border color and thickness */
-        border-radius: 5px; /* Rounded corners */
-        padding: 10px; /* Padding inside the inputs */
-        font-size: 16px; /* Larger font size for better readability */
-        transition: border-color 0.3s; /* Smooth transition for border color */
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: #007bff;
+        /* Blue border on focus */
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
+        /* Light blue glow */
     }
-
-    .form-control:focus {
-        border-color: #0056b3; /* Change border color on focus */
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add shadow on focus */
-    } 
 
     .btn-primary {
-        background-color: #007bff; /* Primary button color */
-        border-color: #007bff; /* Border color for button */
-        font-weight: bold; /* Bold text for button */
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #ffffff;
+        padding: 12px 20px;
+        font-weight: bold;
+        border-radius: 6px;
+        width: 100%;
+        font-size: 18px;
+        transition: background-color 0.3s, border-color 0.3s;
     }
 
     .btn-primary:hover {
-        background-color: #0056b3; /* Darker blue on hover */
-        border-color: #0056b3; /* Darker border on hover */
+        background-color: #0056b3;
+        border-color: #0056b3;
     }
 
-    .form-horizontal .col-form-label {
-        text-align: left; /* Align labels to the left */
+    h3.section-heading {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 30px;
+        color: #007bff;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 10px;
+        text-transform: uppercase;
+        font-size: 1.5rem;
     }
 
-    .text-center {
-        text-align: center; /* Center text */
+    h4.section-subheading {
+        text-align: center;
+        font-weight: 600;
+        margin-top: 20px;
+        color: #333333;
+        font-size: 1.2rem;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
     }
 
-    /* Custom styles for specific elements */
+    .d-flex {
+        display: flex;
+        gap: 20px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .d-flex>div,
+    .d-flex>p {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .d-flex p {
+        font-size: 16px;
+        color: #333333;
+    }
+
+    .d-flex strong {
+        color: #007bff;
+    }
+
+
     #emi-options {
-        background-color: #e9ecef; /* Light background for EMI details */
-        border-radius: 5px; /* Rounded corners */
-        padding: 15px; /* Padding around EMI details */
-        margin-top: 20px; /* Space above EMI details */
+        background-color: #f9f9f9;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 20px;
     }
 
-    /* Responsive design */
+    /* Responsive adjustments */
     @media (max-width: 768px) {
-        .form-horizontal .col-form-label {
-            text-align: left; /* Align labels to the left on smaller screens */
+        .d-flex {
+            flex-direction: column;
         }
 
-        .form-group {
-            margin-bottom: 50px; /* Reduce space between form groups on smaller screens */
+        h3.section-heading {
+            font-size: 1.3rem;
+        }
+
+        h4.section-subheading {
+            font-size: 1.1rem;
         }
     }
 </style>
 
+
 <div class="container mt-5 mb-5 p-4">
-    <h1 class="text-4xl text-gray-800 text-center my-5">PLOT REGISTRATION</h1>
-    
-    
+    <h1 style="text-align: center; color: #000000; font-size: var(--h1-font-size, 32px);">
+        PLOT REGISTRATION
+    </h1>
     <form method="POST" class="form-horizontal">
         {% csrf_token %}
-        
+
         <!-- Booking Date -->
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.booking_date.label }}</label>
-            <div class="col-sm-10">
-                {{ form.booking_date }}
-            </div>
+        <div class="col-md-2">
+            <label>{{ form.booking_date.label }}</label>
+            {{ form.booking_date }}
         </div>
 
-        <!-- Personal Information -->
-        <h3 class="text-2xl text-gray-800 text-center my-5">PERSONAL INFORMATION</h3>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.name.label }}</label>
-            <div class="col-sm-10">
-                {{ form.name }}
-            </div>
+        <!-- Personal Information Section -->
+        <h3 class="section-heading">PERSONAL INFORMATION</h3>
+        <div class="d-flex justify-content-between">
+            <p><strong>Full Name:</strong>{{ form.name }}</p>
+            <p><strong>Fathers/Husband Name:</strong>{{ form.father_husband_name }}</p>
         </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-10">
-                <p><strong>Father's /Husband Name:</strong> {{ form.father_husband_name }}</p>
-            </div>
+        <div class="d-flex justify-content-between">
+            <p><strong>Gender:</strong>{{ form.gender }}</p>
+            <p id="custom-gender-field" style="display:none;"><strong>{{ form.custom_gender.label }}</strong>{{
+                form.custom_gender }}</p>
         </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.gender.label }}</label>
-            <div class="col-sm-10">
-                {{ form.gender }}
-            </div>
+        <div class="d-flex justify-content-between">
+            <p><strong>DOB:</strong>{{ form.dob }}</p>
+            <p><strong>Mobile No.:</strong>{{ form.mobile_no }}</p>
         </div>
-        <div class="form-group row" id="custom-gender-field" style="display:none;">
-            <label class="col-sm-2 col-form-label">{{ form.custom_gender.label }}</label>
-            <div class="col-sm-10">
-                {{ form.custom_gender }}
-            </div>
+        <div class="form-group">
+            <label>{{ form.address.label }}</label>
+            {{ form.address }}
         </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.dob.label }}</label>
-            <div class="col-sm-10">
-                {{ form.dob }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.mobile_no.label }}</label>
-            <div class="col-sm-10">
-                {{ form.mobile_no }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.address.label }}</label>
-            <div class="col-sm-10">
-                {{ form.address }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.bank_name.label }}</label>
-            <div class="col-sm-10">
-                {{ form.bank_name }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.account_no.label }}</label>
-            <div class="col-sm-10">
-                {{ form.account_no }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.email.label }}</label>
-            <div class="col-sm-10">
-                {{ form.email }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.nominee_name.label }}</label>
-            <div class="col-sm-10">
-                {{ form.nominee_name }}
-            </div>
+        <div class="d-flex justify-content-between">
+            <p><strong>Email:</strong>{{ form.email }}</p>
+            <p><strong>Nominee Name:</strong>{{ form.nominee_name }}</p>
         </div>
 
-        <!-- PLC Charges -->
-        <h3 class="text-2xl text-gray-800 text-center my-5">BUISNESS INFORMATION</h3>
-        <h4 class="text-gray-800">PLC Charges</h4>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.corner_plot_10.label }}</label>
-            <div class="col-sm-10">
-                {{ form.corner_plot_10 }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.corner_plot_5.label }}</label>
-            <div class="col-sm-10">
-                {{ form.corner_plot_5 }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.full_pay_discount.label }}</label>
-            <div class="col-sm-10">
-                {{ form.full_pay_discount }}
-            </div>
+
+        <!-- Business Information Section -->
+        <h3 class="section-heading">BUSINESS INFORMATION</h3>
+        <h4 class="section-subheading">PLC Charges</h4>
+        <div class="d-flex justify-content-between">
+            <p><strong>{{ form.corner_plot_10.label }}</strong>{{ form.corner_plot_10 }}</p>
+            <p><strong>{{ form.corner_plot_5.label }}</strong>{{ form.corner_plot_5 }}</p>
+            <p><strong>{{ form.full_pay_discount.label }}</strong>{{ form.full_pay_discount }}</p>
         </div>
 
         <!-- Booking Details -->
-        <h4 class='text-2xl text-gray-800 text-center my-5'>Booking Details</h4>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.location.label }}</label>
-            <div class="col-sm-10">
-                {{ form.location }}
-            </div>
+        <h4 class="section-subheading">Booking Details</h4>
+        <div class="d-flex justify-content-between">
+            <p><strong>{{ form.location.label }}</strong>{{ form.location }}</p>
+            <p><strong>{{ form.project.label }}</strong>{{ form.project }}</p>
         </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.project.label }}</label>
-            <div class="col-sm-10">
-                {{ form.project }}
-            </div>
+        <div class="d-flex justify-content-between">
+            <p><strong>{{ form.associate_detail.label }}</strong>{{ form.associate_detail }}</p>
+            <p id="agent-field" style="display:none;"><strong>Agent</strong><select id="agent-dropdown" name="agent"
+                    class="form-control">
+                    <option value="">Select an Agent</option>
+                    {% for agent in agents %}
+                    <option value="{{ agent.id }}">{{ agent.user.username }}</option>
+                    {% endfor %}
+                </select></p>
         </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.associate_detail.label }}</label>
-            <div class="col-sm-10">
-                {{ form.associate_detail }}
-            </div>
-        </div>
-        <div class="form-group row" id="promoter-field" style="display:none;">
-            <label class="col-sm-2 col-form-label">{{ form.promoter.label }}</label>
-            <div class="col-sm-10">
-                {{ form.promoter }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.Plot_price.label }}</label>
-            <div class="col-sm-10">
-                {{ form.Plot_price }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.payment_type.label }}</label>
-            <div class="col-sm-10">
-                {{ form.payment_type }}
-            </div>
+        <!-- <div class="form-group" id="agent-field" style="display:none;">
+            <label>Agent</label>
+            <select id="agent-dropdown" name="agent" class="form-control">
+                <option value="">Select an Agent</option>
+                {% for agent in agents %}
+                <option value="{{ agent.id }}">{{ agent.user.username }}</option>
+                {% endfor %}
+            </select>
+        </div> -->
+        <div class="d-flex justify-content-between">
+            <p><strong>Project Price:</strong> <span id="project-price"></span>{{ form.Plot_price }}</p>
+            <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>
         </div>
 
         <!-- EMI Options -->
-        <div id="emi-options" style="display:none;">
-            <h4>EMI Details</h4>
-            <div class="form-group row">
-                <label class="col-sm-2 col-form-label">{{ form.emi_tenure.label }}</label>
-                <div class="col-sm-10">
+        <div class="parent-div">
+            <div id="emi-options" style="display:none;">
+                <h4 class="section-subheading">EMI Details</h4>
+                <div class="form-group">
+                    <label>{{ form.emi_tenure.label }}</label>
                     {{ form.emi_tenure }}
                 </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-sm-2 col-form-label">{{ form.interest_rate.label }}</label>
-                <div class="col-sm-10">
+                <div class="form-group">
+                    <label>{{ form.interest_rate.label }}</label>
                     {{ form.interest_rate }}
                 </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-sm-2 col-form-label">Calculated EMI:</label>
-                <div class="col-sm-10">
+                <div class="form-group">
+                    <label>Calculated EMI:</label>
                     <input type="text" id="calculated-emi" readonly class="form-control">
                 </div>
             </div>
         </div>
 
-        <!-- Payment Information -->
-        <h4 class='text-2xl text-gray-800 text-center my-5'>Payment Information</h4>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.booking_amount.label }}</label>
-            <div class="col-sm-10">
-                {{ form.booking_amount }}
-            </div>
+        <!-- Payment Information Section -->
+        <h4 class="section-subheading">Payment Information</h4>
+        <div class="d-flex justify-content-between">
+            <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p>
+            <p><strong>{{ form.mode_of_payment.label }}</strong>{{ form.mode_of_payment }}</p>
         </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.mode_of_payment.label }}</label>
-            <div class="col-sm-10">
-                {{ form.mode_of_payment }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.payment_date.label }}</label>
-            <div class="col-sm-10">
-                {{ form.payment_date }}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label">{{ form.remark.label }}</label>
-            <div class="col-sm-10">
-                {{ form.remark }}
-            </div>
+        <div class="d-flex justify-content-between">
+            <p class="col-md-2"><strong>{{ form.payment_date.label }}</strong>{{ form.payment_date }}</p>
+            <p><strong>{{ form.remark.label }}</strong>{{ form.remark }}</p>
         </div>
 
         <!-- Submit Button -->
-        <div class="form-group text-center mt-4">
-            <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="w-full relative flex justify-center flex-wrap gap-5">
+            <button type="submit"
+                class="btn relative inline-flex items-center justify-start overflow-hidden font-medium transition-all bg-gray-800 rounded group py-1.5 px-2.5">
+                <span
+                    class="absolute inset-0 w-full h-full bg-indigo-600 transition-transform duration-300 ease-in-out transform scale-x-0 group-hover:scale-x-100"></span>
+                <span
+                    class="relative w-full text-white transition-colors duration-300 ease-in-out group-hover:text-indigo-600">Submit</span>
+            </button>
         </div>
     </form>
 </div>
 
-<!-- JavaScript -->
+<!-- JavaScript to handle field visibility and EMI calculation -->
 <script>
-    // Show custom gender field if 'Other' is selected
-    document.getElementById("id_gender").addEventListener("change", function() {
+    document.getElementById("id_gender").addEventListener("change", function () {
         const customGenderField = document.getElementById("custom-gender-field");
         customGenderField.style.display = this.value === "other" ? "block" : "none";
     });
 
-    // Show promoter field if 'Associate Detail' is checked
-    document.getElementById("id_associate_detail").addEventListener("change", function() {
-        const promoterField = document.getElementById("promoter-field");
-        promoterField.style.display = this.checked ? "block" : "none";
+    document.getElementById("id_associate_detail").addEventListener("change", function () {
+        const agentField = document.getElementById("agent-field");
+        agentField.style.display = this.checked ? "block" : "none";
     });
 
-    // Show EMI options if 'Installment' is selected for payment type
-    document.getElementById("id_payment_type").addEventListener("change", function() {
+    document.getElementById("id_payment_type").addEventListener("change", function () {
         const emiOptions = document.getElementById("emi-options");
         emiOptions.style.display = this.value === "installment" ? "block" : "none";
     });
 
-    // Calculate EMI dynamically
     function calculateEMI() {
-        const plotPrice = parseFloat(document.getElementById("id_Plot_price").value) || 0; // Replace with the actual plot price if dynamic
-        const downPayment = parseFloat(document.getElementById("id_booking_amount").value) || 0; // Ensure it's a number
-        const emiTenure = parseInt(document.getElementById("id_emi_tenure").value) || 0; // Ensure it's a number
-        const interestRate = parseFloat(document.getElementById("id_interest_rate").value) || 0; // Ensure it's a number
-    
-        // Calculate remaining amount after down payment
+        const plotPrice = parseFloat(document.getElementById("id_Plot_price").value) || 0;
+        const downPayment = parseFloat(document.getElementById("id_booking_amount").value) || 0;
+        const emiTenure = parseInt(document.getElementById("id_emi_tenure").value) || 0;
+        const interestRate = parseFloat(document.getElementById("id_interest_rate").value) || 0;
+
         const remainingAmount = plotPrice - downPayment;
-    
-        if (remainingAmount > 0 && emiTenure > 0 && interestRate > 0) {
-            const monthlyInterestRate = interestRate / 100 / 12;
-            const emi = remainingAmount * (monthlyInterestRate * Math.pow((1 + monthlyInterestRate), emiTenure)) / (Math.pow((1 + monthlyInterestRate), emiTenure) - 1);
+
+        if (emiTenure > 0 && interestRate > 0) {
+            const r = interestRate / 12 / 100;
+            const emi = remainingAmount * r * Math.pow(1 + r, emiTenure) / (Math.pow(1 + r, emiTenure) - 1);
             document.getElementById("calculated-emi").value = emi.toFixed(2);
+        } else {
+            document.getElementById("calculated-emi").value = "0.00";
         }
     }
-    
-    document.getElementById("id_emi_tenure").addEventListener("input", calculateEMI);
-    document.getElementById("id_interest_rate").addEventListener("input", calculateEMI);
+
+    document.getElementById("id_emi_tenure").addEventListener("change", calculateEMI);
+    document.getElementById("id_interest_rate").addEventListener("change", calculateEMI);
+    // Listen for changes in the project dropdown
+    $('#id_project').change(function () {
+        const projectId = $(this).val();  // Get the selected project ID
+
+        if (projectId) {
+            // Send an AJAX request to fetch the project price
+            $.ajax({
+                url: '{% url "leads:get_project_price" %}',  // URL of the Django view
+                data: {
+                    'project_id': projectId  // Send project ID
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.price) {
+                        // Update the price input field with the fetched price
+                        $('#id_Plot_price').val(response.price);
+                    } else if (response.error) {
+                        console.log(response.error);
+                        $('#id_Plot_price').val('');  // Clear if there's an error
+                    }
+                }
+            });
+        } else {
+            // Clear the price field if no project is selected
+            $('#id_Plot_price').val('');
+        }
+    });
+
+
 </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 {% endblock %}

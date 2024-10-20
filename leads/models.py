@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User 
 from django.db.models.signals import post_save , pre_save
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -58,13 +59,15 @@ class FollowUp(models.Model):
 
 
 
-
-
-
 class Agent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     organisation = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-
+    # New Addition Here
+    parent_agent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='sub_agents')
+    commission_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)  # Percentage of profit shared
+    total_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Total profit earned
+    level = models.IntegerField(default=1)
+    # New Addition Ends
     def __str__(self):
         return self.user.email
 
@@ -136,6 +139,12 @@ class  Project(models.Model):
     def __str__(self):
         return self.project_name
     
+#TypeofPlot
+class Typeplot(models.Model):
+    type = models.CharField(max_length=200,unique=True)
+
+    def __str__(self):
+        return self.type    
 
 class Property(models.Model):
     # project_name = models.CharField(max_length=255,default='Untitled Property')
@@ -145,7 +154,12 @@ class Property(models.Model):
     id = models.AutoField(primary_key=True) 
     project_name = models.CharField(max_length=255,null=True,blank=True)
     price = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    totalprice = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    area = models.IntegerField(null=True,blank=True)
+    length = models.IntegerField(null=True, blank=True)
+    breadth = models.IntegerField(null=True, blank=True)
     block = models.TextField(null=True, blank=True)
+    type = models.CharField(max_length=200,null=True, blank=True)
     agent = models.ForeignKey(Agent, null=True, blank=True, on_delete=models.SET_NULL)
     project_id = models.ForeignKey(Project, null=True, blank=True, on_delete=models.SET_NULL)
     # Add any other fields necessary for the property model
@@ -172,6 +186,7 @@ class Property(models.Model):
             # Update the instance in the database without calling save() again
             self.__class__.objects.filter(pk=self.pk).update(title=self.title)
 
+
 class Bonus(models.Model):
     agent = models.ForeignKey(User, on_delete=models.CASCADE)
     bonus_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -181,12 +196,27 @@ class Bonus(models.Model):
         return f"{self.agent.username} - Bonus of {self.bonus_amount}"
 
 
-# PROJECT
+# Area
+class Area(models.Model):
+    length = models.IntegerField(editable=True)
+    breadth = models.IntegerField(editable=True)
+    area = models.IntegerField(null=True,blank=True )
 
+    class Meta:
+        # Ensure that the combination of length and breadth is unique
+        constraints = [
+            models.UniqueConstraint(fields=['length', 'breadth'], name='unique_length_breadth')
+        ]
+
+    def save(self, *args, **kwargs):
+        # Calculate the area before saving the model
+        self.area = self.length * self.breadth
+        super(Area, self).save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return  f"Property with length {self.length} and breadth {self.breadth}"
 
 # EMI
-from django.db import models
-
 class EmiPlan(models.Model):
     name = models.CharField(max_length=100)  # Name of the EMI plan
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2)  # Interest rate (e.g., 8.5%)
@@ -199,8 +229,6 @@ class EmiPlan(models.Model):
 
 # DAYBOOK
 
-from django.db import models
-from django.utils import timezone
 
 class Daybook(models.Model):
     ACTIVITY_CHOICES = [
@@ -217,7 +245,7 @@ class Daybook(models.Model):
     date = models.DateField(default=timezone.now)
     activity = models.CharField(max_length=50, choices=ACTIVITY_CHOICES)
     custom_activity = models.CharField(max_length=100, blank=True, null=True)  # For "Others"
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     remark = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -265,7 +293,7 @@ class PlotBooking(models.Model):
     location = models.CharField(max_length=255)
     project = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='project', null=True, blank=True)
     associate_detail = models.BooleanField(default=False)
-    promoter = models.ForeignKey(Promoter, on_delete=models.SET_NULL, null=True, blank=True)
+    Agent = models.ForeignKey(Promoter, on_delete=models.SET_NULL, null=True, blank=True, related_name='plot_bookings')  # Changed to lowercase
     Plot_price = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=50, choices=[('custom', 'Custom Payment'), ('installment', 'Installments')])
     booking_amount = models.DecimalField(max_digits=10, decimal_places=2)

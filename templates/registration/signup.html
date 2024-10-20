@@ -1,21 +1,144 @@
-{% extends 'base.html' %}
-{% load tailwind_filters %}
+{% load widget_tweaks %}
 
 {% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
 
-<div class="max-w-lg mx-auto">
-    <form method="post" class="mt-5">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button type='submit' class="w-full text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">
-            Signup
-        </button>
-    </form>
-    <div class="py-5 border-t border-gray-200 mt-5">
-        <a class="hover:text-blue-500" href="{% url 'login' %}">Already have an account?</a>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Raleway, sans-serif;
+    }
+
+    body {
+        background: linear-gradient(90deg, #C7C5F4, #776BCC);
+    }
+
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .form-container {
+        background: linear-gradient(90deg, #5D54A4, #7C78B8);
+        border-radius: 15px;
+        box-shadow: 0px 0px 24px #5C5696;
+        padding: 40px;
+        width: 360px;
+        position: relative;
+    }
+
+    .form-title {
+        font-size: 24px;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .login__field {
+        padding: 20px 0px;
+        position: relative;
+    }
+
+    .login__icon {
+        position: absolute;
+        top: 30px;
+        color: #7875B5;
+    }
+
+    .login__input {
+        border: none;
+        border-bottom: 2px solid #D1D1D4;
+        background: none;
+        padding: 10px;
+        padding-left: 40px; /* Adjusted padding for icon */
+        font-weight: 700;
+        width: 100%;
+        transition: .2s;
+        color: #fff; /* Input text color */
+    }
+
+    .login__input:active,
+    .login__input:focus,
+    .login__input:hover {
+        outline: none;
+        border-bottom-color: #6A679E;
+    }
+
+    .form-button {
+        background: #4C489D; /* Changed background color for better visibility */
+        color: #fff; /* Changed text color to white for contrast */
+        font-size: 16px; /* Increased font size */
+        font-weight: bold; /* Made text bold */
+        margin-top: 30px;
+        padding: 16px 20px;
+        border-radius: 26px;
+        border: none; /* Removed border */
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        transition: .2s;
+        cursor: pointer; /* Added cursor pointer */
+    }
+
+    .form-button:hover {
+        background: #6A679E; /* Change background color on hover */
+        color: #fff; /* Keep text color white on hover */
+    }
+
+    .footer-link {
+        color: #fff;
+        text-align: center;
+        margin-top: 40px; /* Increased margin-top for spacing */
+        font-weight: bold;
+    }
+
+    .footer-link:hover {
+        color: blue;
+        text-decoration: underline;
+    }
+
+    label {
+        color: #fff; /* Label text color */
+        font-weight: 600; /* Bold label text */
+        display: block; /* Ensures label takes full width */
+        margin-bottom: 5px; /* Space between label and input */
+    }
+</style>
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="form-title">Sign Up</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="login__field">
+                <label for="id_username">Username</label>
+                <i class="login__icon fas fa-user"></i>
+                {{ form.username|add_class:"login__input" }}
+            </div>
+            <div class="login__field">
+                <label for="id_email">Email</label>
+                <i class="login__icon fas fa-envelope"></i>
+                {{ form.email|add_class:"login__input" }}
+            </div>
+            <div class="login__field">
+                <label for="id_password">Password</label>
+                <i class="login__icon fas fa-lock"></i>
+                {{ form.password|add_class:"login__input" }}
+            </div>
+            <button type="submit" class="form-button">
+                Signup
+            </button>
+        </form>
+        <div class="py-5 border-t border-gray-200 mt-5">
+            <a class="footer-link" href="{% url 'login' %}">Already have an account?</a>
+        </div>
     </div>
 </div>
 {% endblock content %}
-
-
-
