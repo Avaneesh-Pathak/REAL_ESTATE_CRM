@@ -974,7 +974,12 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             # Retrieve EMI amount and tenure from the form
             emi_amount = form.cleaned_data.get('emi_amount')
             tenure = form.cleaned_data.get('emi_tenure')
-
+            project = form.cleaned_data.get('project')
+            prop =  Property.objects.get(title=project)
+            print(prop.is_sold)
+            prop.is_sold=True
+            prop.save()
+            print(prop.is_sold)
             # Ensure emi_amount is a Decimal and tenure is an integer
             if emi_amount is not None and tenure is not None and tenure > 0:
                 monthly_emi = emi_amount / tenure  # Calculate EMI per month
@@ -1024,15 +1029,33 @@ def buyer_print_view(request, buyer_id):
 @login_required
 def update_delete_buyer(request, id):
     plot_booking = get_object_or_404(PlotBooking, id=id)
+    print(plot_booking.project)
+    pdid = plot_booking.project
+    pd =  Property.objects.get(title=pdid)
+
 
     if request.method == 'POST':
         if 'update' in request.POST:
             form = PlotBookingForm(request.POST, instance=plot_booking)
             if form.is_valid():
+                print(form.is_valid())
                 form.save()
+                pd.is_sold=False
+                pd.save()
+                project = form.cleaned_data.get('project')
+                prop =  Property.objects.get(title=project)
+                print(prop.is_sold)
+                prop.is_sold=True
+                prop.save()
+                print(prop.is_sold)
                 return redirect('leads:buyers_list')  # Redirect after updating
+            else:
+                messages.error(request, 'A buyer with this project already exists!')
+
         elif 'delete' in request.POST:
             plot_booking.delete()
+            pd.is_sold=False
+            pd.save()
             return redirect('leads:buyers_list')  # Redirect after deleting
     else:
         form = PlotBookingForm(instance=plot_booking)  # Pre-fill the form with the existing data
