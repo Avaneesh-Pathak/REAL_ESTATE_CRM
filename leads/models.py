@@ -146,44 +146,44 @@ class Typeplot(models.Model):
     def __str__(self):
         return self.type    
 
+from django.db import models
+
 class Property(models.Model):
-    # project_name = models.CharField(max_length=255,default='Untitled Property')
-    # block_code = models.CharField(max_length=1)
-    # from_plot=models.IntegerField
-    # to_plot=models.IntegerField
-    id = models.AutoField(primary_key=True) 
-    project_name = models.CharField(max_length=255,null=True,blank=True)
+    id = models.AutoField(primary_key=True)
+    project_name = models.CharField(max_length=255, null=True, blank=True)
     price = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     totalprice = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
-    area = models.IntegerField(null=True,blank=True)
+    area = models.IntegerField(null=True, blank=True)
     length = models.IntegerField(null=True, blank=True)
     breadth = models.IntegerField(null=True, blank=True)
     block = models.TextField(null=True, blank=True)
-    type = models.CharField(max_length=200,null=True, blank=True)
-    agent = models.ForeignKey(Agent, null=True, blank=True, on_delete=models.SET_NULL)
-    project_id = models.ForeignKey(Project, null=True, blank=True, on_delete=models.SET_NULL)
-    # Add any other fields necessary for the property model
-    organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.CASCADE)
-    title = models.CharField(max_length=7)
+    type = models.CharField(max_length=200, null=True, blank=True)
+    agent = models.ForeignKey('Agent', null=True, blank=True, on_delete=models.SET_NULL)
+    project_id = models.ForeignKey('Project', null=True, blank=True, on_delete=models.SET_NULL)
+    organisation = models.ForeignKey('UserProfile', null=True, blank=True, on_delete=models.CASCADE)
+    title = models.CharField(max_length=7, blank=True)
+    is_sold = models.BooleanField(default=False)
+    # Removed the redundant ForeignKey to Property itself
+    related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.CASCADE)
+  # This line is not needed
+   
+    def if_sold(self):
+        print(f"Checking if property {self.title} is sold")
+        return self.is_sold  # Ensure this references the correct model
 
     def __str__(self):
         return self.title
     
     def create_composite_key(self):
         letters = "PRP"  # Ensure uppercase
-        # Format the number to be 3 digits
         formatted_number = f"{self.id:03}"  # Pads with zeros if necessary
-        # Construct the composite key
         composite_key = f"{letters}-{formatted_number}"
         return composite_key
 
     def save(self, *args, **kwargs):
-        # Call the original save method
         super().save(*args, **kwargs)
-
         if not self.title:
             self.title = self.create_composite_key()
-            # Update the instance in the database without calling save() again
             self.__class__.objects.filter(pk=self.pk).update(title=self.title)
 
 

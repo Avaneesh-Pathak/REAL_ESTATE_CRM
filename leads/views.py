@@ -605,6 +605,9 @@ class PropertyListView(LoginRequiredMixin, ListView):
     template_name = 'property/property_list.html'  # Update with your template path
     context_object_name = 'properties'
 
+    def get_queryset(self):
+        return Property.objects.all()
+
 class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
     model = Property
     template_name = 'property/property_detail.html'  # Update with your template path
@@ -612,6 +615,14 @@ class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_queryset(self):
         return Property.objects.filter(agent__user=self.request.user)
+
+# Function-based view to display properties
+def properties_view(request):
+    properties = Property.objects.all()  # Fetch all properties
+    context = {
+        'properties': properties,
+    }
+    return render(request, 'leads/properties_list.html', context)  # Ensure this path is correct
 
         
 

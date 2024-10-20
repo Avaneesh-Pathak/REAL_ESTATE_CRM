@@ -4,12 +4,31 @@
 
 {% block content %}
 <style>
-    th{
-        background-color:rgb(58, 32, 142);
+    th {
+        background-color: rgb(58, 32, 142);
+    }
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Allows horizontal scrolling on small screens */
+    }
+    table {
+        width: 100%; /* Full width */
+        border-collapse: collapse; /* Ensures borders between cells are merged */
+    }
+    th, td {
+        padding: 12px; /* Adds some padding */
+        border: 1px solid #d1d5db; /* Gray border for table cells */
+        text-align: left; /* Aligns text to the left */
+    }
+    th {
+        color: white; /* White text color for headers */
+    }
+    tbody tr:hover {
+        background-color: #f0f0f0; /* Light gray background on row hover */
     }
 </style>
 <div class="container mx-auto mt-8">
-    <div class="w-90 mb-6 py-6 flex justify-between items-center border-b border-black-100">
+    <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-black-100">
         <div>
             <h1 class="text-4xl text-gray-800">Buyers</h1>
         </div>
@@ -22,56 +41,47 @@
         {% endif %}
     </div>
 
-
-    <table class="min-w-full bg-white border border-gray-200">
-        <thead>
-            <tr class="bg-gray-200">
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Name</th>               
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Gender</th>               
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Mobile No.</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Address</th>                
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Email</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Property ID</th>
-                <th class="py-1 px-6 border-b border-gray-200 text-left text-sm font-semibold text-white">Associate Detail</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Details</th>
-                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-semibold text-white">Print Recipt</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for buyer in buyers %}
-            <tr class="hover:bg-gray-100">
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">
-                    <a href="{% url 'leads:update_delete_buyer' buyer.id %}" class="text-blue-500 hover:underline">
-                         {{ buyer.name }}
-                    </a>
-                </td>
-                
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.gender }}</td>
-                
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.mobile_no }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.address }}</td>
-                
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.email }}</td>
-                
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyer.project.title }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700">{{ buyers.Agent.username }}</td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-blue-700">
-                    <a href="{% url 'leads:buyer_detail' buyer.id %}" class=" hover:bg-Blue text-lightblue font-bold py-0 px-1">
-                        View Details
-                    </a>
-                </td>
-                <td class="py-2 px-4 border-b border-gray-200 text-sm text-blue-700">
-                    <a href="{% url 'leads:buyer_print' buyer.id %}" class=" hover:bg-Blue text-lightblue font-bold py-0 px-1">
-                        Print
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="18" class="py-2 px-4 border-b border-gray-200 text-sm text-gray-700 text-center">No buyers found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table class="bg-white border border-gray-200">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="text-sm font-semibold">Name</th>
+                    <th class="text-sm font-semibold">Gender</th>
+                    <th class="text-sm font-semibold">Mobile No.</th>
+                    <th class="text-sm font-semibold">Address</th>
+                    <th class="text-sm font-semibold">Email</th>
+                    <th class="text-sm font-semibold">Property ID</th>
+                    <th class="text-sm font-semibold">Associate Detail</th>
+                    <th class="text-sm font-semibold">Details</th>
+                    <th class="text-sm font-semibold">Print Receipt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for buyer in buyers %}
+                <tr>
+                    <td>
+                        <a href="{% url 'leads:update_delete_buyer' buyer.id %}" class="text-blue-500 hover:underline">{{ buyer.name }}</a>
+                    </td>
+                    <td>{{ buyer.gender }}</td>
+                    <td>{{ buyer.mobile_no }}</td>
+                    <td>{{ buyer.address }}</td>
+                    <td>{{ buyer.email }}</td>
+                    <td>{{ buyer.project.title }}</td>
+                    <td>{{ buyer.agent.user.email }}</td>
+                    <td>
+                        <a href="{% url 'leads:buyer_detail' buyer.id %}" class="hover:bg-Blue text-lightblue font-bold">View Details</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'leads:buyer_print' buyer.id %}" class="hover:bg-Blue text-lightblue font-bold">Print</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">No buyers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
