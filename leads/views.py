@@ -73,7 +73,6 @@ def user_profile(request):
     
     return render(request, 'leads/profile.html', {'form': form})
 
-
 class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
     template_name = "dashboard.html"
 
@@ -98,18 +97,17 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         total_land_cost = Kisan.objects.aggregate(total=Sum('land_costing'))['total'] or 0
         total_development_cost = Kisan.objects.aggregate(total=Sum('development_costing'))['total'] or 0
 
+        # Prepare profit data for the graph
+        profit_data = []
+        for sale in sales_data:
+            profit = sale['total_sale_price'] - total_land_cost - total_development_cost
+            profit_data.append(float(profit))  # Convert Decimal to float for JavaScript compatibility
+
         # Calculate total profit
         total_cost = total_land_cost + total_development_cost
         total_profit = total_sales - total_cost
 
-        # Prepare profit data for the graph
-        profit_labels = labels  # Reuse the same labels for dates
-        profit_data = [
-            sale['total_sale_price'] - total_land_cost - total_development_cost
-            for sale in sales_data
-        ]  # Calculate profit for each date
-
-        # Print debug statements
+        # Debugging
         print("Labels:", labels)
         print("Sales Data:", sales_data)
         print("Total Sales:", total_sales)
@@ -118,6 +116,7 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         print("Profit Data:", profit_data)
         print("Total Profit:", total_profit)
 
+        # Leads in last 30 days
         thirty_days_ago = timezone.now().date() - timedelta(days=30)
         total_in_past30 = Lead.objects.filter(
             organisation=user.userprofile,
@@ -134,7 +133,7 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         context.update({
             'labels': labels,
             'data': data,
-            'profit_labels': profit_labels,
+            'profit_labels': labels,  # Reuse the same labels for profit
             'profit_data': profit_data,
             'total_lead_count': total_lead_count,
             'total_in_past30': total_in_past30,
@@ -144,7 +143,6 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
             'total_profit': total_profit,
         })
         return context
-
 
 
     

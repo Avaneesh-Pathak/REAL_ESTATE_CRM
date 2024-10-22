@@ -126,8 +126,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Authentication
-LOGIN_REDIRECT_URL = "/leads"
-LOGIN_URL = "/login"
+LOGIN_REDIRECT_URL = "/dashboard"
+LOGIN_URL = "/dashboard"
 LOGOUT_REDIRECT_URL = "/"
 
 CRISPY_TEMPLATE_PACK = "tailwind"

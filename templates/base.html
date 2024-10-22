@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 
 
@@ -57,7 +58,8 @@
 
         /* Sidebar styles */
         .sidebar {
-            margin-top: 0; /* Ensure this is set to 0 */
+            margin-top: 0;
+            /* Ensure this is set to 0 */
             padding-top: 0;
             position: fixed;
             top: 0;
@@ -84,7 +86,7 @@
             color: #333;
             text-decoration: none;
         }
-        
+
 
         .sidebar a:hover {
             background-color: #e2e2e2;
@@ -203,18 +205,21 @@
 
         <header class="text-white body-font bg-blue-800">
             <div style="max-width: 100%;"
-                class="container mx-auto flex flex-wrap p-2 flex-col md:flex-row items-center justify-between">
+                class="container mx-auto flex flex-wrap p-0 flex-col md:flex-row items-center justify-between">
 
                 <!-- Hamburger Icon -->
-                <div class="hamburger cursor-pointer text-white ml-4" id="hamburger">
+                <div style="font-size: 40px;" class="hamburger cursor-pointer text-white ml-4" id="hamburger">
                     &#9776; <!-- Unicode character for hamburger icon -->
                 </div>
 
                 <!-- Sidebar -->
-                <div class="sidebar fixed top-5 left-0 w-30 h-full bg-blue-900 text-white transform -translate-x-full transition-transform duration-300 ease-in-out"
+                <div class="sidebar fixed  left-0 w-30 h-full bg-blue-900 text-white transform -translate-x-full transition-transform duration-300 ease-in-out"
                     id="sidebar">
-                    <div class="close-btn text-right p-4 cursor-pointer" id="close-btn">&times;</div>
-                    <nav class="flex flex-col p-4 space-y-4">
+                    <div class="close-btn flex ml-2 text-right cursor-pointer" id="close-btn"><span
+                            style="font-size:18px; margin-top: 17px;">PMA Software</span>
+                        <div class="close-btn mr-5 text-right cursor-pointer" id="close-btn"></div>&times;
+                    </div>
+                    <nav class="flex flex-col space-y-0">
                         {% if request.user.is_organisor %}
                         <a href="{% url 'agents:agent-list' %}"
                             class="flex items-center text-white hover:text-blue-300 py-2 px-4 rounded-lg transition duration-200">
@@ -287,12 +292,15 @@
 
 
                 <!-- Brand and Title -->
-                <a href="{% url 'dashboard' %}"
-                    class="flex w-320 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5">
-                    <img src="{% static 'images/Screenshot 2024-10-19 002628.png' %}" alt="Image" class="w-10 h-10">
+                <div style="margin-top: 12px;">
+                    <a href="{% url 'dashboard' %}"
+                        class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5">
+                        <img src="{% static 'images/Screenshot 2024-10-19 002628.png' %}" alt="Image" class="w-12 h-12">
 
-                    <span class="ml-3 text-xl py-2">PMA Software</span>
-                </a>
+                        <span class="ml-3 text-xl py-2 ">PMA Software</span>
+                    </a>
+                </div>
+
 
                 <!-- Navigation Links -->
                 <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center space-x-4">
@@ -310,7 +318,7 @@
                 {% if request.user.is_authenticated %}
                 <div class="relative inline-block text-left">
                     <!-- Profile Button -->
-                    <div>
+                    <div style="margin-right: 25px;">
                         <button type="button"
                             class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             id="profile-menu-button" aria-expanded="true" aria-haspopup="true">
@@ -395,39 +403,38 @@
                 sidebar.style.transform = 'translateX(-100%)';
             });
         </script>
+    </div>
+
+
+
+    <!-- Message block -->
+    {% if messages %}
+    <div class="alert-messages">
+        {% for message in messages %}
+        <div id="message-{{ forloop.counter }}"
+            class="alert bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            {{ message }}
+            <!-- Close button -->
+            <span class="absolute top-0 right-0 px-4 py-3 cursor-pointer close-alert"
+                onclick="this.parentElement.style.display='none';">
+                &times;
+            </span>
         </div>
+        {% endfor %}
+    </div>
+    <script>
+        // Automatically hide the alert after 5 seconds
+        setTimeout(function () {
+            var alerts = document.getElementsByClassName('alert');
+            for (var i = 0; i < alerts.length; i++) {
+                alerts[i].style.display = 'none';
+            }
+        }, 5000); // 5000 milliseconds = 5 seconds
+    </script>
+    {% endif %}
 
-
-
-        <!-- Message block -->
-        {% if messages %}
-        <div class="alert-messages">
-            {% for message in messages %}
-            <div id="message-{{ forloop.counter }}"
-                class="alert bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
-                role="alert">
-                {{ message }}
-                <!-- Close button -->
-                <span class="absolute top-0 right-0 px-4 py-3 cursor-pointer close-alert"
-                    onclick="this.parentElement.style.display='none';">
-                    &times;
-                </span>
-            </div>
-            {% endfor %}
-        </div>
-        <script>
-            // Automatically hide the alert after 5 seconds
-            setTimeout(function () {
-                var alerts = document.getElementsByClassName('alert');
-                for (var i = 0; i < alerts.length; i++) {
-                    alerts[i].style.display = 'none';
-                }
-            }, 5000); // 5000 milliseconds = 5 seconds
-        </script>
-        {% endif %}
-
-        {% block content %}
-        {% endblock content %}
+    {% block content %}
+    {% endblock content %}
     </div>
 
     {% include "scripts.html" %}
