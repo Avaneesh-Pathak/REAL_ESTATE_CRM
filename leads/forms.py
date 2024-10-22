@@ -8,11 +8,19 @@ User = get_user_model()
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['full_name', 'contact_number', 'email', 'profile_picture']
-        widgets = {
-            'profile_picture': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
-        }
+        fields = ['full_name', 'contact_number', 'profile_picture']  # Add other fields if needed
 
+    username = forms.CharField(max_length=150)  # Include username in the form
+    email = forms.EmailField()  # Include email in the form
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        if self.user:
+            self.fields['username'].initial = self.user.username
+            self.fields['email'].initial = self.user.email
+
+            
 class LeadModelForm(forms.ModelForm):
     class Meta:
         model = Lead

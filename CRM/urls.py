@@ -13,12 +13,13 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView, 
     PasswordResetCompleteView,
 )
-from leads.views import LandingPageView, SignupView, DashboardView,user_profile
+from leads.views import LandingPageView, SignupView, DashboardView,update_profile,user_profile
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', LandingPageView.as_view(), name='landing_page'),
-    path('profile/', user_profile, name='profile'),
+    path('profile/', user_profile, name='profile'),  # Profile view
+    path('profile/update/', update_profile, name='update_profile'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('leads/', include('leads.urls', namespace='leads')),
     path('agents/', include('agents.urls', namespace='agents')),

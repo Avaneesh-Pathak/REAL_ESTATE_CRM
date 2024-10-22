@@ -15,11 +15,11 @@
     <div class="floating-form-container">
         <div class="max-w-lg mx-auto">
 
-            <div class="py-5 border-b border-gray-200">
+            <div class="py-5 border-b border-black-200">
                 <a class="btn btn-primary ml-5" href="{% url 'agents:agent-list' %}">Go back to agents</a>
             </div>
 
-            <h1 class="text-4xl text-gray-800">Create a new agent</h1>
+            <h1 class="text-4xl text-black-800">Create a new agent</h1>
             <form method="post">
                 {% csrf_token %}
                 {{ form|crispy }}

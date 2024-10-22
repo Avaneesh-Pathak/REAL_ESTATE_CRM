@@ -73,6 +73,27 @@ def user_profile(request):
     
     return render(request, 'leads/profile.html', {'form': form})
 
+def update_profile(request):
+    user_profile = request.user.userprofile
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            # Update the username and email in the User model if they have changed
+            request.user.username = form.cleaned_data.get('username')
+            request.user.email = form.cleaned_data.get('email')
+            request.user.save()  # Save the User model changes
+            return redirect('dashboard')  # Redirect to the profile URL name
+    else:
+        form = UserProfileForm(instance=user_profile)
+
+    context = {
+        'form': form,
+        'user_profile': user_profile,
+    }
+    return render(request, 'leads/profile.html', context)
+
 class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
     template_name = "dashboard.html"
 
@@ -110,14 +131,29 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         total_cost = total_land_cost + total_development_cost
         total_profit = total_sales - total_cost
 
+        # Calculate total salary distributed
+        total_salary_distributed = Salary.objects.filter(payment_date__gte=timezone.now().date() - timedelta(days=30)).aggregate(total=Sum('base_salary'))['total'] or 0
+
+        # Salary distribution data for pie chart
+        
+        salary_distribution = [
+            float(total_salary_distributed),  # Convert to float
+            float(total_profit - total_salary_distributed),]  # Convert to float
+        salaryDistribution_labels = ['Salary Distributed', 'Remaining Profit']
+
         # Debugging
         print("Labels:", labels)
+        print("Total cost:" , total_cost)
         print("Sales Data:", sales_data)
         print("Total Sales:", total_sales)
         print("Total Land Cost:", total_land_cost)
         print("Total Development Cost:", total_development_cost)
         print("Profit Data:", profit_data)
         print("Total Profit:", total_profit)
+        print("Total salary_distribution:", salary_distribution)
+        print("Salary Distribution Data:", salary_distribution)
+        print("Salary Distribution Labels:", salaryDistribution_labels)
+
 
         # Leads in last 30 days
         thirty_days_ago = timezone.now().date() - timedelta(days=30)
@@ -145,6 +181,10 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
             'total_sales': total_sales,
             'total_cost': total_cost,
             'total_profit': total_profit,
+            
+            'salary_distribution': salary_distribution,
+            'salaryDistribution_labels': salaryDistribution_labels,
+            
         })
         return context
 
@@ -1139,22 +1179,37 @@ class KisanForm(forms.ModelForm):
             'payment_to_kisan', 'basic_sales_price'
         ]
 
+    def clean(self):
+        cleaned_data = super().clean()
+        kisan_payment = cleaned_data.get("kisan_payment")
+        land_address = cleaned_data.get("land_address")
+
+        # Example validation logic
+        if kisan_payment is None and land_address is None:
+            raise forms.ValidationError("At least one of 'Kisan Payment' or 'Land Address' must be provided.")
+
 # View for creating Kisan
 
 def kisan_view(request, pk=None):
-    if pk:  # If there's a primary key, we're editing
-        kisan = Kisan.objects.get(pk=pk)
-        form = KisanForm(request.POST or None, instance=kisan)
-        if request.method == 'POST' and form.is_valid():
-            form.save()
-            return redirect('kisan_list')
-    else:  # Creating a new Kisan
-        form = KisanForm(request.POST or None)
-        if request.method == 'POST' and form.is_valid():
-            form.save()
-            return redirect('kisan_list')
+    try:
+        if pk:  # Editing an existing Kisan
+            kisan = Kisan.objects.get(pk=pk)
+            form = KisanForm(request.POST or None, instance=kisan)
+            if request.method == 'POST':
+                if form.is_valid():
+                    form.save()
+                    return redirect('kisan_list')  # Redirect to the Kisan list
+        else:  # Creating a new Kisan
+            form = KisanForm(request.POST or None)
+            if request.method == 'POST':
+                if form.is_valid():
+                    form.save()
+                    return redirect('kisan_list')  # Redirect to the Kisan list
 
-    return render(request, 'kisan/kisan_update.html', {'form': form, 'kisan': kisan if pk else None})
+        return render(request, 'kisan/kisan_update.html', {'form': form, 'kisan': kisan if pk else None})
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return render(request, 'kisan/kisan_update.html', {'form': form, 'error': str(e)})
 
 
 # View for listing Kisan
@@ -1173,7 +1228,7 @@ class KisanUpdateView(UpdateView):
         'kisan_payment', 'land_address', 'payment_to_kisan', 'basic_sales_price'
     ]
     template_name = 'kisan/kisan_update.html'  # Updated template name
-    success_url = reverse_lazy('kisan_list')
+    success_url = reverse_lazy('leads:kisan_list')
 
 # View for deleting Kisan
 

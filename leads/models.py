@@ -358,14 +358,24 @@ class Kisan(models.Model):
     contact_number = models.IntegerField()
     address = models.TextField(max_length=50)
 
-    khasra_number = models.IntegerField( unique=True)
-    area_in_beegha = models.DecimalField(max_digits=20,decimal_places=3)
-    land_costing = models.DecimalField(max_digits=12,decimal_places=3)
-    development_costing = models.DecimalField(max_digits=12,decimal_places=3)
-    kisan_payment = models.DecimalField(max_digits=10,decimal_places=3)
-    land_address = models.TextField(max_length=50)
-    payment_to_kisan = models.DecimalField(max_digits=12, decimal_places=2,null=True, blank=True)  
+    khasra_number = models.IntegerField(unique=True)
+    area_in_beegha = models.DecimalField(max_digits=20, decimal_places=3)
+    land_costing = models.DecimalField(max_digits=12, decimal_places=3)
+    development_costing = models.DecimalField(max_digits=12, decimal_places=3)
+    
+    # Make these fields optional
+    kisan_payment = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    land_address = models.TextField(max_length=50, null=True, blank=True)
+
+    payment_to_kisan = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  
     basic_sales_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  
 
     def __str__(self) -> str:
         return f"{self.first_name} with khasra no {self.khasra_number}"
+    
+
+
+
+
+
+ 

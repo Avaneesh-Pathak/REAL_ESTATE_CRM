@@ -14,7 +14,7 @@
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/main.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/main.min.js"></script>
-  
+
 
 
     <link id="theme-style" rel="stylesheet" href="{% static 'CSS/styles.css' %}"> <!-- Main CSS -->
@@ -46,7 +46,7 @@
         }
 
         /* Sidebar styles */
-       
+
         .sidebar {
             position: fixed;
             top: 0;
@@ -127,7 +127,7 @@
         .sidebar {
             width: 250px;
             height: 100vh;
-            background-color: #1e3a8a;
+            background-color: #243642;
             /* Dark Blue */
             padding-top: 30px;
             position: fixed;
@@ -173,10 +173,10 @@
     </style>
 </head>
 
-<body style="background-color: #d6d9dd;">
+<body style="background-color: #E3FEF7">
     <div class="max-w-10xl mx-auto">
 
-        <header class="text-white body-font bg-blue-800">
+        <header style="background-color: #003C43;" class="text-white body-font">
             <div style="max-width: 100%;"
                 class="container mx-auto flex flex-wrap p-0 flex-col md:flex-row items-center justify-between">
 
@@ -262,8 +262,6 @@
                     </nav>
                 </div>
 
-
-
                 <!-- Brand and Title -->
                 <div style="margin-top: 12px;">
                     <a href="{% url 'dashboard' %}"
@@ -274,9 +272,14 @@
                     </a>
                 </div>
 
-                <div>
-                    
+                <div style="text-align: center; margin-left: 380px;">
+                    <p style="font-size: 1.5rem; font-weight: bold; color: #0a0b45;">CRM</p>
+                    <h2 style="font-size: 2rem; font-weight: bold; color: #007bff; margin-bottom: 10px;">Concept</h2>
+                    <hr style="width: 100%; border: 1px solid #007bff; margin: 2px auto;">
                 </div>
+
+
+
 
                 <!-- Navigation Links -->
                 <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center space-x-4">
@@ -296,9 +299,15 @@
                     <!-- Profile Button -->
                     <div style="margin-right: 25px;">
                         <button type="button"
-                            class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            class="inline-flex justify-center items-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             id="profile-menu-button" aria-expanded="true" aria-haspopup="true">
-                            <i class="fas fa-user-circle text-xl mr-2"></i> {{ request.user.username }}
+                            {% if request.user.userprofile.profile_picture %}
+                            <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile Picture"
+                                class="h-8 w-8 rounded-full mr-2">
+                            {% else %}
+                            <i class="fas fa-user-circle text-xl mr-2"></i>
+                            {% endif %}
+                            {{ request.user.username }}
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20"
                                 fill="currentColor">
                                 <path fill-rule="evenodd"
@@ -313,7 +322,7 @@
                         role="menu" aria-orientation="vertical" aria-labelledby="profile-menu-button"
                         id="profile-dropdown">
                         <div class="py-1" role="none">
-                            <a href="{% url 'profile' %}"
+                            <a href="{% url 'update_profile' %}"
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                 role="menuitem">
                                 <i class="fas fa-user-edit mr-2"></i> Update Profile
@@ -357,13 +366,8 @@
                 </a>
                 {% endif %}
 
-
             </div>
-
         </header>
-
-
-
         <script>
 
             // Sidebar toggle functionality
@@ -380,9 +384,6 @@
             });
         </script>
     </div>
-
-        
-
     <!-- Message block -->
     {% if messages %}
     <div class="alert-messages">
@@ -478,6 +479,7 @@
         // Other existing JavaScript...
 
     </script>
+
 </body>
 
 </html>
