@@ -4,17 +4,18 @@ from datetime import timedelta
 from decimal import Decimal
 from django.db import models, IntegrityError
 from django.db.models import Count
-from django.core.mail import send_mail
+from django.db.models import Sum, Count
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import messages
+from django.urls import reverse_lazy
 from django.views import View, generic
-from django.views.generic import ListView
+from django.views.generic import ListView,UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin # type: ignore
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot
 from agents.mixins import OrganisorAndLoginRequiredMixin
-from .models import Property, Sale, Salary, Bonus
+from .models import Property, Sale, Salary, Bonus,Kisan,UserProfile
 from .forms import (
     LeadForm, 
     LeadModelForm, 
@@ -25,9 +26,10 @@ from .forms import (
     FollowUpModelForm,
     SalaryForm,
     SaleForm,
-    PropertyModelForm,
+    UserProfileForm,
     PromoterForm,
-    PlotBookingForm
+    PlotBookingForm,
+    KisanForm,
 )
 
 
@@ -57,6 +59,20 @@ class LandingPageView(generic.TemplateView):
 def landing_page(request):
     return render(request, "landing.html")
 
+@login_required
+def user_profile(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')  # Redirect to a success page
+    else:
+        form = UserProfileForm(instance=profile)
+    
+    return render(request, 'leads/profile.html', {'form': form})
+
 
 class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
     template_name = "dashboard.html"
@@ -65,30 +81,49 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         context = super(DashboardView, self).get_context_data(**kwargs)
         user = self.request.user
 
-        # How many leads we have in total
+        # Total leads
         total_lead_count = Lead.objects.filter(organisation=user.userprofile).count()
-        # Sales Report
-        sales_data = Sale.objects.values('sale_date').annotate(properties_sold=Count('id')).order_by('sale_date')
-        labels = [sale['sale_date'].strftime("%Y-%m-%d") for sale in sales_data]  # Format dates
-        data = [sale['properties_sold'] for sale in sales_data] 
-        # How many new leads in the last 30 days
-        thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
-        # Total sales for the organisation          
-        total_salaries = Salary.objects.count()
-        # Total sales for the organisation
-        total_sales = Sale.objects.count()
-        
-        # Total properties managed by the organisation
-        total_properties = Property.objects.count()
-        # Total Promoters 
-        total_promoters = Promoter.objects.count()
 
+        # Sales Report
+        sales_data = Sale.objects.values('sale_date').annotate(
+            total_sale_price=Sum('sale_price'),
+            properties_sold=Count('id')
+        ).order_by('sale_date')
+
+        labels = [sale['sale_date'].strftime("%Y-%m-%d") for sale in sales_data]  # Format dates
+        data = [sale['properties_sold'] for sale in sales_data]
+
+        # Calculate total sales amount and total costs
+        total_sales = Sale.objects.aggregate(total=Sum('sale_price'))['total'] or 0
+        total_land_cost = Kisan.objects.aggregate(total=Sum('land_costing'))['total'] or 0
+        total_development_cost = Kisan.objects.aggregate(total=Sum('development_costing'))['total'] or 0
+
+        # Calculate total profit
+        total_cost = total_land_cost + total_development_cost
+        total_profit = total_sales - total_cost
+
+        # Prepare profit data for the graph
+        profit_labels = labels  # Reuse the same labels for dates
+        profit_data = [
+            sale['total_sale_price'] - total_land_cost - total_development_cost
+            for sale in sales_data
+        ]  # Calculate profit for each date
+
+        # Print debug statements
+        print("Labels:", labels)
+        print("Sales Data:", sales_data)
+        print("Total Sales:", total_sales)
+        print("Total Land Cost:", total_land_cost)
+        print("Total Development Cost:", total_development_cost)
+        print("Profit Data:", profit_data)
+        print("Total Profit:", total_profit)
+
+        thirty_days_ago = timezone.now().date() - timedelta(days=30)
         total_in_past30 = Lead.objects.filter(
             organisation=user.userprofile,
             date_added__gte=thirty_days_ago
         ).count()
 
-        # How many converted leads in the last 30 days
         converted_category = Category.objects.filter(name="Converted").first()
         converted_in_past30 = Lead.objects.filter(
             organisation=user.userprofile,
@@ -97,19 +132,18 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         ).count()
 
         context.update({
-                'labels': labels,
-                'data': data,
-                # Add other context variables like total_lead_count, total_sales, etc.
-                'total_lead_count': total_lead_count,
-                'total_in_past30': total_in_past30,
-                'converted_in_past30': converted_in_past30,
-                'total_salaries': total_salaries,
-                'total_sales': total_sales,
-                'total_properties': total_properties,
-                'total_promoters': total_promoters,
+            'labels': labels,
+            'data': data,
+            'profit_labels': profit_labels,
+            'profit_data': profit_data,
+            'total_lead_count': total_lead_count,
+            'total_in_past30': total_in_past30,
+            'converted_in_past30': converted_in_past30,
+            'total_sales': total_sales,
+            'total_cost': total_cost,
+            'total_profit': total_profit,
         })
         return context
-
 
 
 
@@ -947,6 +981,7 @@ def add_promoter(request):
 
 
 
+
 class PlotRegistrationView(LoginRequiredMixin, View):
     template_name = 'plot_registration/plot_registration.html'
 
@@ -960,17 +995,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
         agents = Agent.objects.all()
 
         if form.is_valid():
-            print("Form is valid. Saving PlotBooking...")
-            plot_booking = form.save(commit=False)  # Create the PlotBooking instance without saving it yet
-            
-            # Debug output to check the selected property
-            print(f"Selected property: {plot_booking.property}")
-
-            # Check if property is set before trying to access it
-            if plot_booking.property is None:
-                form.add_error('property', 'This field is required.')  # Add a custom error if no property is selected
-                return render(request, self.template_name, {'form': form, 'agents': agents})
-
+            plot_booking = form.save()
             # Retrieve EMI amount and tenure from the form
             emi_amount = form.cleaned_data.get('emi_amount')
             tenure = form.cleaned_data.get('emi_tenure')
@@ -982,7 +1007,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             print(prop.is_sold)
             # Ensure emi_amount is a Decimal and tenure is an integer
             if emi_amount is not None and tenure is not None and tenure > 0:
-                monthly_emi = emi_amount / tenure  # Calculate EMI per month
+                monthly_emi = emi_amount / tenure  # EMI per month
                 
                 # Generate EMI payment records
                 for month in range(tenure):
@@ -992,23 +1017,17 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                         due_date=due_date,
                         emi_amount=monthly_emi  # Store calculated EMI
                     )
-            else:
+            elif emi_amount is None and tenure is None:
                 # Handle missing or invalid EMI amount or tenure
-                form.add_error(None, 'Invalid EMI amount or tenure.')  # Add error to form
+                form.add_error(None, 'Invalid EMI amount or tenure.')
 
-            # Save the plot booking instance to the database
-            plot_booking.save()  # Ensure to save it before redirecting
-
-            # After saving the plot booking, we can mark the property as sold
-            if plot_booking.property:  # Check if the property is linked
-                plot_booking.property.is_sold = True  # Set the property to sold
-                plot_booking.property.save()  # Save the property to update the status
-                print(f"Property {plot_booking.property.title} marked as sold.")
-
-            return redirect('plot_registration:buyers_list')  # Ensure this matches your URL configuration
+            return redirect('plot_registration/buyers_list')  # Ensure this matches your URL configuration
         else:
-            print("Form is not valid. Errors:", form.errors)
+            messages.error(request, 'A buyer with this project already exists!')
+
+            #return redirect('plot_registration/buyers_list.html')
             return render(request, self.template_name, {'form': form, 'agents': agents})
+
 def load_properties(request):
     project_name = request.GET.get('property.title')
     properties = Property.objects.filter(project_name_id=project_name).values('id', 'property.title')
@@ -1092,7 +1111,6 @@ def pay_emi(request, emi_id):
 
 
 class GetProjectPriceView(View):
-
     def get(self, request):
         project_id = request.GET.get('project_id')
         try:
@@ -1106,25 +1124,60 @@ class GetProjectPriceView(View):
                 return JsonResponse({'error': 'No properties found for this project.'})
         except Exception as e:
             return JsonResponse({'error': str(e)})
-        
 
-def book_plot(request, property_id):
-    # Assuming you're using a POST request to create a booking
-    if request.method == 'POST':
-        property_instance = get_object_or_404(Property, id=property_id)
-        
-        # Create a new PlotBooking instance
-        plot_booking = PlotBooking(
-            booking_date=request.POST['booking_date'],
-            name=request.POST['name'],
-            # Fill in other fields from the request
-            property=property_instance,
-        )
-        plot_booking.save()
 
-        # Mark the property as sold
-        property_instance.is_sold = True
-        property_instance.save()
+from django import forms
 
-        # Redirect or return a response
-        return redirect('success_view')
+class KisanForm(forms.ModelForm):
+    class Meta:
+        model = Kisan
+        fields = [
+            'first_name', 'last_name', 'contact_number', 'address',
+            'khasra_number', 'area_in_beegha', 'land_costing',
+            'development_costing', 'kisan_payment', 'land_address',
+            'payment_to_kisan', 'basic_sales_price'
+        ]
+
+# View for creating Kisan
+
+def kisan_view(request, pk=None):
+    if pk:  # If there's a primary key, we're editing
+        kisan = Kisan.objects.get(pk=pk)
+        form = KisanForm(request.POST or None, instance=kisan)
+        if request.method == 'POST' and form.is_valid():
+            form.save()
+            return redirect('kisan_list')
+    else:  # Creating a new Kisan
+        form = KisanForm(request.POST or None)
+        if request.method == 'POST' and form.is_valid():
+            form.save()
+            return redirect('kisan_list')
+
+    return render(request, 'kisan/kisan_update.html', {'form': form, 'kisan': kisan if pk else None})
+
+
+# View for listing Kisan
+
+class KisanListView(LoginRequiredMixin,ListView):
+    model = Kisan
+    template_name = 'kisan/kisan_list.html'
+    context_object_name = 'kisans'
+
+
+class KisanUpdateView(UpdateView):
+    model = Kisan
+    fields = [
+        'first_name', 'last_name', 'contact_number', 'address',
+        'khasra_number', 'area_in_beegha', 'land_costing', 'development_costing',
+        'kisan_payment', 'land_address', 'payment_to_kisan', 'basic_sales_price'
+    ]
+    template_name = 'kisan/kisan_update.html'  # Updated template name
+    success_url = reverse_lazy('kisan_list')
+
+# View for deleting Kisan
+
+class KisanDeleteView(DeleteView):
+    model = Kisan
+    template_name = 'kisan/kisan_confirm_delete.html'
+    success_url = reverse_lazy('leads:kisan_list')
+

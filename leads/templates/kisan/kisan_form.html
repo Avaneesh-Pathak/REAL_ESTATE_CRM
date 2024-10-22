@@ -1,0 +1,32 @@
+<!-- leads/templates/kisan/kisan_form.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Create Kisan</h2>
+  
+  <form method="POST">
+    {% csrf_token %}
+    
+    {% if form.errors %}
+      <div class="bg-red-200 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <strong class="font-bold">There were some errors:</strong>
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {{ form.as_p }}  <!-- Render the form fields -->
+    
+    <button type="submit" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded">Save Kisan</button>
+  </form>
+  
+  <a href="{% url 'leads:kisan_list' %}" class="mt-2 inline-block text-blue-500">Back to Kisan List</a>
+{% endblock %}

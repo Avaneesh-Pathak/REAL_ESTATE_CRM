@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load tailwind_filters %}
+
+{% block content %}
+<style>
+    th {
+        background-color: rgb(58, 32, 142);
+    }
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Allows horizontal scrolling on small screens */
+    }
+    table {
+        width: 100%; /* Full width */
+        border-collapse: collapse; /* Ensures borders between cells are merged */
+    }
+    th, td {
+        padding: 12px; /* Adds some padding */
+        border: 1px solid #d1d5db; /* Gray border for table cells */
+        text-align: left; /* Aligns text to the left */
+    }
+    th {
+        color: white; /* White text color for headers */
+    }
+    tbody tr:hover {
+        background-color: #f0f0f0; /* Light gray background on row hover */
+    }
+</style>
+<div class="container mx-auto mt-8">
+    <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-black-100">
+        <div>
+            <h1 class="text-4xl text-gray-800">Kisan Detail</h1>
+        </div>
+    {% if request.user.is_organisor %}
+        <div>
+            <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:kisan_create' %}">
+                Add New Kisan
+            </a>
+        </div>
+        {% endif %}
+</div>
+
+<div class="table-container">
+    <table class="bg-white border border-gray-200">
+        <thead>
+            <tr class="bg-gray-200">
+                <th class="py-2 px-4 border-b">First Name</th>
+                <th class="py-2 px-4 border-b">Last Name</th>
+                <th class="py-2 px-4 border-b">Contact Number</th>
+                <th class="py-2 px-4 border-b">Khasra Number</th>
+                <th class="py-2 px-4 border-b">Area (Beegha)</th>
+                <th class="py-2 px-4 border-b">Land Costing</th>
+                <th class="py-2 px-4 border-b">Development Costing</th>
+                <th class="py-2 px-4 border-b">Payment to Kisan</th>
+                <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for kisan in kisans %}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ kisan.first_name }}</td>
+                <td class="py-2 px-4 border-b">{{ kisan.last_name }}</td>
+                <td class="py-2 px-4 border-b">{{ kisan.contact_number }}</td>
+                <td class="py-2 px-4 border-b">{{ kisan.khasra_number }}</td>
+                <td class="py-2 px-4 border-b">{{ kisan.area_in_beegha }}</td>
+                <td class="py-2 px-4 border-b">{{ kisan.land_costing }}</td>
+                <td class="py-2 px-4 border-b">{{ kisan.development_costing }}</td>
+                <td class="py-2 px-4 border-b">{{ kisan.payment_to_kisan }}</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="{% url 'leads:kisan_edit' kisan.id %}" class="hover:bg-Blue text-lightblue font-bold">Edit</a>
+                    <a href="{% url 'leads:kisan_delete' kisan.id %}" class="bg-red text-red-600 hover:text-red-800 ml-4">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="text-center py-4">No Kisan records available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

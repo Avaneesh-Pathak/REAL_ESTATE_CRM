@@ -7,12 +7,14 @@ from .views import (
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
     PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,DaybookListView,daybook_create,add_promoter,update_delete_promoter,
-    PromoterListView,load_properties,PlotRegistrationView,update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView
+    PromoterListView,load_properties,PlotRegistrationView,
+    update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView,kisan_view,KisanListView,KisanUpdateView,KisanDeleteView
 )
 
 app_name = "leads"
 
 urlpatterns = [
+    
     path('sales/', SaleListView.as_view(), name='sale_list'),
     path('salaries/', SalaryListView.as_view(), name='salary_list'),
     path('my_bonus/', BonusInfoView.as_view(), name='bonus_info'),
@@ -63,6 +65,11 @@ urlpatterns = [
     path('buyer/update-delete/<int:id>/', update_delete_buyer, name='update_delete_buyer'),
     path('emi/pay/<int:emi_id>/', pay_emi, name='pay_emi'),
 
-     path('property/get_price/', GetProjectPriceView.as_view(), name='get_project_price'),
-   
-]
+    path('property/get_price/', GetProjectPriceView.as_view(), name='get_project_price'),
+    path('kisan/create/', kisan_view, name='kisan_create'),  # Create Kisan
+    path('kisans/', KisanListView.as_view(), name='kisan_list'),
+    path('kisan/edit/<int:pk>/', KisanUpdateView.as_view(), name='kisan_edit'),
+    path('kisan/delete/<int:pk>/', KisanDeleteView.as_view(), name='kisan_delete'),
+
+
+]   

@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 # import environ
 
 # # Initialize environment variables
@@ -120,6 +121,9 @@ STATIC_ROOT = BASE_DIR / "static_root"
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 AUTH_USER_MODEL = 'leads.User'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Authentication
 LOGIN_REDIRECT_URL = "/leads"

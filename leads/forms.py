@@ -1,11 +1,17 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter, Daybook,PlotBooking,Agent
+from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter, Daybook,PlotBooking,Agent,Kisan,UserProfile
 
 User = get_user_model()
 
-
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['full_name', 'contact_number', 'email', 'profile_picture']
+        widgets = {
+            'profile_picture': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+        }
 
 class LeadModelForm(forms.ModelForm):
     class Meta:
@@ -205,7 +211,7 @@ class PlotBookingForm(forms.ModelForm):
             'booking_date', 'name', 'father_husband_name', 'gender', 'custom_gender', 'dob', 'mobile_no',
             'address', 'bank_name', 'account_no', 'email', 'nominee_name', 'corner_plot_10', 'corner_plot_5',
             'full_pay_discount', 'location', 'project', 'associate_detail', 'agent', 'Plot_price',
-            'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark','emi_tenure', 'interest_rate','property',
+            'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark','emi_tenure', 'interest_rate'
         ]
         widgets = {
             'booking_date': forms.DateInput(attrs={'type': 'date'}),
@@ -258,9 +264,19 @@ class PlotBookingForm(forms.ModelForm):
             cleaned_data['emi_amount'] = emi_amount  # Save calculated EMI
 
         return cleaned_data
-    def save(self, *args, **kwargs):
-        plot_booking = super().save(*args, **kwargs)  # Call parent save
-        if plot_booking.property:  # Ensure the property is set
-            print(f"Marking property {plot_booking.property.title} as sold.")
-            plot_booking.property.is_sold = True  # Update sold status
-            plot_booking.property.save()  # Save the property
+    
+
+class KisanForm(forms.ModelForm):
+    class Meta:
+        model = Kisan
+        fields = [
+            'first_name', 'last_name', 'contact_number', 'address',
+            'khasra_number', 'area_in_beegha', 'land_costing', 'development_costing',
+            'payment_to_kisan', 'basic_sales_price'
+        ]
+    def __init__(self, *args, **kwargs):
+        super(KisanForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm'
+            })

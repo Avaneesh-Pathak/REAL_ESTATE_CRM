@@ -164,8 +164,7 @@
         </div>
         <div class="d-flex justify-content-between">
             <p><strong>Gender:</strong>{{ form.gender }}</p>
-            <p id="custom-gender-field" style="display:none;"><strong>{{ form.custom_gender.label }}</strong>{{
-                form.custom_gender }}</p>
+            <p id="custom-gender-field" style="display:none;"><strong>{{ form.custom_gender.label }}</strong>{{form.custom_gender }}</p>
         </div>
         <div class="d-flex justify-content-between">
             <p><strong>DOB:</strong>{{ form.dob }}</p>
@@ -206,15 +205,6 @@
                     {% endfor %}
                 </select></p>
         </div>
-        <!-- <div class="form-group" id="agent-field" style="display:none;">
-            <label>Agent</label>
-            <select id="agent-dropdown" name="agent" class="form-control">
-                <option value="">Select an Agent</option>
-                {% for agent in agents %}
-                <option value="{{ agent.id }}">{{ agent.user.username }}</option>
-                {% endfor %}
-            </select>
-        </div> -->
         <div class="d-flex justify-content-between">
             <p><strong>Project Price:</strong> <span id="project-price"></span>{{ form.Plot_price }}</p>
             <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>

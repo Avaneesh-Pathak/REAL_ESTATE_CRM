@@ -10,6 +10,12 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+
+
 
     <link id="theme-style" rel="stylesheet" href="{% static 'CSS/styles.css' %}"> <!-- Main CSS -->
 
@@ -19,6 +25,8 @@
     <style>
         /* General styles */
         body {
+            margin: 0;
+            padding: 0%;
             background-color: #ffffff;
             color: #000000;
             /* background-image: url("{% static 'path/to/your/image.jpg' %}"); */
@@ -39,10 +47,21 @@
             /* Light text */
         }
 
+        /* Nested menu styles */
+        .nested-menu {
+            display: none;
+            /* Hide nested menu by default */
+            padding-left: 20px;
+            /* Indent nested items */
+        }
+
         /* Sidebar styles */
         .sidebar {
+            margin-top: 0; /* Ensure this is set to 0 */
+            padding-top: 0;
             position: fixed;
             top: 0;
+            left: 0;
             left: -250px;
             /* Initially hidden */
             width: 250px;
@@ -65,6 +84,7 @@
             color: #333;
             text-decoration: none;
         }
+        
 
         .sidebar a:hover {
             background-color: #e2e2e2;
@@ -122,7 +142,7 @@
             /* Darker on hover */
         }
 
-       
+
 
         /* Sidebar transition styles */
         .hamburger {
@@ -169,7 +189,12 @@
             color: white;
             font-size: 24px;
         }
-   
+
+        /* Adjust main content when sidebar is active */
+        .sidebar.active+main {
+            margin-left: 250px;
+            /* Shift content to the right */
+        }
     </style>
 </head>
 
@@ -177,7 +202,8 @@
     <div class="max-w-10xl mx-auto">
 
         <header class="text-white body-font bg-blue-800">
-            <div style="max-width: 100%;" class="container mx-auto flex flex-wrap p-2 flex-col md:flex-row items-center justify-between">
+            <div style="max-width: 100%;"
+                class="container mx-auto flex flex-wrap p-2 flex-col md:flex-row items-center justify-between">
 
                 <!-- Hamburger Icon -->
                 <div class="hamburger cursor-pointer text-white ml-4" id="hamburger">
@@ -185,23 +211,76 @@
                 </div>
 
                 <!-- Sidebar -->
-                <div class="sidebar fixed top-0 left-0 w-64 h-full bg-blue-900 text-white transform -translate-x-full transition-transform duration-300 ease-in-out"
+                <div class="sidebar fixed top-5 left-0 w-30 h-full bg-blue-900 text-white transform -translate-x-full transition-transform duration-300 ease-in-out"
                     id="sidebar">
                     <div class="close-btn text-right p-4 cursor-pointer" id="close-btn">&times;</div>
                     <nav class="flex flex-col p-4 space-y-4">
                         {% if request.user.is_organisor %}
-                        <a href="{% url 'agents:agent-list' %}" class="text-white hover:text-blue-300">Agents</a>
+                        <a href="{% url 'agents:agent-list' %}"
+                            class="flex items-center text-white hover:text-blue-300 py-2 px-4 rounded-lg transition duration-200">
+                            <i class="fas fa-users mr-2"></i> Agents
+                        </a>
                         {% endif %}
-                        <a href="{% url 'dashboard' %}" class="hover:text-blue-300">Home</a>
-                        <a href="{% url 'leads:lead-list' %}" class="hover:text-blue-300">Leads</a>
-                        <a href="{% url 'leads:sale_list' %}" class="hover:text-blue-300">Sales</a>
-                        <a href="{% url 'leads:property_list' %}" class="hover:text-blue-300">Properties</a>
-                        <a href="{% url 'leads:salary_list' %}" class="hover:text-blue-300">Salary</a>
-                        <a href="{% url 'leads:daybook_list' %}" class="hover:text-blue-300">Daybook</a>
-                        <a href="{% url 'leads:promoter_list' %}" class="hover:text-blue-300">Promoter List</a>
-                        <a href="{% url 'leads:plot_registration' %}" class="hover:text-blue-300">Register Plot</a>
-                        <a href="{% url 'leads:buyers_list' %}" class="hover:text-blue-300">Buyers List</a>
 
+                        <a href="{% url 'dashboard' %}" class="flex items-center hover:text-blue-300">
+                            <i class="fas fa-home mr-2"></i> Home
+                        </a>
+
+                        <!-- Nested menu for Leads -->
+                        <div class="relative">
+                            <a href="#" class="flex items-center justify-between hover:text-blue-300"
+                                id="toggle-leads-menu">
+                                <span><i class="fas fa-user mr-2"></i> Leads</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </a>
+                            <div class="nested-menu" id="leads-menu">
+                                <a href="{% url 'leads:lead-list' %}" class="hover:text-blue-300">Lead List</a>
+                                <a href="{% url 'leads:lead-create' %}" class="hover:text-blue-300">Create Lead</a>
+                            </div>
+                        </div>
+
+                        <!-- Nested menu for Sales -->
+                        <div class="relative">
+                            <a href="#" class="flex items-center justify-between hover:text-blue-300"
+                                id="toggle-sales-menu">
+                                <span><i class="fas fa-file-alt mr-2"></i> Sales</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </a>
+                            <div class="nested-menu" id="sales-menu">
+                                <a href="{% url 'leads:sale_list' %}" class="hover:text-blue-300">Sales List</a>
+                                <a href="{% url 'leads:create_sale' %}" class="hover:text-blue-300">Add New Sale</a>
+                            </div>
+                        </div>
+
+                        <!-- Nested menu for Properties -->
+                        <div class="relative">
+                            <a href="#" class="flex items-center justify-between hover:text-blue-300"
+                                id="toggle-properties-menu">
+                                <span><i class="fas fa-building mr-2"></i> Properties</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </a>
+                            <div class="nested-menu" id="properties-menu">
+                                <a href="{% url 'leads:property_list' %}" class="hover:text-blue-300">Property List</a>
+                                <a href="{% url 'leads:plot_registration' %}" class="hover:text-blue-300">Register
+                                    Plot</a>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'leads:salary_list' %}" class="flex items-center hover:text-blue-300">
+                            <i class="fas fa-wallet mr-2"></i> Salary
+                        </a>
+                        <a href="{% url 'leads:daybook_list' %}" class="flex items-center hover:text-blue-300">
+                            <i class="fas fa-book mr-2"></i> Daybook
+                        </a>
+                        <a href="{% url 'leads:promoter_list' %}" class="flex items-center hover:text-blue-300">
+                            <i class="fas fa-chart-line mr-2"></i> Promoter List
+                        </a>
+                        <a href="{% url 'leads:buyers_list' %}" class="flex items-center hover:text-blue-300">
+                            <i class="fas fa-user-friends mr-2"></i> Buyers List
+                        </a>
+                        <a href="{% url 'leads:kisan_list' %}" class="flex items-center hover:text-blue-300">
+                            <i class="fas fa-leaf mr-2"></i> View Kisan List
+                        </a>
                     </nav>
                 </div>
 
@@ -229,16 +308,60 @@
 
                 <!-- User Info and Logout/Login -->
                 {% if request.user.is_authenticated %}
-                <div class="flex items-center text-white space-x-4">
-                    <span>Logged in as: {{ request.user.username }}</span>
-                    <form action="{% url 'logout' %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit"
-                            class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline">
-                            Logout
+                <div class="relative inline-block text-left">
+                    <!-- Profile Button -->
+                    <div>
+                        <button type="button"
+                            class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            id="profile-menu-button" aria-expanded="true" aria-haspopup="true">
+                            <i class="fas fa-user-circle text-xl mr-2"></i> {{ request.user.username }}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 9.707a1 1 0 011.414 0L10 13.414l3.293-3.707a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
                         </button>
-                    </form>
+                    </div>
+
+                    <!-- Dropdown Content -->
+                    <div class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                        role="menu" aria-orientation="vertical" aria-labelledby="profile-menu-button"
+                        id="profile-dropdown">
+                        <div class="py-1" role="none">
+                            <a href="{% url 'profile' %}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                role="menuitem">
+                                <i class="fas fa-user-edit mr-2"></i> Update Profile
+                            </a>
+                            <form action="{% url 'logout' %}" method="post" role="none">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
+
+                <script>
+                    // Toggle the dropdown menu
+                    document.getElementById('profile-menu-button').addEventListener('click', function (event) {
+                        event.stopPropagation();
+                        const dropdown = document.getElementById('profile-dropdown');
+                        dropdown.classList.toggle('hidden');
+                    });
+
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', function (event) {
+                        const profileButton = document.getElementById('profile-menu-button');
+                        const dropdown = document.getElementById('profile-dropdown');
+                        if (!profileButton.contains(event.target)) {
+                            dropdown.classList.add('hidden');
+                        }
+                    });
+                </script>
                 {% else %}
                 <a href="{% url 'login' %}"
                     class="inline-flex items-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
@@ -249,11 +372,8 @@
                     </svg>
                 </a>
                 {% endif %}
-                <!-- Night Mode Toggle Button -->
-                <button id="toggle-theme"
-                    class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-1 px-10 rounded focus:outline-none focus:shadow-outline">
-                    <span id="theme-icon" class="theme-icon">&#9728;</span> <!-- Default to Sun Icon -->
-                </button>
+
+
             </div>
 
         </header>
@@ -261,6 +381,7 @@
 
 
         <script>
+
             // Sidebar toggle functionality
             const sidebar = document.getElementById('sidebar');
             const hamburger = document.getElementById('hamburger');
@@ -274,6 +395,8 @@
                 sidebar.style.transform = 'translateX(-100%)';
             });
         </script>
+        </div>
+
 
 
         <!-- Message block -->
@@ -340,23 +463,6 @@
                 }
             });
 
-            // Night Mode Toggle
-            const themeStyle = document.getElementById('theme-style');
-            const themeIcon = document.getElementById('theme-icon');
-
-            $('#toggle-theme').click(function () {
-                if (themeStyle.getAttribute('href') === "{% static 'CSS/styles.css' %}") {
-                    themeStyle.setAttribute('href', "{% static 'CSS/night_mode.css' %}");
-                    $('body').addClass('night-mode'); // Add night mode class
-                    themeIcon.innerHTML = '&#9729;'; // Change to Moon Icon
-                    localStorage.setItem('theme', 'night');
-                } else {
-                    themeStyle.setAttribute('href', "{% static 'CSS/styles.css' %}");
-                    $('body').removeClass('night-mode'); // Remove night mode class
-                    themeIcon.innerHTML = '&#9728;'; // Change to Sun Icon
-                    localStorage.setItem('theme', 'light');
-                }
-            });
 
             // On page load, check for saved theme preference
             const currentTheme = localStorage.getItem('theme');
@@ -366,6 +472,26 @@
                 themeIcon.innerHTML = '&#9729;'; // Set icon to Moon
             }
         });
+        // Toggle nested menu for Sales
+        $('#toggle-sales-menu').on('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            $('#sales-menu').slideToggle(); // Slide toggle for the nested menu
+        });
+
+        // Toggle nested menu for Leads
+        $('#toggle-leads-menu').on('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            $('#leads-menu').slideToggle(); // Use slideToggle for animation
+        });
+
+        // Toggle nested menu for Properties
+        $('#toggle-properties-menu').on('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            $('#properties-menu').slideToggle(); // Use slideToggle for animation
+        });
+
+        // Other existing JavaScript...
+
     </script>
 </body>
 

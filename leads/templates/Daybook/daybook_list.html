@@ -1,6 +1,11 @@
 {% extends 'base.html' %}  <!-- Adjust to your base template if different -->
 
 {% block content %}
+<style>
+    th{
+        background-color:rgb(58, 32, 142);
+    }
+</style>
 <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-8">
     <h2 class="text-3xl font-semibold mb-4">Daily Expenses</h2>
     <p class="text-lg text-gray-600 mb-6">Current Balance: <span class="font-bold text-green-600">{{ total_balance }}</span></p>
@@ -13,10 +18,10 @@
     <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
         <thead>
             <tr class="bg-gray-200 text-gray-700">
-                <th class="py-3 px-4 text-left text-sm font-medium">Date</th>
-                <th class="py-3 px-4 text-left text-sm font-medium">Activity</th>
-                <th class="py-3 px-4 text-left text-sm font-medium">Amount</th>
-                <th class="py-3 px-4 text-left text-sm font-medium">Remark</th>
+                <th class="py-3 px-4 text-xm font-medium text-white">Date</th>
+                <th class="py-3 px-4 text-xm font-medium text-white">Activity</th>
+                <th class="py-3 px-4 text-xm font-medium text-white">Amount</th>
+                <th class="py-3 px-4 text-xm font-medium text-white">Remark</th>
             </tr>
         </thead>
         <tbody>

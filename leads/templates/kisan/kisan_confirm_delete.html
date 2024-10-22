@@ -1,0 +1,55 @@
+<!-- leads/templates/kisan/kisan_confirm_delete.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .card {
+        max-width: 400px; /* Set a max width for the card */
+        margin: 100px auto; /* Center the card vertically and horizontally */
+        padding: 20px; /* Add padding inside the card */
+        border-radius: 10px; /* Rounded corners */
+        background-color: #ffffff; /* White background for the card */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Floating effect with shadow */
+        transition: transform 0.3s; /* Animation for hover effect */
+    }
+
+    .card:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+    }
+
+    h2 {
+        color: #dc3545; /* Danger color for the header */
+        font-weight: bold;
+    }
+
+    .lead {
+        font-size: 1.2em; /* Increase font size for the lead text */
+    }
+
+    .text-muted {
+        color: #6c757d; /* Muted text color */
+    }
+
+    .btn {
+        margin: 10px; /* Margin around buttons */
+    }
+</style>
+
+<div class="container text-center">
+    <div class="card">
+        <h2>Delete Confirmation</h2>
+        <p class="lead">Are you sure you want to delete the Kisan:</p>
+        <h3 class="font-weight-bold">{{ kisan.first_name }} {{ kisan.last_name }}</h3>
+
+        <div class="mt-4">
+            <p class="text-muted">This action cannot be undone.</p>
+        </div>
+
+        <form method="POST" class="mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-lg">Yes, delete</button>
+            <a href="{% url 'leads:kisan_list' %}" class="btn btn-secondary btn-lg">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

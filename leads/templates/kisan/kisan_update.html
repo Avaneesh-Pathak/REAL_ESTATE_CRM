@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Form Container */
+    .kisan-form {
+        max-width: 50%;
+        margin: 0 auto;
+        padding: 20px;
+        border: 2px solid #007bff; /* Change border color */
+        border-radius: 10px; /* Round corners */
+        background-color: #f9f9f9;
+        box-shadow: 0 4px 20px rgba(0, 123, 255, 0.2); /* Subtle shadow for depth */
+        transition: transform 0.3s; /* Animation effect */
+    }
+
+    .kisan-form:hover {
+        transform: scale(1.02); /* Slightly enlarge on hover */
+    }
+
+    /* Input Styling */
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #007bff; /* Change border color */
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    /* Input focus effect */
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: #0056b3; /* Darker border on focus */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Blue shadow on focus */
+    }
+
+    /* Grouping for form fields */
+    .form-group {
+        margin-bottom: 20px; /* More space between groups */
+    }
+
+    /* Button Styling */
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s; /* Animation effects */
+    }
+
+    /* Button hover effect */
+    .btn-primary:hover {
+        background-color: #0056b3; /* Darker shade on hover */
+        transform: translateY(-2px); /* Slight lift effect */
+    }
+
+    /* Back Button Styling */
+    .btn-secondary {
+        background-color: #0056b3; /* Change to a blue shade */
+        color: white; /* Text color */
+        padding: 10px 20px; /* Same padding as primary button */
+        border: none; /* No border */
+        border-radius: 5px; /* Rounded corners */
+        transition: background-color 0.3s; /* Transition for hover effect */
+    }
+
+    /* Back Button hover effect */
+    .btn-secondary:hover {
+        background-color: #003f7f; /* Darker shade on hover */
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 2.5em;
+        font-weight: bold;
+        color: rgb(63, 69, 193);
+    }
+</style>
+
+<h2>Update Details</h2>
+
+<!-- Back to Kisan List Button -->
+<h3 style="text-align: center;">
+    <a href="{% url 'leads:kisan_list' %}" class="btn btn-secondary">Back to Kisan List</a>
+</h3>
+
+<form method="POST" class="kisan-form">
+    {% csrf_token %}
+
+    <div class="d-flex justify-content-between">
+        <p><strong>First Name:</strong> {{ form.first_name }} {{ form.first_name.errors }}</p>
+        <p><strong>Last Name:</strong> {{ form.last_name }} {{ form.last_name.errors }}</p>
+    </div>
+
+    <div class="form-group">
+        <p><strong for="id_contact_number">Contact Number:</strong></p>
+        {{ form.contact_number }}
+        {{ form.contact_number.errors }}
+    </div>
+
+    <div class="form-group">
+        <p><strong for="id_address">Address:</strong></p>
+        {{ form.address }}
+        {{ form.address.errors }}
+    </div>
+
+    <div class="form-group">
+        <p><strong for="id_khasra_number">Khasra Number:</strong></p>
+        {{ form.khasra_number }}
+        {{ form.khasra_number.errors }}
+    </div>
+
+    <div class="form-group">
+        <p><strong for="id_area_in_beegha">Area in Beegha:</strong></p>
+        {{ form.area_in_beegha }}
+        {{ form.area_in_beegha.errors }}
+    </div>
+
+    <div class="form-group">
+        <p><strong for="id_land_costing">Land Costing:</strong></p>
+        {{ form.land_costing }}
+        {{ form.land_costing.errors }}
+    </div>
+
+    <div class="form-group">
+        <p><strong for="id_development_costing">Development Costing:</strong></p>
+        {{ form.development_costing }}
+        {{ form.development_costing.errors }}
+    </div>
+
+    <div class="form-group">
+        <p><strong for="id_payment_to_kisan">Payment to Kisan:</strong></p>
+        {{ form.payment_to_kisan }}
+        {{ form.payment_to_kisan.errors }}
+    </div>
+
+    <div class="form-group">
+        <p><strong for="id_basic_sales_price">Basic Sales Price:</strong></p>
+        {{ form.basic_sales_price }}
+        {{ form.basic_sales_price.errors }}
+    </div>
+
+    <!-- Centered Update Button -->
+    <div style="text-align: center;">
+        <button type="submit" class="btn btn-primary">
+            {% if kisan %}Update{% else %}Create{% endif %}
+        </button>
+    </div>
+</form>
+{% endblock %}

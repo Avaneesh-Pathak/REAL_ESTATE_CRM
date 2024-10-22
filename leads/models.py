@@ -13,6 +13,10 @@ class User(AbstractUser):
 # Create your models here.
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
+    full_name = models.CharField(max_length=100, blank=True, null=True)
+    contact_number = models.IntegerField(blank=True,null=True)
+    email = models.EmailField(null=True,blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
@@ -291,7 +295,7 @@ class PlotBooking(models.Model):
     corner_plot_5 = models.BooleanField(default=False)
     full_pay_discount = models.BooleanField(default=False)
     location = models.CharField(max_length=255)
-    project = models.ForeignKey(Property, on_delete=models.DO_NOTHING, related_name='project', unique=True,null=True, blank=True)
+    project = models.OneToOneField(Property, on_delete=models.DO_NOTHING, related_name='project', unique=True,null=True, blank=True)
     associate_detail = models.BooleanField(default=False)
     agent = models.ForeignKey(Agent, on_delete=models.SET_NULL, null=True, blank=True, related_name='plot_bookings')  # Changed to lowercase
     Plot_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -303,19 +307,6 @@ class PlotBooking(models.Model):
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # Interest rate as a percentage
     emi_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=True)  # Calculated EMI amount
     remark = models.TextField(blank=True, null=True)
-    property = models.ForeignKey(Property, on_delete=models.CASCADE,blank=False, null=True)
-
-    def save(self, *args, **kwargs):
-        print("Entering save method in PlotBooking.")
-        super().save(*args, **kwargs)  # Call the parent save method
-        if self.property:  # Check if the property is linked
-            print(f"Current property state before update: {self.property.is_sold}")
-            self.property.is_sold = True  # Set the property to sold
-            self.property.save()  # Save the property to update the status
-            print(f"Property {self.property.title} marked as sold.")
-        else:
-            print("No property linked to this PlotBooking.")
-
 
     def __str__(self):
         return f"Plot Booking - {self.name} - {self.booking_date}"
@@ -359,3 +350,22 @@ class Level(models.Model):
 
     def __str__(self):
         return  self.level
+    
+
+class Kisan(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    contact_number = models.IntegerField()
+    address = models.TextField(max_length=50)
+
+    khasra_number = models.IntegerField( unique=True)
+    area_in_beegha = models.DecimalField(max_digits=20,decimal_places=3)
+    land_costing = models.DecimalField(max_digits=12,decimal_places=3)
+    development_costing = models.DecimalField(max_digits=12,decimal_places=3)
+    kisan_payment = models.DecimalField(max_digits=10,decimal_places=3)
+    land_address = models.TextField(max_length=50)
+    payment_to_kisan = models.DecimalField(max_digits=12, decimal_places=2,null=True, blank=True)  
+    basic_sales_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  
+
+    def __str__(self) -> str:
+        return f"{self.first_name} with khasra no {self.khasra_number}"
