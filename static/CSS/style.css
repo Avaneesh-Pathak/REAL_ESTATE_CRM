@@ -20,6 +20,14 @@ body {
     padding: 20px; /* Add some padding to the content area */
 }
 
+.buyer-list-card {
+  height: 400px; /* Set height of the card */
+}
+
+.buyer-list-item {
+  font-size: large; /* Adjust font size */
+  padding: 15px; /* Add padding for more space */
+}
 
 
 /*! tailwindcss v2.2.11 | MIT License | https://tailwindcss.com */

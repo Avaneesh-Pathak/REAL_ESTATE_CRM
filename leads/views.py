@@ -83,6 +83,9 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         # Total leads
         total_lead_count = Lead.objects.filter(organisation=user.userprofile).count()
 
+        recent_buyers = PlotBooking.objects.order_by('-booking_date')[:5]  # Use the appropriate field for your criteria
+        
+
         # Sales Report
         sales_data = Sale.objects.values('sale_date').annotate(
             total_sale_price=Sum('sale_price'),
@@ -133,6 +136,7 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         context.update({
             'labels': labels,
             'data': data,
+            'recent_buyers': recent_buyers,
             'profit_labels': labels,  # Reuse the same labels for profit
             'profit_data': profit_data,
             'total_lead_count': total_lead_count,
@@ -143,7 +147,6 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
             'total_profit': total_profit,
         })
         return context
-
 
     
 class LeadListView(LoginRequiredMixin,generic.ListView):

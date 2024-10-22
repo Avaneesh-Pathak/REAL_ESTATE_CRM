@@ -12,10 +12,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/main.min.js"></script>
+  
 
 
+    <link id="theme-style" rel="stylesheet" href="{% static 'CSS/styles.css' %}"> <!-- Main CSS -->
+
+    <!-- Add Chart.js CDN here -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
     <link id="theme-style" rel="stylesheet" href="{% static 'CSS/styles.css' %}"> <!-- Main CSS -->
@@ -30,22 +35,6 @@
             padding: 0%;
             background-color: #ffffff;
             color: #000000;
-            /* background-image: url("{% static 'path/to/your/image.jpg' %}"); */
-            /* Background image */
-            background-size: cover;
-            /* Cover the entire page */
-            background-position: center;
-            /* Center the image */
-            background-repeat: no-repeat;
-            /* Prevent the image from repeating */
-        }
-
-        /* Night mode styles */
-        body.night-mode {
-            background-color: #121212;
-            /* Dark background */
-            color: #ffffff;
-            /* Light text */
         }
 
         /* Nested menu styles */
@@ -57,22 +46,16 @@
         }
 
         /* Sidebar styles */
+       
         .sidebar {
-            margin-top: 0;
-            /* Ensure this is set to 0 */
-            padding-top: 0;
             position: fixed;
             top: 0;
-            left: 0;
             left: -250px;
-            /* Initially hidden */
             width: 250px;
             height: 100%;
-            background-color: #f8f9fa;
-            /* Light background */
+            background-color: 003C43;
             transition: left 0.3s ease;
             z-index: 1000;
-            /* Ensure it's above other content */
         }
 
         .sidebar.active {
@@ -109,16 +92,6 @@
             /* Align to the right */
         }
 
-        /* Night mode toggle button */
-        #toggle-theme {
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            font-size: 24px;
-            /* Adjust icon size */
-            margin: 10px;
-            /* Add some margin */
-        }
 
         .theme-icon {
             display: inline-block;
@@ -158,7 +131,7 @@
             /* Dark Blue */
             padding-top: 30px;
             position: fixed;
-            left: 0;
+            left: -250px;
             top: 0;
             z-index: 1000;
             overflow: auto;
@@ -301,6 +274,9 @@
                     </a>
                 </div>
 
+                <div>
+                    
+                </div>
 
                 <!-- Navigation Links -->
                 <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center space-x-4">
@@ -405,7 +381,7 @@
         </script>
     </div>
 
-
+        
 
     <!-- Message block -->
     {% if messages %}
@@ -438,7 +414,9 @@
     </div>
 
     {% include "scripts.html" %}
-
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- Include jQuery and Bootstrap Datepicker JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script
