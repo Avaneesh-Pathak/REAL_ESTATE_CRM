@@ -16,6 +16,7 @@ app_name = "leads"
 urlpatterns = [
     
     path('sales/', SaleListView.as_view(), name='sale_list'),
+    
     path('salaries/', SalaryListView.as_view(), name='salary_list'),
     path('my_bonus/', BonusInfoView.as_view(), name='bonus_info'),
     path('create_salary/', create_salary, name='create_salary'),

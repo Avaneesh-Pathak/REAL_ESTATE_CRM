@@ -20,6 +20,10 @@ class UserProfileForm(forms.ModelForm):
             self.fields['username'].initial = self.user.username
             self.fields['email'].initial = self.user.email
 
+class SearchForm(forms.Form):
+    query = forms.CharField(label='Search', max_length=100)
+
+    
             
 class LeadModelForm(forms.ModelForm):
     class Meta:

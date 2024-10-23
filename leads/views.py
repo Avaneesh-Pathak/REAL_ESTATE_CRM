@@ -1,6 +1,7 @@
 import logging
 import datetime
 from datetime import timedelta
+from django.db.models import Q
 from decimal import Decimal
 from django.db import models, IntegrityError
 from django.db.models import Count
@@ -46,6 +47,53 @@ class SignupView(generic.CreateView):
 
     def get_success_url(self):
         return reverse("login")
+
+def search_view(request):
+    query = request.GET.get('q', '')
+
+    # Searching in Property model (fields that exist)
+    property_results = Property.objects.filter(
+        Q(title__icontains=query) |
+        Q(project_name__icontains=query) |
+        Q(type__icontains=query)
+    )
+
+    # Searching in Agent model (existing fields)
+    agent_results = Agent.objects.filter(
+        Q(user__first_name__icontains=query) |
+        Q(user__last_name__icontains=query) |
+        Q(user__email__icontains=query) |
+        Q(user__username__icontains=query)
+    )
+
+    # Searching in PlotBooking model (updated to use the correct field)
+    plotbooking_results = PlotBooking.objects.filter(
+        Q(name__icontains=query) |
+        Q(project__title__icontains=query)  # Use project to access Property title
+    )
+
+    # Searching in UserProfile model (existing fields)
+    userprofile_results = UserProfile.objects.filter(
+        Q(full_name__icontains=query) |
+        Q(email__icontains=query)
+    )
+
+   # Debugging output to check results
+    print(f"Query: {query}")
+    print(f"Property Results: {[str(prop) for prop in property_results]}")
+    print(f"Agent Results: {[str(agent) for agent in agent_results]}")
+    print(f"Plot Booking Results: {[str(booking) for booking in plotbooking_results]}")
+    print(f"User Profile Results: {[str(profile) for profile in userprofile_results]}")
+
+
+    context = {
+        'query': query,
+        'property_results': property_results,
+        'agent_results': agent_results,
+        'plotbooking_results': plotbooking_results,
+        'userprofile_results': userprofile_results,
+    }
+    return render(request, 'leads/search_result.html', context) 
 
 
 class LandingPageView(generic.TemplateView):

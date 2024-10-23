@@ -2,10 +2,11 @@
 
 {% block content %}
 <style>
-    
-    /* Additional CSS for hover effect */
+    /* Additional CSS for hover effect and animation */
     .table tbody tr:hover {
         background-color: #02381c;
+        transform: scale(1.02); /* Slight scale on hover */
+        transition: transform 0.3s ease, background-color 0.3s ease;
     }
 
     .table {
@@ -13,16 +14,79 @@
         border-radius: 10px;
         overflow: hidden;
     }
-    
+
+    /* Animation for cards */
+    .card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: translateY(-10px); /* Elevate the card slightly on hover */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+    }
+
+    /* Background color transitions for cards */
+    .card {
+        background-color: #003C43;
+        color: #feffff;
+    }
+
+    .card-body h3 {
+        font-size: 1.4rem; /* Adjust heading size */
+        transition: color 0.3s ease;
+    }
+
+    .card-body p.display-4 {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+
+    /* Subtle text color change on hover */
+    .card:hover h3 {
+        color: #FFD700; /* Gold color on hover */
+    }
+
+    /* Animation for graphs */
+    canvas {
+        transition: transform 0.3s ease;
+    }
+
+    canvas:hover {
+        transform: scale(1.05); /* Slight scale on hover */
+    }
+
+    /* Styling for the summary section cards */
+    .card.text-center.text-white {
+        background-color: #1B4242;
+        color: #feffff;
+    }
+
+    /* Animation for salary distribution chart */
+    #salaryDistributionChart {
+        animation: fadeIn 2s ease;
+    }
+
+    /* Keyframes for fade-in animation */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
 </style>
+
 <div class="container mt-4">
-    <h1 style="font-family: 'Poppins', sans-serif; font-size: xx-large; margin-bottom: 10px; font-weight: bold;"
-        class="text-center">
-        Analysis</h1>
+    <h1 style="font-family: 'Poppins', sans-serif; font-size: xx-large; margin-bottom: 10px; font-weight: bold;" class="text-center">
+        Analysis
+    </h1>
+    
+
     <div class="row">
         <!-- Total Leads -->
         <div class="col-md-4">
-            <div style="background-color: #003C43; color:#feffff" class="card text-center text-white">
+            <div class="card text-center text-white">
                 <div class="card-body">
                     <h3>Total Leads</h3>
                     <a href="{% url 'leads:lead-list' %}"><p class="display-4">{{ total_lead_count }}</p></a>
@@ -32,7 +96,7 @@
 
         <!-- Leads in the Past 30 Days -->
         <div class="col-md-4">
-            <div style="background-color: #003C43; color:#feffff" class="card text-center text-white">
+            <div class="card text-center text-white">
                 <div class="card-body">
                     <h3>Leads in the Past 30 Days</h3>
                     <p class="display-4">{{ total_in_past30 }}</p>
@@ -42,7 +106,7 @@
 
         <!-- Converted Leads in the Past 30 Days -->
         <div class="col-md-4">
-            <div style="background-color: #003C43; color:#feffff" class="card text-center text-white">
+            <div class="card text-center text-white">
                 <div class="card-body">
                     <h3>Converted Leads in the Past 30 Days</h3>
                     <p class="display-4">{{ converted_in_past30 }}</p>
@@ -54,13 +118,13 @@
     <!-- Sales and Profit Section -->
     <div class="row mt-4">
         <!-- Sales Data -->
-        <div class="col-md-6">
+        <div class="bg-white col-md-6">
             <h3 style="font-size:x-large;  margin-left: 25%; font-weight: bold;">Properties Sold Over Time</h3>
             <canvas id="salesChart"></canvas>
         </div>
 
         <!-- Profit Data -->
-        <div class="col-md-6">
+        <div class="bg-white col-md-6">
             <h3 style="font-size:x-large;  margin-left: 40%; font-weight: bold;">Profit Over Time</h3>
             <canvas id="profitChart"></canvas>
         </div>
@@ -69,7 +133,7 @@
     <!-- Summary Section -->
     <div class="row mt-4">
         <div class="col-md-4">
-            <div style="background-color: #003C43; color:#feffff" class="card text-center text-white">
+            <div class="card text-center text-white">
                 <div class="card-body">
                     <h3>Total Sales</h3>
                     <p class="display-4">₹{{ total_sales }}</p>
@@ -77,7 +141,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div style="background-color: #005B41; color:#feffff" class="card text-center text-white">
+            <div class="card text-center text-white">
                 <div class="card-body">
                     <h3>Total Cost</h3>
                     <p class="display-4">-₹{{ total_cost }}</p>
@@ -85,7 +149,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div style="background-color: #1B4242; color:#feffff" class="card text-center text-white">
+            <div class="card text-center text-white">
                 <div class="card-body">
                     <h3>Total Profit</h3>
                     <p class="display-4">₹{{ total_profit }}</p>
@@ -96,17 +160,16 @@
 
     <!-- Calendar Section -->
     <div class="row mt-6">
-        <div style="height: 350px; width: 450px;" class="col-md-5">
+        <div style="height: 350px; width: 450px; background-color: #fefefe;border-radius: 10px;" class="col-md-5">
             <h3 style="font-size:x-large;  margin-left: 25%; font-weight: bold;">Salary Distribution from Profit</h3>
             <canvas id="salaryDistributionChart"></canvas>
-
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-7">
             <h3 style="font-size: x-large; font-weight: bold; text-align: center;">Top 5 Recent Buyers</h3>
             <table class="table table-striped table-bordered "
-                style="width: 100%; height: auto; border-radius: 10px; overflow: hidden;">
-                <thead style="background-color: #003C43; color:#78A083">
+                style="width: 100%; height: 100%; border-radius: 10px; overflow: hidden;">
+                <thead style="background-color: #003C43; color:#fdfdfd">
                     <tr>
                         <th style="width: 10%; text-align: center;">S.No</th>
                         <th style="width: 30%; text-align: center;">Buyer Name</th>
@@ -117,7 +180,7 @@
                 </thead>
                 <tbody>
                     {% for buyer in recent_buyers %}
-                    <tr style="background-color: #77B0AA; transition: background-color 0.3s;">
+                    <tr style="background-color: #f5f5f5; transition: background-color 0.3s ease;">
                         <td style="text-align: center;">{{ forloop.counter }}.</td>
                         <td style="text-align: center; font-weight: bold;"><a
                                 href="{% url 'leads:update_delete_buyer' buyer.id %}"
@@ -139,6 +202,8 @@
 
 <!-- Chart.js Library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
 <!-- FullCalendar CSS & JS -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/main.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/main.min.js"></script>
@@ -167,7 +232,7 @@
         options: {
             responsive: true,
             plugins: {
-                legend: { display: true, labels: { color: 'black' } },
+                legend: { display: true, labels: { color: 'dark black' } },
                 tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.7)', titleColor: 'white', bodyColor: 'white' }
             },
             scales: { y: { beginAtZero: true } }
@@ -197,15 +262,14 @@
         options: {
             responsive: true,
             plugins: {
-                legend: { display: true, labels: { color: 'black' } },
-                tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.7)', titleColor: 'white', bodyColor: 'white' }
+                legend: { display: true, labels: { color: 'white' } },
+                tooltip: { backgroundColor: 'white', titleColor: 'black', bodyColor: 'white' }
             },
             scales: { y: { beginAtZero: true } }
         }
     });
 </script>
 <!-- Salary -->
-
 <script>
     const salaryDistributionLabels = {{ salaryDistribution_labels|safe }};
     const salaryDistributionData = {{ salary_distribution|safe }}; 
@@ -216,8 +280,9 @@
         data: {
             labels: salaryDistributionLabels,
             datasets: [{
+                label:salaryDistributionLabels,
                 data: salaryDistributionData,
-                backgroundColor: ['#77B0AA', '#04364A'],  // Colors for each slice
+                backgroundColor: ['#77B0AA', '#04364A'],
                 borderColor: '#35374B',
                 borderWidth: 1,
             }]
@@ -233,8 +298,26 @@
                     display: true,
                     text: 'Salary Distribution from Profit',
                 },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    color: '#000',  // Label color
+                    formatter: function(value, context) {
+                        return value.toLocaleString();  // Format numbers with commas
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,  // Start y-axis from 0
+                    title: {
+                        display: true,
+                        text: 'Amount in Currency'
+                    }
+                }
             }
-        }
+        },
+        plugins: [ChartDataLabels]  // Activate the datalabels plugin
     });
 </script>
 

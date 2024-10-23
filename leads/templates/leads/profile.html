@@ -5,41 +5,48 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header bg-primary text-white">
+                <!-- Card Header with Dashboard Theme Colors -->
+                <div class="card-header" style="background-color: #003C43; color: #feffff;">
                     <h4>Update Profile</h4>
                 </div>
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
+                        <!-- Username Field -->
                         <div class="form-group">
                             <label for="id_username">Username</label>
-                            <input type="text" id="id_username" name="username" value="{{ form.username.value }}" class="form-control">
+                            <input type="text" id="id_username" name="username" value="{{ form.username.value }}" class="form-control" style="border: 1px solid #003C43;">
                         </div>
 
+                        <!-- Email Field -->
                         <div class="form-group">
                             <label for="id_email">Email</label>
-                            <input type="email" id="id_email" name="email" value="{{ form.email.value }}" class="form-control">
+                            <input type="email" id="id_email" name="email" value="{{ form.email.value }}" class="form-control" style="border: 1px solid #003C43;">
                         </div>
 
+                        <!-- Full Name Field -->
                         <div class="form-group">
                             <label for="id_full_name">Full Name</label>
-                            <input type="text" id="id_full_name" name="full_name" value="{{ form.full_name.value }}" class="form-control">
+                            <input type="text" id="id_full_name" name="full_name" value="{{ form.full_name.value }}" class="form-control" style="border: 1px solid #003C43;">
                         </div>
 
+                        <!-- Contact Number Field -->
                         <div class="form-group">
                             <label for="id_contact_number">Contact Number</label>
-                            <input type="text" id="id_contact_number" name="contact_number" value="{{ form.contact_number.value }}" class="form-control">
+                            <input type="text" id="id_contact_number" name="contact_number" value="{{ form.contact_number.value }}" class="form-control" style="border: 1px solid #003C43;">
                         </div>
 
+                        <!-- Profile Picture Field -->
                         <div class="form-group">
                             <label for="id_profile_picture">Profile Picture</label>
                             <input type="file" id="id_profile_picture" name="profile_picture" class="form-control-file">
                             {% if user_profile.profile_picture %}
-                                <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="img-thumbnail mt-3" style="max-width: 150px;">
+                                <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="img-thumbnail mt-3" style="max-width: 150px; border: 2px solid #003C43;">
                             {% endif %}
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-block mt-4">Save Changes</button>
+                        <!-- Save Changes Button -->
+                        <button type="submit" class="btn btn-block mt-4" style="background-color: #005B41; color: #feffff;">Save Changes</button>
                     </form>
                 </div>
             </div>
