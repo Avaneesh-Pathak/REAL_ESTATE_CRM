@@ -2,31 +2,121 @@
 {% load tailwind_filters %}
 
 {% block content %}
+<style>
+    /* Additional CSS Styles for Enhancements */
+    body {
+        background-color: #f9fafb; /* Light background color */
+        font-family: 'Arial', sans-serif; /* Consistent font */
+    }
 
-<section class="text-gray-700 body-font overflow-hidden">
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .lead-section {
+        background: linear-gradient(135deg, #1481af 0%, #fbfbfb 100%);
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Button Styles */
+    .btn-submit {
+        background-color: #3b82f6; /* Blue background */
+        border-radius: 0.5rem; /* Rounded corners */
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        padding: 12px 20px; /* Consistent padding */
+        font-weight: 600; /* Bolder text */
+        text-transform: uppercase; /* Uppercase text */
+    }
+
+    .btn-submit:hover {
+        background-color: #2563eb; /* Darker blue on hover */
+        transform: scale(1.05); /* Scale up on hover */
+    }
+
+    /* Navigation link styles */
+    .nav-link {
+        position: relative;
+        text-align: center;
+        padding-bottom: 5px; /* Space for the underline */
+        color: #000000; /* Default text color */
+        transition: color 0.3s ease; /* Smooth color transition */
+    }
+
+    .nav-link:hover {
+        color: #3b82f6; /* Change color on hover */
+    }
+
+    .nav-link:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px; /* Underline height */
+        background-color: #3b82f6; /* Underline color */
+        transform: scaleX(0); /* Start with no underline */
+        transition: transform 0.3s ease; /* Animation for underline */
+    }
+
+    .nav-link:hover:after {
+        transform: scaleX(1); /* Grow underline on hover */
+    }
+
+    /* Card-like container for the form */
+    .form-container {
+        background: white; /* White background for the form */
+        border-radius: 0.5rem; /* Rounded corners */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        padding: 20px; /* Padding for inner content */
+    }
+
+    h1 {
+        color: #1f2937; /* Darker text for main heading */
+        margin-bottom: 15px; /* Margin for separation */
+    }
+
+    h2 {
+        color: #000000; /* Gray color for subheading */
+        margin-bottom: 10px; /* Margin for separation */
+    }
+
+    p {
+        color: #4b5563; /* Gray color for text */
+        line-height: 1.6; /* Improve readability */
+    }
+</style>
+
+<section class="lead-section text-gray-700 body-font overflow-hidden">
     <div class="container px-5 py-24 mx-auto">
-      <div class="lg:w-4/5 mx-auto flex flex-wrap">
-        <div class="w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
-            <h2 class="text-sm title-font text-gray-500 tracking-widest">LEAD</h2>
-            <h1 class="text-gray-900 text-3xl title-font font-medium mb-4">{{ lead.first_name }} {{ lead.last_name }}</h1>
-            <div class="flex mb-4">
-                <a href="{% url 'leads:lead-detail' lead.pk %}" class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1">
-                    Overview
-                </a>
-                <a href="{% url 'leads:lead-category-update' lead.pk %}" class="flex-grow text-indigo-500 border-b-2 border-indigo-500 py-2 text-lg px-1">
-                    Category
-                </a>
-                <a href="{% url 'leads:lead-update' lead.pk %}" class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1">
-                    Update Details
-                </a>
+        <div class="lg:w-4/5 mx-auto flex flex-wrap fade-in">
+            <div class="w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
+                <h2 class="text-sm title-font text-black-900 tracking-widest">LEAD</h2>
+                <h1 class="text-3xl title-font font-medium mb-4">{{ lead.first_name }} {{ lead.last_name }}</h1>
+                <div class="flex mb-4">
+                    <a href="{% url 'leads:lead-detail' lead.pk %}" class="flex-grow nav-link py-2 text-lg">Overview</a>
+                    <a href="{% url 'leads:lead-category-update' lead.pk %}" class="flex-grow nav-link py-2 text-lg">Category</a>
+                    <a href="{% url 'leads:lead-update' lead.pk %}" class="flex-grow nav-link py-2 text-lg">Update Details</a>
+                </div>
+                <div class="form-container">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn-submit w-full mt-4">Submit</button>
+                    </form>
+                </div>
             </div>
-            <form form method="post">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <button type="submit" class="w-full text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">Submit</button>
-            </form>
         </div>
-      </div>
     </div>
-  </section>
+</section>
 {% endblock content %}

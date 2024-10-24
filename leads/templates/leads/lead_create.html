@@ -2,19 +2,51 @@
 {% load tailwind_filters %}
 
 {% block content %}
+<style>
+    /* Button Styles */
+    .btn-primary {
+        background-color: #241d9d;
+        /* Indigo color */
+        border-radius: 0.5rem;
+        /* Rounded corners */
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        padding: 12px 10px;
+        /* Consistent padding */
+        font-weight: 600;
+        /* Bolder text */
+        text-transform: uppercase;
+        /* Uppercase text */
+        letter-spacing: 0.05em;
+        /* Spacing between letters */
+        text-align: center;
 
-<div class="max-w-lg mx-auto">
-    <a class="hover:text-blue-500" href="{% url 'leads:lead-list' %}">Go back to leads</a>
+    }
+
+    .btn-primary:hover {
+        background-color: #4338ca;
+        /* Darker shade on hover */
+        transform: scale(1.05);
+        /* Slight scale on hover */
+    }
+
+    .main {
+        margin-top: 25px;
+    }
+</style>
+
+<div class="main max-w-lg mx-auto">
+    <a class="btn-primary w-full mt-4" href="{% url 'leads:lead-list' %}">Go back to leads</a>
     <div class="py-5 border-t border-gray-200">
-        <h1 class="text-4xl text-gray-800">Create a new lead</h1>
+        <h1 class="text-4xl text-black-800">Create a new lead</h1>
+
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type='submit' class="w-full text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">
+                Submit
+            </button>
+        </form>
     </div>
-    <form method="post" class="mt-5">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button type='submit' class="w-full text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">
-            Submit
-        </button>
-    </form>
 </div>
 
 {% endblock content %}

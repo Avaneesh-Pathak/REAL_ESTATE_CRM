@@ -1,12 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
+<style>
+    .form-group{
+        text-align: center;
+        text-shadow: #03083d;
+        text-decoration: wavy;
+        font-size: larger;
+    }
+</style>
+<div class="lead-section container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <!-- Card Header with Dashboard Theme Colors -->
-                <div class="card-header" style="background-color: #003C43; color: #feffff;">
+                <div class="card-header" style="background-color: #03083d; color: #feffff; text-align: center;">
                     <h4>Update Profile</h4>
                 </div>
                 <div class="card-body">
@@ -46,7 +54,7 @@
                         </div>
 
                         <!-- Save Changes Button -->
-                        <button type="submit" class="btn btn-block mt-4" style="background-color: #005B41; color: #feffff;">Save Changes</button>
+                        <button type="submit" class="btn btn-block mt-4" style="background-color: #09005b; color: #feffff;">Save Changes</button>
                     </form>
                 </div>
             </div>

@@ -2,48 +2,110 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="mb-4 text-center text-primary">
-        {% if sale %}Update Sale{% else %}Create Sale{% endif %}
-    </h1>
-
-    <form method="POST" class="bg-light p-4 rounded shadow">
-        {% csrf_token %}
-        <div class="form-group">
-            {{ form.as_p }}
-        </div>
-
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary btn-lg">Save</button>
-            
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Sale</title>
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light background for better contrast */
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-weight: 300;
+            animation: fadeIn 0.8s ease forwards; /* Fade in effect for heading */
+        }
+        .form {
+            width: 500px;
+            margin: 50px auto; /* Center the form */
+            background-color: #ffffff; /* White background for the form */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
+            transition: transform 0.3s; /* Smooth transformation */
+        }
+        .form:hover {
+            transform: scale(1.02); /* Slight scale effect on hover */
+        }
+        .title {
+            font-weight: bolder;
+            font-size: 1.5em; /* Increase font size */
+            color: #007bff; /* Primary color for title */
+            margin: 20px 0; /* Vertical margin */
+            text-align: center; /* Center the title */
+        }
+        .down-button {
+            text-align: center;
+            margin-top: 20px; /* Add top margin for spacing */
+        }
+        .btn {
+            min-width: 120px; /* Ensures buttons are a uniform size */
+            transition: background-color 0.3s; /* Smooth background color change */
+        }
+        .btn:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+            color: #ffffff; /* Change text color on hover */
+        }
+        .text-center {
+            text-align: center; /* Center align text */
+        }
+        .bg-light {
+            background-color: #f8f9fa; /* Light background color */
+        }
+        /* Animation Keyframes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px); /* Slide up effect */
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Responsive styles */
+        @media (max-width: 600px) {
+            .form {
+                width: 90%; /* Full width on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form mt-2 p-4 small rounded shadow">
+        <h1 class="title mb-4">
+            {% if sale %}Update Sale{% else %}Create Sale{% endif %}
+        </h1>
+        <p class="text-center" style="margin-bottom: 20px;">Manage sales data according to your data</p>
+    
+        <form method="POST" class="bg-light p-4 rounded shadow">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+    
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg">Save</button>
+                
+                {% if sale %}
+                    <div class="mt-4"> <!-- Add margin top for spacing -->
+                        <button type="submit" name="delete" class="btn btn-danger btn-lg">Delete Sale</button>  <!-- Delete button -->
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    
+        <div class="down-button mt-4">
             {% if sale %}
-                <div class="mt-4"> <!-- Add margin top for spacing -->
-                    <button type="submit" name="delete" class="btn btn-danger btn-lg">Delete Sale</button>  <!-- Delete button -->
-                </div>
+                <a href="{% url 'leads:sale_list' %}" class="btn btn-secondary">Cancel</a>  <!-- Link back to sale list -->
+            {% else %}
+                <a href="{% url 'leads:sale_list' %}" class="btn btn-secondary">Back to Sale List</a>  <!-- Link back to sale list -->
             {% endif %}
         </div>
-    </form>
-
-    <div class="text-center mt-4">
-        {% if sale %}
-            <a href="{% url 'leads:sale_list' %}" class="btn btn-secondary">Cancel</a>  <!-- Link back to sale list -->
-        {% else %}
-            <a href="{% url 'leads:sale_list' %}" class="btn btn-secondary">Back to Sale List</a>  <!-- Link back to sale list -->
-        {% endif %}
     </div>
-</div>
-
-<!-- Custom Styles -->
-<style>
-    body {
-        background-color: #f8f9fa;  /* Light background for contrast */
-    }
-    h1 {
-        font-weight: 300;
-    }
-    .btn {
-        min-width: 120px; /* Ensures buttons are a uniform size */
-    }
-</style>
-
+</body>
+</html>
 {% endblock %}

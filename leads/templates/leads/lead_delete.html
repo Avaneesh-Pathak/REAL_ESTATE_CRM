@@ -2,7 +2,14 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<div class="max-w-lg mx-auto">
+<style>
+    .lead-section {
+        background: linear-gradient(135deg, #1481af 0%, #fbfbfb 100%);
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+<div class="lead-section max-w-lg mx-auto">
     <div class="py-5 border-b border-gray-200">
         <a class="hover:text-blue-500" href="{% url 'leads:lead-list' %}">Go back to leads</a>
     </div>

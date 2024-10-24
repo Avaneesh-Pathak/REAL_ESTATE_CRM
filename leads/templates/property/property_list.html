@@ -55,7 +55,7 @@
 <div style="border-radius:20%;" class="grid grid-cols-8 gap-7">
     {% for property in properties %}
     <!-- <div  style="border-radius:10%;" class="bg-white shadow-lg rounded-lg overflow-hidden relative border-4"> -->
-    <div style="border-radius:20%;background-color: {% if property.is_sold %} rgba(255, 0, 0, 0.1); {% else %} rgba(0, 255, 0, 0.1); {% endif %}"
+    <div style="border-radius:20%;background-color: {% if property.is_sold %} rgba(255, 0.5, 0.4, 0.4); {% else %} rgba(0, 255, 0, 0.2); {% endif %}"
         class=" myDIV px-4 py-4">
         <h2 class="font-bold text-xl mb-2">{{ property.title }}</h2>
         <p class="text-gray-700 text-base">Total Price: ${{ property.totalprice }}</p>

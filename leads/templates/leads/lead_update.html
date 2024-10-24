@@ -2,41 +2,152 @@
 {% load tailwind_filters %}
 
 {% block content %}
+<style>
+    /* CSS Styles */
+    body {
+        background-color: #1481af; /* Light background color */
+        font-family: 'Arial', sans-serif; /* Font family for the page */
+    }
 
-<section class="text-gray-600 body-font overflow-hidden">
-    <div class="container px-5 py-24 mx-auto">
-        <div class="lg:w-4/5 mx-auto flex flex-wrap">
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Gradient background for section */
+    .lead-section {
+        background: linear-gradient(135deg, #1481af 0%, #fbfbfb 100%);
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Button Styles */
+    .btn-primary {
+        background-color: #241d9d; /* Indigo color */
+        border-radius: 0.5rem; /* Rounded corners */
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        padding: 12px 20px; /* Consistent padding */
+        font-weight: 600; /* Bolder text */
+        text-transform: uppercase; /* Uppercase text */
+        letter-spacing: 0.05em; /* Spacing between letters */
+    }
+
+    .btn-primary:hover {
+        background-color: #4338ca; /* Darker shade on hover */
+        transform: scale(1.05); /* Slight scale on hover */
+    }
+
+    .btn-danger {
+        border-radius: 10%;
+        background-color: #dc2626; /* Red color for delete */
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background-color: #b91c1c; /* Darker red on hover */
+        transform: scale(1.05); /* Slight scale on hover */
+    }
+
+    h1 {
+        transition: color 0.3s ease;
+    }
+
+    h1:hover {
+        color: #3b82f6; /* Change color on hover */
+    }
+
+    p {
+        line-height: 1.6; /* Improve readability */
+        color: #4b5563; /* Gray color for text */
+    }
+
+    /* Image Container Styles */
+    .img-container {
+        border: 2px solid #e5e7eb; /* Light gray border */
+        border-radius: 0.5rem; /* Rounded corners */
+        overflow: hidden; /* Clip overflow */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        transition: transform 0.3s; /* Transition for scale */
+    }
+
+    .img-container:hover {
+        transform: scale(1.05); /* Slight zoom on hover */
+    }
+
+    /* Card styling for profile image */
+    .profile-card {
+        background-color: white; /* White background for contrast */
+        padding: 20px; /* Padding for inner content */
+        border-radius: 1rem; /* Rounded corners */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Shadow for depth */
+        transition: transform 0.3s ease;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+    }
+
+    /* Navigation link styles */
+    .nav-link {
+        position: relative;
+        padding-bottom: 5px; /* Space for the underline */
+        color: #e0f2fe; /* Light color for nav links */
+        font-weight: 500; /* Medium weight */
+    }
+
+    .nav-link:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px; /* Underline height */
+        background-color: #4f46e5; /* Underline color */
+        transform: scaleX(0); /* Start with no underline */
+        transition: transform 0.3s ease; /* Animation for underline */
+    }
+
+    .nav-link:hover:after {
+        transform: scaleX(1); /* Grow underline on hover */
+    }
+</style>
+
+<section class="lead-section text-white body-font overflow-hidden py-10">
+    <div class="container px-5 mx-auto">
+        <div class="lg:w-4/5 mx-auto flex flex-wrap fade-in">
             <div class="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
-                <h2 class="text-sm title-font text-gray-500 tracking-widest">LEAD</h2>
-                <h1 class="text-gray-900 text-3xl title-font font-medium mb-4">{{lead.first_name}} {{ lead.last_name}}
-                </h1>
+                <h2 class="text-sm title-font text-gray-300 tracking-widest">LEAD</h2>
+                <h1 class="text-4xl title-font font-bold mb-4">{{ lead.first_name }} {{ lead.last_name }}</h1>
                 <div class="flex mb-4">
-                    <a href="{% url 'leads:lead-detail' lead.pk %}"
-                        class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1">
-                        Overview</a>
-                    <a href="{% url 'leads:lead-category-update' lead.pk %}"
-                        class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1">
-                        Category</a>
-                    <a href="{% url 'leads:lead-update' lead.pk %}"
-                        class="flex-grow border-b-2 border-gray-300 py-2 text-lg px-1">
-                        Update Details</a>
+                    <a href="{% url 'leads:lead-detail' lead.pk %}" class="flex-grow nav-link py-2 text-lg">Overview</a>
+                    <a href="{% url 'leads:lead-category-update' lead.pk %}" class="flex-grow nav-link py-2 text-lg">Category</a>
+                    <a href="{% url 'leads:lead-update' lead.pk %}" class="flex-grow nav-link py-2 text-lg">Update Details</a>
                 </div>
                 <form method="post" action=".">
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <button type="submit"
-                        class="w-full text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">Submit</button>
+                    <button type="submit" class="btn-primary w-full mt-4">Submit</button>
                 </form>
 
-                <div class="mt-5 py-5 border-t border-gray-200">
-                    <a href="{% url 'leads:lead-delete' lead.pk %}"
-                        class="w-1/2 mt-3 text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
-                        Delete
-                    </a>
+                <div class="mt-5 py-5 border-t border-gray-300">
+                    <a href="{% url 'leads:lead-delete' lead.pk %}" class="btn-danger w-full mt-4 py-2 px-4">Delete</a>
                 </div>
             </div>
-            <img alt="Profile Picture" class="w-320 h-100 object-cover border-2 border-gray-300"
-                src="https://dummyimage.com/400x400">
+            <div class="lg:w-1/2 w-full fade-in">
+                <div class="img-container profile-card">
+                    <img alt="Profile Picture" class="w-full h-auto object-cover" src="https://dummyimage.com/400x400">
+                </div>
+            </div>
         </div>
     </div>
 </section>

@@ -2,9 +2,33 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<div class="max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+<style>
+    /* Floating effect for card */
+    .card {
+        background-color: rgb(255, 255, 255);
+        /* Card background */
+        padding: 20px;
+        /* Padding for inner content */
+        border-radius: 2rem;
+        /* Rounded corners */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        /* Shadow for depth */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* Smooth transition for transform and shadow */
+    }
+
+    .card:hover {
+        transform: translateY(-20px);
+        /* Move card upwards */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        /* Increase shadow on hover */
+    }
+
+</style>
+<div class="card max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
     <div class="text-center mb-6">
-        <a href="{% url 'leads:project-create' %}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md shadow-lg focus:outline-none">Create
+        <a href="{% url 'leads:project-create' %}"
+            class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md shadow-lg focus:outline-none">Create
             Project</a>
     </div>
 

@@ -111,7 +111,14 @@ class Sale(models.Model):
     sale_price = models.DecimalField(max_digits=15, decimal_places=2)
     sale_date = models.DateField()
     organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.DO_NOTHING)
-    
+
+    def save(self, *args, **kwargs):
+        super().save(*args,**kwargs)
+
+        if self.property:
+            self.property.is_sold = True
+            self.property.save()
+
     def __str__(self):
         return f"Sale by {self.agent.username} for ${self.sale_price}"
 

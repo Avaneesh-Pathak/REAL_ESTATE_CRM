@@ -6,6 +6,50 @@
   --color-lightest-teal: #E3FEF7; /* Lightest Teal */
 }
 
+
+/* Mobile devices (portrait, less than 600px) */
+@media only screen and (max-width: 600px) {
+  body {
+      font-size: 14px;
+  }
+  .container {
+      width: 100%;
+      padding: 10px;
+  }
+  .sidebar {
+      display: none; /* Hide sidebar on mobile */
+  }
+}
+
+/* Tablets and small desktops (between 600px and 1200px) */
+@media only screen and (min-width: 600px) and (max-width: 1200px) {
+  body {
+      font-size: 15px;
+  }
+  .container {
+      width: 90%;
+      margin: auto;
+  }
+  .sidebar {
+      width: 200px; /* Adjust sidebar size */
+  }
+}
+
+/* Large desktops (more than 1200px) */
+@media only screen and (min-width: 1200px) {
+  body {
+      font-size: 16px;
+  }
+  .container {
+      width: 80%;
+      margin: auto;
+  }
+  .sidebar {
+      width: 250px; /* Default sidebar size */
+  }
+}
+Explana
+
 /* Global Styles */
 body {
   background-color: var(--color-lightest-teal); /* Lightest teal background */

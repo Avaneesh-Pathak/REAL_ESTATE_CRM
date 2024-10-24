@@ -71,6 +71,7 @@ urlpatterns = [
     path('kisans/', KisanListView.as_view(), name='kisan_list'),
     path('kisan/edit/<int:pk>/', KisanUpdateView.as_view(), name='kisan_edit'),
     path('kisan/delete/<int:pk>/', KisanDeleteView.as_view(), name='kisan_delete'),
+  
 
 
 ]   

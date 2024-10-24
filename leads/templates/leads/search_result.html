@@ -1,35 +1,38 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Basic styling for the search box and results */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: hsl(195, 40%, 76%);
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1481af 0%, #fbfbfb 100%); /* Soft background color */
             margin: 0;
             padding: 20px;
         }
         .container {
             max-width: 800px;
             margin: auto;
-            background: #fff;
+            background: linear-gradient(135deg, #1e077d 0%, #fbfbfb 100%);
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s; /* Animation for container */
         }
         .container:hover {
-            transform: scale(1.02); /* Scale effect on hover */
+            transform: scale(1.01); /* Scale effect on hover */
         }
         .search-box {
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 10px; /* Added padding for better touch */
+            border-radius: 6px; /* Rounded search box */
+            background-color: #e9ecef; /* Light grey background for the search box */
         }
         .search-box input[type="text"] {
             width: 80%;
@@ -54,41 +57,43 @@
             font-size: 16px; /* Increased font size for better readability */
         }
         .search-box button:hover {
-            background-color: #218838; /* Darker green for hover effect */
+            background-color: #08022e; /* Darker green for hover effect */
             transform: scale(1.05); /* Scale effect on hover */
         }
         .results {
             margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px; /* Rounded corners */
+            background: linear-gradient(135deg, #ffffff 0%, #9d98db 100%); /* Very light grey */
             border: 1px solid #ccc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         ul {
             list-style-type: none;
             padding: 0;
         }
         li {
-            padding: 10px 15px;
+            padding: 12px 15px;
             border-bottom: 1px solid #ddd;
             transition: background-color 0.3s;
+            border-radius: 5px; /* Rounded items */
         }
         li:hover {
-            background-color: #e9ecef;
+            background-color: #e2e6ea; /* Slightly darker grey on hover */
         }
         li:last-child {
             border-bottom: none;
         }
         h2, h3 {
-            color: #333;
+            color: #343a40; /* Dark grey */
             margin-bottom: 10px; /* Added margin for spacing */
-            font-weight: bold; /* Bold headings */
+            font-weight: 700; /* Bold headings */
         }
         h2 {
-            font-size: 1.8em; /* Increased size for main heading */
+            font-size: 2em; /* Increased size for main heading */
         }
         h3 {
-            font-size: 1.4em; /* Increased size for section headings */
+            font-size: 1.5em; /* Increased size for section headings */
             margin-top: 20px; /* Spacing between sections */
         }
         .button {
@@ -140,7 +145,7 @@
                     <h3>Properties:</h3>
                     <ul>
                         {% for property in property_results %}
-                            <li><a href="{% url 'leads:property_list' %}">{{ property.title }} - {{ property.project_name }}</a></li>
+                            <li><a href="{% url 'leads:property_list' %}" style="color: #007BFF;">{{ property.title }} - {{ property.project_name }}</a></li>
                         {% endfor %}
                     </ul>
                 {% else %}
@@ -151,7 +156,7 @@
                     <h3>Agents:</h3>
                     <ul>
                         {% for agent in agent_results %}
-                            <li><a href="{% url 'agents:agent-detail' agent.id %}">{{ agent.user.first_name }} {{ agent.user.last_name }} - {{ agent.user.email }}</a></li>
+                            <li><a href="{% url 'agents:agent-detail' agent.id %}" style="color: #007BFF;">{{ agent.user.first_name }} {{ agent.user.last_name }} - {{ agent.user.email }}</a></li>
                         {% endfor %}
                     </ul>
                 {% else %}
@@ -162,7 +167,7 @@
                     <h3>Plot Bookings:</h3>
                     <ul>
                         {% for booking in plotbooking_results %}
-                            <li><a href="{% url 'leads:buyers_list' %}">{{ booking.name }} - {{ booking.email }} - {{ booking.project.title }}</a></li>
+                            <li><a href="{% url 'leads:buyers_list' %}" style="color: #007BFF;">{{ booking.name }} - {{ booking.email }} - {{ booking.project.title }}</a></li>
                         {% endfor %}
                     </ul>
                 {% else %}
@@ -185,4 +190,3 @@
 
 </body>
 </html>
-

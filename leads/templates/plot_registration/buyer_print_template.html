@@ -1,3 +1,4 @@
+{% load static %}
 <html>
 <head>
     <title>Buyer Registration Receipt</title>
@@ -13,77 +14,77 @@
             max-width: 800px;
             margin: auto;
             background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         h2, h4 {
             text-align: center;
             color: #333;
-            margin: 10px 0;
+            margin: 15px 0;
         }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #0056b3;
-            padding-bottom: 5px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0056b3;
         }
         .header .company-logo img {
-            max-width: 100px; /* Reduced logo size */
+            max-width: 80px;
         }
         .header .receipt-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             color: #0056b3;
         }
         .receipt-info {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         .receipt-info p {
             margin: 0;
-            font-size: 14px;
-            color: #666;
+            font-size: 15px;
+            color: #555;
         }
         .details-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         .details-table th, .details-table td {
             border: 1px solid #ddd;
-            padding: 8px; /* Reduced padding */
+            padding: 10px;
             text-align: left;
-            font-size: 14px; /* Reduced font size */
+            font-size: 14px;
         }
         .details-table th {
             background-color: #0056b3;
             color: white;
         }
         .details-table tr:hover {
-            background-color: #f1f1f1;
+            background-color: #f9f9f9;
         }
         .footer {
             text-align: center;
-            font-size: 12px;
+            font-size: 13px;
             color: #666;
-            margin-top: 15px;
+            margin-top: 20px;
             border-top: 1px solid #ddd;
-            padding-top: 5px;
+            padding-top: 10px;
         }
         .footer p {
-            margin: 3px 0;
+            margin: 5px 0;
         }
         .print-button {
-            margin-top: 10px;
-            padding: 8px 15px;
+            margin-top: 20px;
+            padding: 10px 20px;
             background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             transition: background-color 0.3s;
         }
         .print-button:hover {
@@ -98,33 +99,34 @@
             }
             .container {
                 box-shadow: none;
-                padding: 0; /* Minimize padding for print */
+                padding: 0;
             }
             .details-table th, .details-table td {
-                font-size: 12px; /* Further reduce font size for print */
-                padding: 6px;
+                font-size: 12px;
+                padding: 8px;
             }
             .details-table tr {
-                page-break-inside: avoid; /* Prevent table rows from breaking */
+                page-break-inside: avoid;
             }
             h2, h4 {
-                font-size: 18px; /* Smaller headers for print */
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <div style="border-radius:15%;" class="header">
             <div class="company-logo">
-                <img src="logo-placeholder.png" alt="Company Logo"> <!-- Replace with actual logo -->
+                <img style="border-radius: 50px;" src="{% static 'images/Screenshot 2024-10-19 002628.png' %}" alt="Company Logo">
             </div>
             <div class="receipt-title">Registration Receipt</div>
         </div>
 
         <div class="receipt-info">
-            <p><strong>Date:</strong> {{ receipt_date }}</p>
-            <p><strong>Receipt No:</strong> {{ receipt_number }}</p>
+            <p><strong>Date:</strong> {% now "Y-m-d" %}</p> <!-- Automatically fetches current date -->
+            <p><strong>Receipt No:</strong> {{ receipt_number }}</p> 
+
             <p><strong>Buyer Name:</strong> {{ buyer.name }}</p>
         </div>
 
@@ -175,8 +177,8 @@
                 <td>{{ buyer.project.title }}</td>
             </tr>
             <tr>
-                <th>Promoter Name</th>
-                <td>{{ buyer.promoter.name }}</td>
+                <th>Agent Name</th>
+                <td>{{ buyer.agent.user.username }}</td>
             </tr>
         </table>
 

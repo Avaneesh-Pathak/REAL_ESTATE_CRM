@@ -22,9 +22,6 @@
     <!-- Add Chart.js CDN here -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-    <link id="theme-style" rel="stylesheet" href="{% static 'CSS/styles.css' %}"> <!-- Main CSS -->
-
     <!-- Add Chart.js CDN here -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -33,7 +30,7 @@
         body {
             margin: 0;
             padding: 0%;
-            background-color: #ffffff;
+            background: linear-gradient(135deg, #427bc6 0%, #fbfbfb 100%);
             color: #000000;
         }
 
@@ -53,7 +50,7 @@
             left: -250px;
             width: 250px;
             height: 100%;
-            background-color: 003C43;
+            background: linear-gradient(135deg, #0e36e5 0%, #071904 100%);
             transition: left 0.3s ease;
             z-index: 1000;
         }
@@ -72,7 +69,7 @@
 
 
         .sidebar a:hover {
-            background-color: #e2e2e2;
+            background: linear-gradient(135deg, #6235f6 0%, #0f5420 100%);
             /* Highlight on hover */
         }
 
@@ -172,49 +169,88 @@
         }
 
         /* Styles for the search box */
-    .search-form {
-        margin: 20px 0;
-        display: flex; /* Use flexbox for better alignment */
-    }
+        .search-form {
+            margin: 20px 0;
+            display: flex;
+            /* Use flexbox for better alignment */
+        }
 
-    .search-input {
-        flex: 1; /* Allow input to grow */
-        padding: 10px; /* Padding for better spacing */
-        font-size: 16px; /* Font size for readability */
-        color: #333; /* Text color */
-        background-color: #f9f9f9; /* Background color of the input */
-        border: 1px solid #ccc; /* Border for visibility */
-        border-radius: 4px; /* Rounded corners */
-        transition: border 0.3s; /* Transition effect for focus */
-    }
+        .search-input {
+            flex: 1;
+            /* Allow input to grow */
+            padding: 10px;
+            /* Padding for better spacing */
+            font-size: 16px;
+            /* Font size for readability */
+            color: #333;
+            /* Text color */
+            background-color: #f9f9f9;
+            /* Background color of the input */
+            border: 1px solid #ccc;
+            /* Border for visibility */
+            border-radius: 4px;
+            /* Rounded corners */
+            transition: border 0.3s;
+            /* Transition effect for focus */
+        }
 
-    .search-input:focus {
-        border: 1px solid #007bff; /* Change border color on focus */
-        outline: none; /* Remove outline */
-    }
+        .search-input:focus {
+            border: 1px solid #007bff;
+            /* Change border color on focus */
+            outline: none;
+            /* Remove outline */
+        }
 
-    /* Style the button */
-    .search-button {
-        padding: 10px 15px; /* Padding for the button */
-        background-color: #007bff; /* Button background color */
-        color: white; /* Button text color */
-        border: none; /* Remove button border */
-        border-radius: 4px; /* Rounded corners */
-        cursor: pointer; /* Pointer cursor on hover */
-        margin-left: 10px; /* Space between input and button */
-        transition: background-color 0.3s; /* Smooth background color change */
-    }
+        /* Style the button */
+        .search-button {
+            padding: 10px 15px;
+            /* Padding for the button */
+            background-color: #007bff;
+            /* Button background color */
+            color: white;
+            /* Button text color */
+            border: none;
+            /* Remove button border */
+            border-radius: 4px;
+            /* Rounded corners */
+            cursor: pointer;
+            /* Pointer cursor on hover */
+            margin-left: 10px;
+            /* Space between input and button */
+            transition: background-color 0.3s;
+            /* Smooth background color change */
+        }
 
-    .search-button:hover {
-        background-color: #0056b3; /* Darker button color on hover */
-    }
-</style>
+        .search-button:hover {
+            background-color: #0056b3;
+            /* Darker button color on hover */
+        }
+        .logo-container {
+            transition: transform 0.3s ease; /* Smooth transition */
+        }
+    
+        .logo-container:hover {
+            animation: bounce 0.5s; /* Bounce animation */
+        }
+    
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px); /* Upward bounce */
+            }
+            60% {
+                transform: translateY(-5px); /* Smaller bounce */
+            }
+        }
+    </style>
 </head>
 
 <body style="background-color: #E3FEF7">
     <div class="max-w-10xl mx-auto">
 
-        <header style="background-color: #003C43;" class="text-white body-font">
+        <header style="background-color: #030648;" class="text-white body-font">
             <div style="max-width: 100%;"
                 class="container mx-auto flex flex-wrap p-0 flex-col md:flex-row items-center justify-between">
 
@@ -226,7 +262,7 @@
                 <!-- Sidebar -->
                 <div class="sidebar fixed  left-0 w-30 h-full bg-blue-900 text-white transform -translate-x-full transition-transform duration-300 ease-in-out"
                     id="sidebar">
-                    <div class="close-btn flex ml-2 text-right cursor-pointer" id="close-btn"><span
+                    <div class="close-btn flex ml-2 text-right cursor-pointer logo-container" id="close-btn"><span
                             style="font-size:18px; margin-top: 17px;">PMA Software</span>
                         <div class="close-btn mr-5 text-right cursor-pointer" id="close-btn"></div>&times;
                     </div>
@@ -252,8 +288,17 @@
                             <div class="nested-menu" id="leads-menu">
                                 <a href="{% url 'leads:lead-list' %}" class="hover:text-blue-300">Lead List</a>
                                 <a href="{% url 'leads:lead-create' %}" class="hover:text-blue-300">Create Lead</a>
+                                <a href="{% url 'leads:category-create' %}" class="hover:text-blue-300">Create
+                                    Category</a>
+                                {% if lead.pk %}
+                                <a href="{% url 'leads:lead-followup-create' lead.pk %}"
+                                    class="hover:text-blue-300">Create FollowUp</a>
+                                {% endif %}
+
+
                             </div>
                         </div>
+
 
                         <!-- Nested menu for Sales -->
                         <div class="relative">
@@ -301,23 +346,23 @@
                 </div>
 
                 <!-- Brand and Title -->
+               
                 <div style="margin-top: 12px;">
                     <a href="{% url 'dashboard' %}"
-                        class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5">
-                        <img src="{% static 'images/Screenshot 2024-10-19 002628.png' %}" alt="Image" class="w-12 h-12">
-
-                        <span class="ml-3 text-xl py-2 ">PMA Software</span>
+                       class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5 logo-container">
+                        <img src="{% static 'images/Screenshot 2024-10-19 002628.png' %}" alt="Image" class="w-12 h-12 logo">
+                        <span class="ml-3 text-xl py-2 text">PMA Software</span>
                     </a>
                 </div>
 
                 <div style="text-align: center; margin-left: 380px;">
-                    <p style="font-size: 1.5rem; font-weight: bold; color: #0a0b45;">CRM</p>
-                    <h2 style="font-size: 2rem; font-weight: bold; color: #007bff; margin-bottom: 10px;">Concept</h2>
-                    <hr style="width: 100%; border: 1px solid #007bff; margin: 2px auto;">
+                    <p style="font-size: 1.5rem; font-weight: bold; color: #f3f3f3;">CRM</p>
+                    <h2 style="font-size: 2rem; font-weight: bold; color: #7b87e4; margin-bottom: 10px;">Concept</h2>
+                    <hr style="width: 100%; border: 1px solid #ffffff; margin: 2px auto;">
                 </div>
                 <!-- Search Box -->
                 <div style="margin-left: 12%;">
-                    <form  action="{% url 'search' %}" method="GET" class="search-form flex items-center">
+                    <form action="{% url 'search' %}" method="GET" class="search-form flex ">
                         <input type="text" name="q" id="search-input" class="search-input" placeholder="Search..."
                             value="{{ query }}" required>
                         <button type="submit" class="search-button">Search</button>
@@ -330,11 +375,8 @@
                 <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center space-x-4">
                     {% if not request.user.is_authenticated %}
                     <a href="{% url 'signup' %}" class="text-white hover:text-blue-300">Signup</a>
-                    {% else %}
-                    {% if lead.pk %}
-                    <a href="{% url 'leads:lead-followup-create' lead.pk %}"
-                        class="text-white hover:text-blue-300">Create Follow-up</a>
-                    {% endif %}
+
+
                     {% endif %}
                 </nav>
 

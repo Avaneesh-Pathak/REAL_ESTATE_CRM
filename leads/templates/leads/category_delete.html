@@ -2,19 +2,70 @@
 {% load tailwind_filters %}
 
 {% block content %}
+<style>
+    /* Button hover effect with transition */
+    .submit-btn:hover {
+        transform: translateY(-2px); /* Slight lift effect */
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3); /* Elevated shadow */
+    }
 
-<div class="max-w-lg mx-auto">
-    <a class="hover:text-blue-500" href="{% url 'leads:category-list' %}">Go back to categories</a>
-    <div class="py-5 border-t border-gray-200">
-        <h1 class="text-4xl text-gray-800">Are you sure you want to delete {{ object.name }}?</h1>
+    .cancel-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 99, 132, 0.3); /* Red shadow */
+    }
+
+    /* Transition for form container */
+    .form-container {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-container:hover {
+        transform: scale(1.02); /* Slight zoom effect */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    }
+    .lead-section {
+        background: linear-gradient(135deg, #1481af 0%, #fbfbfb 100%);
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<div class="lead-section min-h-screen flex items-center justify-center bg-gray-100">
+    <!-- Container for the form -->
+    <div class="form-container bg-white shadow-lg rounded-lg max-w-lg w-full p-10 space-y-6">
+        <!-- Back link -->
+        <div class="mb-4">
+            <a class="text-blue-500 hover:underline" href="{% url 'leads:category-list' %}">
+                ← Go back to categories
+            </a>
+        </div>
+
+        <!-- Header section with confirmation message -->
+        <div class="py-5 border-t border-gray-200">
+            <h1 class="text-3xl font-bold text-gray-800">Delete Category</h1>
+            <p class="mt-2 text-lg text-gray-600">
+                Are you sure you want to delete the category <span class="font-semibold">{{ object.name }}</span>? This action cannot be undone.
+            </p>
+        </div>
+
+        <!-- Form section -->
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+            {{ form|crispy }}
+
+            <!-- Action buttons -->
+            <div class="flex justify-between space-x-4">
+                <button type="submit"
+                    class="submit-btn w-full text-white bg-red-500 hover:bg-red-600 font-bold py-3 rounded-lg transition ease-in-out duration-300">
+                    Yes, Delete
+                </button>
+                <a href="{% url 'leads:category-list' %}"
+                    class="cancel-btn w-full text-white bg-gray-400 hover:bg-gray-500 font-bold py-3 rounded-lg transition ease-in-out duration-300 text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
     </div>
-    <form method="post" class="mt-5">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button type='submit' class="w-full text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">
-            Submit
-        </button>
-    </form>
 </div>
 
 {% endblock content %}

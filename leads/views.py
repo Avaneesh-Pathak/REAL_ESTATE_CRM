@@ -843,17 +843,19 @@ class PropertyCreateView(LoginRequiredMixin, View):
         return reverse('leads:property_list')  # Redirect to property list after creation  # Redirect to property list after successful update
 
 def select_properties_view(request):
+    projects = Project.objects.all()
+    properties = Property.objects.all()
+
     if request.method == 'POST':
-        print(1)
         selected_ids = request.POST.getlist('properties')  # Get list of selected IDs
-        # Redirect to the update view with the selected IDs print
+        # Redirect to the update view with the selected IDs
         return redirect('leads:property-update', ids=','.join(selected_ids))  # Join IDs as a comma-separated string
-    else:
-        id = request.GET.get('project_id')
-        projects = Project.objects.all()
-        properties = Property.objects.filter(project_id= id)
-        return render(request,'property/select_properties.html',{'projects':projects,'properties':properties})
-    
+
+    return render(request, 'property/select_properties.html', {
+        'projects': projects,
+        'properties': properties
+    })
+
 def get_properties_by_project(request, project_id):
     properties = Property.objects.filter(project_id=project_id)  # Correct usage
     properties_data = [{'id': prop.id, 'project_name': prop.property_name} for prop in properties]
@@ -862,6 +864,7 @@ def get_properties_by_project(request, project_id):
 
 # View to edit selected properties
 class PropertyUpdateView(LoginRequiredMixin,View):
+
     template_name = 'property/property_update.html'  # Update with your template 
 
     def get(self, request, ids):
@@ -1129,9 +1132,31 @@ class BuyersListView(LoginRequiredMixin, View):
         buyers = PlotBooking.objects.select_related('agent').all()
         return render(request, self.template_name, {'buyers': buyers})
 
+
+def generate_receipt_number():
+ 
+    # Generate a unique receipt number using the current date and time
+    current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+  
+    return f"REC-{current_time}"  # Receipt number with prefix 'REC-'
+
+
+
 def buyer_print_view(request, buyer_id):
+    # Fetch the buyer instance or return a 404 error if not found
     buyer = get_object_or_404(PlotBooking, id=buyer_id)
-    context = {'buyer': buyer}
+   
+    # Generate a unique receipt number
+    receipt_number = generate_receipt_number()
+    
+    # Prepare the context for rendering the template
+    context = {
+        'buyer': buyer,
+        'receipt_date': timezone.now(),  # Get the current date and time
+        'receipt_number': receipt_number,  # Add the generated receipt number to the context
+    }
+    
+    # Render the template with the context
     return render(request, 'plot_registration/buyer_print_template.html', context)
 
 @login_required
@@ -1251,8 +1276,9 @@ def kisan_view(request, pk=None):
             form = KisanForm(request.POST or None)
             if request.method == 'POST':
                 if form.is_valid():
+                    print("save")
                     form.save()
-                    return redirect('kisan_list')  # Redirect to the Kisan list
+                    return redirect('leads:kisan_list')  # Redirect to the Kisan list
 
         return render(request, 'kisan/kisan_update.html', {'form': form, 'kisan': kisan if pk else None})
     except Exception as e:
@@ -1269,6 +1295,7 @@ class KisanListView(LoginRequiredMixin,ListView):
 
 
 class KisanUpdateView(UpdateView):
+
     model = Kisan
     fields = [
         'first_name', 'last_name', 'contact_number', 'address',
@@ -1284,4 +1311,3 @@ class KisanDeleteView(DeleteView):
     model = Kisan
     template_name = 'kisan/kisan_confirm_delete.html'
     success_url = reverse_lazy('leads:kisan_list')
-

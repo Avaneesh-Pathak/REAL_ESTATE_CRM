@@ -1,34 +1,109 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="text-gray-600 body-font">
-    <div class="container px-5 py-24 mx-auto">
-        <div class="flex flex-col text-center w-full mb-20">
-            <h1 class="sm:text-4xl text-3xl font-medium title-font mb-2 text-gray-900">Categories</h1>
-            <p class="lg:w-2/3 mx-auto leading-relaxed text-base">These Category Segment the Leads</p>
+<style>
+    /* Animations */
+    .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Table Hover Effects */
+    tbody tr:hover {
+        background-color: rgba(229, 231, 235, 0.6); /* Slightly darker hover effect */
+        transition: background-color 0.3s ease;
+    }
+
+    /* Button Hover Effect */
+    .btn:hover {
+        background-color: #2563eb;
+        transform: scale(1.05); /* Slight button grow */
+        transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    /* Delete button hover effect */
+    .delete-btn:hover {
+        background-color: #f87171;
+        transform: scale(1.05);
+        transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    /* Table Shadow */
+    .table-container {
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2rem;
+        }
+
+        .container {
+            padding: 10px;
+        }
+    }
+    .lead-section {
+        background: linear-gradient(135deg, #1481af 0%, #fbfbfb 100%);
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<section class="lead-section text-gray-600 body-font fade-in">
+    <div class="container px-5 py-16 mx-auto">
+        <!-- Header Section -->
+        <div class="flex flex-col text-center w-full mb-12">
+            <h1 class="sm:text-4xl text-3xl font-bold title-font mb-4 text-gray-900 tracking-wide">
+                Manage Your Categories
+            </h1>
+            <p class="lg:w-1/2 mx-auto leading-relaxed text-base text-gray-600">
+                Categorize leads for better organization and management.
+            </p>
+            <a href="{% url 'leads:category-create' %}" 
+               class="btn bg-blue-500 text-white font-bold py-2 px-4 rounded-full mt-6 mx-auto hover:bg-blue-700 shadow-lg">
+                + Create New Category
+            </a>
         </div>
-        <div class="lg:w-2/3 w-full mx-auto overflow-auto">
+
+        <!-- Table Section -->
+        <div class="lg:w-2/3 w-full mx-auto overflow-hidden bg-white rounded-lg table-container fade-in">
             <table class="table-auto w-full text-left whitespace-no-wrap">
                 <thead>
-                    <tr>
-                        <th
-                            class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 rounded-tl rounded-bl">
-                            Name</th>
-                        <th class="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">
-                            Lead Count</th>
+                    <tr class="bg-gray-100 text-gray-900">
+                        <th class="px-4 py-3 text-sm font-medium">Category Name</th>
+                        <th class="px-4 py-3 text-sm font-medium">Lead Count</th>
+                        <th class="px-4 py-3 text-sm font-medium">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
+                <tbody class="divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3">Unassigned</td>
                         <td class="px-4 py-3">{{ unassigned_lead_count }}</td>
+                        <td class="px-4 py-3 text-red-500">-</td>
                     </tr>
                     {% for category in category_list %}
-                    <tr>
+                    <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3">
-                            <a href="{% url 'leads:category-detail' category.pk %}">{{ category.name }}</a>
+                            <a href="{% url 'leads:category-detail' category.pk %}"
+                               class="text-blue-500 hover:text-blue-700 font-semibold transition duration-300">
+                                {{ category.name }}
+                            </a>
                         </td>
                         <td class="px-4 py-3">TODO</td>
+                        <td class="px-4 py-3">
+                            <a href="{% url 'leads:category-delete' category.pk %}" 
+                               class="delete-btn bg-red-500 text-white py-1 px-3 rounded-full hover:bg-red-600 shadow-sm">
+                               Delete
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
