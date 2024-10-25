@@ -1,111 +1,115 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Sale</title>
-    
-    <!-- Custom Styles -->
-    <style>
-        body {
-            background-color: #f8f9fa; /* Light background for better contrast */
-            font-family: Arial, sans-serif;
+<style>
+    /* Animations */
+    .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        100% {
+            opacity: 1;
+            transform: translateY(0);
         }
+    }
+
+    /* Button Hover Effects */
+    .btn:hover {
+        background-color: #2563eb;
+        transform: scale(1.05); /* Slight button grow */
+        transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    /* Delete button hover effect */
+    .delete-btn:hover {
+        background-color: #f87171;
+        transform: scale(1.05);
+        transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    /* Form Container Styling */
+    .form-container {
+        max-width: 500px;
+        margin: 50px auto;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        transition: transform 0.3s ease;
+    }
+
+    .form-container:hover {
+        transform: scale(1.02);
+    }
+
+    /* Title and Header Section */
+    .title {
+        font-weight: bolder;
+        font-size: 1.75rem;
+        color: #1481af;
+        text-align: center;
+    }
+
+    .description {
+        text-align: center;
+        color: #6b7280; /* Gray */
+        margin-bottom: 1rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
         h1 {
-            font-weight: 300;
-            animation: fadeIn 0.8s ease forwards; /* Fade in effect for heading */
+            font-size: 1.5rem;
         }
-        .form {
-            width: 500px;
-            margin: 50px auto; /* Center the form */
-            background-color: #ffffff; /* White background for the form */
-            border-radius: 10px; /* Rounded corners */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
-            transition: transform 0.3s; /* Smooth transformation */
+
+        .form-container {
+            width: 90%;
+            padding: 1rem;
         }
-        .form:hover {
-            transform: scale(1.02); /* Slight scale effect on hover */
-        }
-        .title {
-            font-weight: bolder;
-            font-size: 1.5em; /* Increase font size */
-            color: #007bff; /* Primary color for title */
-            margin: 20px 0; /* Vertical margin */
-            text-align: center; /* Center the title */
-        }
-        .down-button {
-            text-align: center;
-            margin-top: 20px; /* Add top margin for spacing */
-        }
-        .btn {
-            min-width: 120px; /* Ensures buttons are a uniform size */
-            transition: background-color 0.3s; /* Smooth background color change */
-        }
-        .btn:hover {
-            background-color: #0056b3; /* Darker shade on hover */
-            color: #ffffff; /* Change text color on hover */
-        }
-        .text-center {
-            text-align: center; /* Center align text */
-        }
-        .bg-light {
-            background-color: #f8f9fa; /* Light background color */
-        }
-        /* Animation Keyframes */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px); /* Slide up effect */
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        /* Responsive styles */
-        @media (max-width: 600px) {
-            .form {
-                width: 90%; /* Full width on small screens */
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="form mt-2 p-4 small rounded shadow">
-        <h1 class="title mb-4">
-            {% if sale %}Update Sale{% else %}Create Sale{% endif %}
-        </h1>
-        <p class="text-center" style="margin-bottom: 20px;">Manage sales data according to your data</p>
-    
-        <form method="POST" class="bg-light p-4 rounded shadow">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ form.as_p }}
-            </div>
-    
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary btn-lg">Save</button>
-                
+    }
+</style>
+
+<section class="fade-in">
+    <div class="container px-5 py-16 mx-auto">
+        <div class="form-container">
+            <!-- Title Section -->
+            <h1 class="title">
+                {% if sale %}Update Sale{% else %}Create Sale{% endif %}
+            </h1>
+            <p class="description">Manage sales data according to your requirements</p>
+
+            <!-- Form Section -->
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.as_p }}
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg">
+                        Save
+                    </button>
+                </div>
+
                 {% if sale %}
-                    <div class="mt-4"> <!-- Add margin top for spacing -->
-                        <button type="submit" name="delete" class="btn btn-danger btn-lg">Delete Sale</button>  <!-- Delete button -->
-                    </div>
+                <div class="text-center mt-4">
+                    <button type="submit" name="delete" class="delete-btn bg-red-500 text-white py-2 px-4 rounded-full shadow-sm">
+                        Delete Sale
+                    </button>
+                </div>
                 {% endif %}
+            </form>
+
+            <div class="text-center mt-6">
+                <a href="{% url 'leads:sale_list' %}" class="btn bg-gray-400 text-white py-2 px-4 rounded-full shadow-sm">
+                    {% if sale %}Cancel{% else %}Back to Sale List{% endif %}
+                </a>
             </div>
-        </form>
-    
-        <div class="down-button mt-4">
-            {% if sale %}
-                <a href="{% url 'leads:sale_list' %}" class="btn btn-secondary">Cancel</a>  <!-- Link back to sale list -->
-            {% else %}
-                <a href="{% url 'leads:sale_list' %}" class="btn btn-secondary">Back to Sale List</a>  <!-- Link back to sale list -->
-            {% endif %}
         </div>
     </div>
-</body>
-</html>
+</section>
+
 {% endblock %}

@@ -55,11 +55,11 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User  # replace with your user model
         fields = ['username', 'email', 'password']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'login__input'}),
-            'email': forms.EmailInput(attrs={'class': 'login__input'}),
-            'password': forms.PasswordInput(attrs={'class': 'login__input'}),
-        }
+        # widgets = {
+        #     'username': forms.TextInput(attrs={'class': 'login__input'}),
+        #     'email': forms.EmailInput(attrs={'class': 'login__input'}),
+        #     'password': forms.PasswordInput(attrs={'class': 'login__input'}),
+        # }
 
 
 
@@ -93,8 +93,12 @@ class FollowUpModelForm(forms.ModelForm):
         model = FollowUp
         fields = (
             'notes',
-            'file'
+            'file',
         )
+        labels = {
+                    'notes': 'Follow-Up Notes',
+                    'file': 'Upload File (optional)',
+                }
 
 
 class SalaryForm(forms.ModelForm):

@@ -225,23 +225,35 @@
             background-color: #0056b3;
             /* Darker button color on hover */
         }
+
         .logo-container {
-            transition: transform 0.3s ease; /* Smooth transition */
+            transition: transform 0.3s ease;
+            /* Smooth transition */
         }
-    
+
         .logo-container:hover {
-            animation: bounce 0.5s; /* Bounce animation */
+            animation: bounce 0.5s;
+            /* Bounce animation */
         }
-    
+
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
                 transform: translateY(0);
             }
+
             40% {
-                transform: translateY(-10px); /* Upward bounce */
+                transform: translateY(-10px);
+                /* Upward bounce */
             }
+
             60% {
-                transform: translateY(-5px); /* Smaller bounce */
+                transform: translateY(-5px);
+                /* Smaller bounce */
             }
         }
     </style>
@@ -290,10 +302,14 @@
                                 <a href="{% url 'leads:lead-create' %}" class="hover:text-blue-300">Create Lead</a>
                                 <a href="{% url 'leads:category-create' %}" class="hover:text-blue-300">Create
                                     Category</a>
+                                {% if request.user.is_organisor %}
                                 {% if lead.pk %}
                                 <a href="{% url 'leads:lead-followup-create' lead.pk %}"
                                     class="hover:text-blue-300">Create FollowUp</a>
                                 {% endif %}
+                                {% endif %}
+
+
 
 
                             </div>
@@ -346,11 +362,12 @@
                 </div>
 
                 <!-- Brand and Title -->
-               
+
                 <div style="margin-top: 12px;">
                     <a href="{% url 'dashboard' %}"
-                       class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5 logo-container">
-                        <img src="{% static 'images/Screenshot 2024-10-19 002628.png' %}" alt="Image" class="w-12 h-12 logo">
+                        class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5 logo-container">
+                        <img style="border-radius: 50px;" src="{% static 'images/Screenshot 2024-10-19 002628.png' %}"
+                            alt="Image" class="w-12 h-12 logo">
                         <span class="ml-3 text-xl py-2 text">PMA Software</span>
                     </a>
                 </div>
