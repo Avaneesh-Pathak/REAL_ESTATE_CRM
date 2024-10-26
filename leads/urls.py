@@ -7,7 +7,7 @@ from .views import (
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
     PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,DaybookListView,daybook_create,add_promoter,update_delete_promoter,
-    PromoterListView,load_properties,PlotRegistrationView,
+    PromoterListView,load_properties,PlotRegistrationView,user_profile_view,
     update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView,kisan_view,KisanListView,KisanUpdateView,KisanDeleteView
 )
 
@@ -16,7 +16,7 @@ app_name = "leads"
 urlpatterns = [
     
     path('sales/', SaleListView.as_view(), name='sale_list'),
-    
+    path('profile/<int:user_id>/', user_profile_view, name='user-profile'),
     path('salaries/', SalaryListView.as_view(), name='salary_list'),
     path('my_bonus/', BonusInfoView.as_view(), name='bonus_info'),
     path('create_salary/', create_salary, name='create_salary'),

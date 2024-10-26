@@ -58,6 +58,15 @@ class FollowUp(models.Model):
     notes = models.TextField(blank=True, null=True)
     file = models.FileField(null=True, blank=True, upload_to=handle_upload_follow_ups)
 
+    # Add the status field
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('postponed', 'Postponed'),
+        ('in-Progress', 'In-Progress'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
     def __str__(self):
         return f"{self.lead.first_name} {self.lead.last_name}"
 
@@ -68,13 +77,55 @@ class Agent(models.Model):
     organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
     # New Addition Here
     parent_agent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='sub_agents')
-    commission_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)  # Percentage of profit shared
+    commission_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=10.0)  # Percentage of profit shared default 10 for level 1
     total_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Total profit earned
     level = models.IntegerField(default=1)
     # New Addition Ends
     def __str__(self):
-        return self.user.email
+        
+        return f"{self.user.email} (Level {self.level})(Id {self.pk}) "
 
+    # def save(self, *args, **kwargs):
+    #     if not self.pk:
+    #         if self.level==1: # shi haii naa..??🙄
+    #             self.commission_percentage=10.00
+    #         elif self.level ==2:
+    #             self.commission_percentage=4.00
+    #         elif self.level==3:
+    #             self.commission_percentage=3.00
+    #         elif self.level ==4:
+    #             self.commission_percentage=2.00
+    #         elif self.level ==5:
+    #             self.commission_percentage=1.00
+    #     super().save(*args, **kwargs) 
+
+    # def distribute_commission(self, sale_amount):
+    #     """Distribute commission to agents up to 5 levels above based on a predefined structure."""
+    #     commission_structure = {
+    #         1: 10,  # Level 1: 10%
+    #         2: 4,   # Level 2: 4%
+    #         3: 3,   # Level 3: 3%
+    #         4: 2,   # Level 4: 2%
+    #         5: 1    # Level 5: 1%
+    #     }
+
+    #     total_distribution = 0
+    #     agent = self
+    #     level = 1
+        
+    #     # Traverse up the chain and distribute commission up to 5 levels
+    #     while agent and level <= 5:
+    #         # Calculate commission for the current level agent
+    #         commission_amount = (commission_structure[level] / 100) * sale_amount
+    #         agent.total_profit += commission_amount  # Update the agent's total profit
+    #         agent.save(update_fields=['total_profit'])  # Save the updated profit to the database
+            
+    #         # Move to the parent agent for the next level
+    #         agent = agent.parent_agent
+    #         level += 1
+    #         total_distribution += commission_amount
+        
+    #     return total_distribution
 
 class Category(models.Model):
     name = models.CharField(max_length=30)  # New, Contacted, Converted, Unconverted
@@ -318,6 +369,11 @@ class PlotBooking(models.Model):
     def __str__(self):
         return f"Plot Booking - {self.name} - {self.booking_date}"
     
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Trigger commission distribution for the selected agent
+        if self.agent:
+            self.agent.distribute_commission(self.Plot_price)
 
 class EMIPayment(models.Model):
 

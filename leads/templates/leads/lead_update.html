@@ -143,11 +143,9 @@
                     <a href="{% url 'leads:lead-delete' lead.pk %}" class="btn-danger w-full mt-4 py-2 px-4">Delete</a>
                 </div>
             </div>
-            <div class="lg:w-1/2 w-full fade-in">
-                <div class="img-container profile-card">
-                    <img alt="Profile Picture" class="w-full h-auto object-cover" src="https://dummyimage.com/400x400">
-                </div>
-            </div>
+            <img alt="lead image" class="lead-image fade-in" src="{{ user_profile.profile_picture.url }}"
+                onerror="this.onerror=null; this.src='media\profile_pics\IMG_20220905_1857031.jpg'"
+                style="width: 5px; height: 5px; object-fit: cover; border-radius: 0.375rem;">
         </div>
     </div>
 </section>

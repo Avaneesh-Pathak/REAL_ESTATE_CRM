@@ -2,24 +2,74 @@
 {% load tailwind_filters %}
 
 {% block content %}
+<style>
+    /* Fade-in animation for alert messages */
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
 
-<div class="max-w-lg mx-auto">
-    <a class="hover:text-blue-500" href="{% url 'leads:lead-detail' object.lead.pk %}">Go back to followup</a>
-    <div class="py-5 border-t border-gray-200">
-        <h1 class="text-4xl text-gray-800">Update this followup</h1>
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Apply the fade-in animation */
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-out forwards;
+    }
+
+    /* Button styles */
+    button {
+        transition: all 0.3s ease-in-out;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Card hover effect */
+    .max-w-lg:hover {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+<div
+    class="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105">
+    <a class="w-full mt-2 text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition duration-200 ease-in-out shadow-md hover:shadow-lg"
+        href="{% url 'leads:lead-detail' object.lead.pk %}">
+        &larr; Go back to follow-up
+    </a>
+
+    <div class="py-5 border-b border-gray-300">
+        <h1 class="text-4xl text-gray-800 font-semibold transition-transform duration-300 transform hover:scale-105">
+            Update this Follow-Up</h1>
     </div>
+
+    {% if messages %}
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5 mt-4 animate-fade-in"
+        role="alert">
+        <strong class="font-bold">Success!</strong>
+        <span class="block sm:inline">{{ messages }}</span>
+    </div>
+    {% endif %}
+
     <form method="post" class="mt-5">
         {% csrf_token %}
         {{ form|crispy }}
-        <button type='submit' class="w-full text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">
+
+        <button type='submit'
+            class="w-full mt-4 text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition duration-200 ease-in-out shadow-md hover:shadow-lg">
             Submit
         </button>
     </form>
-    <div class="mt-5 pt-5 border-t border-gray-200">
-        <a href="{% url 'leads:lead-followup-delete' object.pk %}" class="text-white bg-red-500 hover:bg-red-600 px-3 py-2 rounded-md">
-            Delete
+
+    <div class="mt-5 pt-5 border-t border-black-900">
+        <a href="{% url 'leads:lead-followup-delete' object.pk %}"
+            class="w-full text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md transition duration-200 ease-in-out shadow-md hover:shadow-lg text-center">
+            Delete Follow-Up
         </a>
     </div>
 </div>
-
 {% endblock content %}

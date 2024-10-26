@@ -5,44 +5,124 @@
 <style>
     /* Button Styles */
     .btn-primary {
-        background-color: #241d9d;
-        /* Indigo color */
-        border-radius: 0.5rem;
-        /* Rounded corners */
+        background-color: #241d9d; /* Indigo color */
+        border-radius: 0.5rem; /* Rounded corners */
         transition: background-color 0.3s ease, transform 0.3s ease;
-        padding: 12px 10px;
-        /* Consistent padding */
-        font-weight: 600;
-        /* Bolder text */
-        text-transform: uppercase;
-        /* Uppercase text */
-        letter-spacing: 0.05em;
-        /* Spacing between letters */
+        padding: 12px 10px; /* Consistent padding */
+        font-weight: 600; /* Bolder text */
+        text-transform: uppercase; /* Uppercase text */
+        letter-spacing: 0.05em; /* Spacing between letters */
         text-align: center;
-
+        color: white; /* Ensure text is visible */
     }
 
     .btn-primary:hover {
-        background-color: #4338ca;
-        /* Darker shade on hover */
-        transform: scale(1.05);
-        /* Slight scale on hover */
+        background-color: #4338ca; /* Darker shade on hover */
+        transform: scale(1.05); /* Slight scale on hover */
     }
 
     .main {
         margin-top: 25px;
+        padding: 20px; /* Add padding for better spacing */
+        background-color: #f9fafb; /* Light background for contrast */
+        border-radius: 0.5rem; /* Rounded corners for main container */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+    }
+
+    h1 {
+        color: #1f2937; /* Dark text color for headings */
+        font-weight: 700; /* Bolder font for headings */
+    }
+
+    input, select, textarea {
+        width: 100%; /* Full width */
+        padding: 10px; /* Padding inside input fields */
+        border: 1px solid #d1d5db; /* Light gray border */
+        border-radius: 0.375rem; /* Rounded corners */
+        transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Animation for focus effect */
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: #3b82f6; /* Blue border on focus */
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* Blue glow effect */
+        outline: none; /* Remove default outline */
+    }
+
+    .form-submit-btn {
+        background-color: #3b82f6; /* Blue background for the submit button */
+        transition: background-color 0.3s ease; /* Smooth transition */
+        color: white; /* Text color */
+        padding: 10px; /* Padding for the button */
+        border-radius: 0.375rem; /* Rounded corners */
+        border: none; /* No border */
+        cursor: pointer; /* Pointer cursor on hover */
+    }
+
+    .form-submit-btn:hover {
+        background-color: #2563eb; /* Darker blue on hover */
+    }
+
+    .space-y-4 > * + * {
+        margin-top: 1rem; /* Space between form elements */
     }
 </style>
 
 <div class="main max-w-lg mx-auto">
     <a class="btn-primary w-full mt-4" href="{% url 'leads:lead-list' %}">Go back to leads</a>
     <div class="py-5 border-t border-gray-200">
-        <h1 class="text-4xl text-black-800">Create a new lead</h1>
+        <h1 class="text-4xl font-semibold text-black">Create a New Lead</h1>
 
-        <form method="post" class="mt-5">
+        <form method="post" class="mt-5 space-y-4" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form|crispy }}
-            <button type='submit' class="w-full text-white bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md">
+            <div>
+                {{ form.first_name.label_tag }} 
+                {{ form.first_name }}
+                {{ form.first_name.errors }}
+            </div>
+
+            <div>
+                {{ form.last_name.label_tag }} 
+                {{ form.last_name }}
+                {{ form.last_name.errors }}
+            </div>
+
+            <div>
+                {{ form.age.label_tag }} 
+                {{ form.age }}
+                {{ form.age.errors }}
+            </div>
+
+            <div>
+                {{ form.agent.label_tag }} 
+                {{ form.agent }}
+                {{ form.agent.errors }}
+            </div>
+
+            <div>
+                {{ form.description.label_tag }} 
+                {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+
+            <div>
+                {{ form.phone_number.label_tag }} 
+                {{ form.phone_number }}
+                {{ form.phone_number.errors }}
+            </div>
+
+            <div>
+                {{ form.email.label_tag }} 
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+
+            <div>
+                {{ form.profile_picture.label_tag }} 
+                {{ form.profile_picture }}
+                {{ form.profile_picture.errors }}
+            </div>
+
+            <button type="submit" class="form-submit-btn w-full">
                 Submit
             </button>
         </form>

@@ -41,22 +41,31 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
 
         # Check if the parent agent exists and if commission percentage is valid
         if parent_agent:
-            # Validate the commission percentage against existing sub-agents
-            total_commission_shared = sum(sub_agent.commission_percentage for sub_agent in parent_agent.sub_agents.all())
-            if total_commission_shared + commission_percentage > 20:
-                form.add_error('commission_percentage', "Total commission shared cannot exceed 20%.")
+            # Check if the parent agent's level is at maximum
+            if parent_agent.level >= 5:
+                print('Level Exceeds')
+                form.add_error(None, "Exceeding maximum level of agent.")  # Use None to add a non-field error
                 return self.form_invalid(form)
+            
+            # Validate the commission percentage against existing sub-agents
+            # total_commission_shared = sum(sub_agent.commission_percentage for sub_agent in parent_agent.sub_agents.all())
+            # if total_commission_shared + commission_percentage > 20:
+            #     form.add_error('commission_percentage', "Total commission shared cannot exceed 20%.")
+            #     return self.form_invalid(form)
 
-            level = parent_agent.level + 1  # Increment level based on parent agent
+            # If validations pass, set the level of the new agent
+            else:
+                level = parent_agent.level + 1  # Increment level based on parent agent
         else:
-            level = 1  # Top-level agent
+            level = 1  # Top-level agent if no parent agent is provided
 
-        # Create and save the Agent instance
+        
+
+        # # Create and save the Agent instance
         Agent.objects.create(
             user=user,
             organisation=self.request.user.userprofile,
             parent_agent=parent_agent,
-            commission_percentage=commission_percentage,
             level=level
         )
 

@@ -21,23 +21,27 @@
             <th class="text-left">Agent</th>
             <th class="text-right">Base Salary</th>
             <th class="text-right">Bonus</th>
+            <th class="text-right">Total Commission</th>
+            <th class="text-right">Last Sale Commission</th>
             <th class="text-right">Payment Date</th>
             <th class="text-right">Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for salary in salaries %}
-            <tr class="bg-gray-100">
-                <td>{{ salary.agent.username }}</td>
-                <td class="text-right">${{ salary.base_salary }}</td>
-                <td class="text-right">${{ salary.bonus }}</td>
-                <td class="text-right">{{ salary.payment_date|date:"F j, Y" }}</td>
-                <td class="text-right" style="vertical-align: bottom;">
-                    <a href="{% url 'leads:manage_salary' salary.id %}" class="btn btn-link text-indigo-600 hover:text-indigo-900">
-                        Edit
-                    </a>
-                </td>
-            </tr>
+        <tr class="bg-gray-100">
+            <td>{{ salary.agent.username }}</td>
+            <td class="text-right">₹{{ salary.base_salary }}</td>
+            <td class="text-right">₹{{ salary.bonus }}</td>
+            <td class="text-right">₹{{ salary.agent.total_profit }}</td> <!-- Total Commission -->
+            <td class="text-right">₹{{ salary.agent.last_sale_commission }}</td> <!-- Last Sale Commission -->
+            <td class="text-right">{{ salary.payment_date|date:"F j, Y" }}</td>
+            <td class="text-right" style="vertical-align: bottom;">
+                <a href="{% url 'leads:manage_salary' salary.id %}" class="btn btn-link text-indigo-600 hover:text-indigo-900">
+                    Edit
+                </a>
+            </td>
+        </tr>
         {% empty %}
             <tr>
                 <td colspan="5" class="text-center bg-red-100 p-4 rounded">No salaries available.</td>

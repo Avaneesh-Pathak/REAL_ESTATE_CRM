@@ -1,22 +1,24 @@
 import logging
 import datetime
 from datetime import timedelta
-from django.db.models import Q
-from decimal import Decimal
-from django.db import models, IntegrityError
-from django.db.models import Count
-from django.db.models import Sum, Count
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from decimal import Decimal, InvalidOperation
+
+from django import forms
 from django.contrib import messages
-from django.urls import reverse_lazy
-from django.views import View, generic
-from django.views.generic import ListView,UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin # type: ignore
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import IntegrityError
+from django.db.models import Count, Sum, Q
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.urls import reverse_lazy
+from django.utils import timezone
+from django.views import View, generic
+from django.views.generic import ListView, UpdateView, DeleteView
+
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot
 from agents.mixins import OrganisorAndLoginRequiredMixin
-from .models import Property, Sale, Salary, Bonus,Kisan,UserProfile
+from .models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook
 from .forms import (
     LeadForm, 
     LeadModelForm, 
@@ -31,6 +33,7 @@ from .forms import (
     PromoterForm,
     PlotBookingForm,
     KisanForm,
+    DaybookEntryForm,
 )
 
 
@@ -72,6 +75,30 @@ def search_view(request):
         Q(project__title__icontains=query)  # Use project to access Property title
     )
 
+    # Searching in Sale model
+    sale_results = Sale.objects.filter(
+        Q(property__title__icontains=query) |  # Assuming Property has a 'title' field
+        Q(agent__username__icontains=query) |  # Searching by agent's username
+        Q(sale_price__icontains=query) |       # Searching by sale price
+        Q(sale_date__icontains=query)         # Searching by sale date
+    )
+    # Searching in Salary model
+    salary_result = Salary.objects.filter(
+        Q(agent__username__icontains=query) |
+        Q(base_salary__icontains=query) |
+        Q(bonus__icontains=query) |
+        Q(payment_date__icontains=query)
+    )
+
+    kisan_results = Kisan.objects.filter(
+        Q(first_name__icontains=query) |
+        Q(last_name__icontains=query) |
+        Q(contact_number__icontains=query) |
+        Q(khasra_number__icontains=query) |
+        Q(address__icontains=query) |
+        Q(land_address__icontains=query)
+    )
+
     # Searching in UserProfile model (existing fields)
     userprofile_results = UserProfile.objects.filter(
         Q(full_name__icontains=query) |
@@ -84,6 +111,8 @@ def search_view(request):
     print(f"Agent Results: {[str(agent) for agent in agent_results]}")
     print(f"Plot Booking Results: {[str(booking) for booking in plotbooking_results]}")
     print(f"User Profile Results: {[str(profile) for profile in userprofile_results]}")
+    print(f"Sales Result: {[str(sale) for sale in sale_results]}")
+    print(f"Salary Result: {[str(salary) for salary in salary_result]}")
 
 
     context = {
@@ -92,6 +121,9 @@ def search_view(request):
         'agent_results': agent_results,
         'plotbooking_results': plotbooking_results,
         'userprofile_results': userprofile_results,
+        'sale_results':sale_results,
+        'salary_result':salary_result,
+        "kisan_results": kisan_results
     }
     return render(request, 'leads/search_result.html', context) 
 
@@ -283,7 +315,11 @@ def lead_list(request):
     }
     return render(request,"leads/lead_list.html",context)
 
-
+def user_profile_view(request, user_id):
+    user_profile = get_object_or_404(UserProfile, user_id=user_id)
+    return render(request, 'leads/lead_detail.html', {
+        'user_profile': user_profile  # Pass the specific user profile to the template
+    })
 
 class LeadDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = "leads/lead_detail.html"
@@ -927,7 +963,6 @@ class BonusInfoView(LoginRequiredMixin,ListView):
 
 
 # EMI
-from decimal import Decimal, InvalidOperation, getcontext
 
 def calculate_emi(request):
     emi = None  # Initialize emi variable
@@ -988,10 +1023,6 @@ def calculate_emi(request):
     return render(request, 'EMI/emi_calculation.html', {'emi': emi, 'error_message': error_message})
 
 # DAYBOOK
-from .models import Daybook
-from django.utils import timezone
-from .forms import DaybookEntryForm  # Update the import statement
-
 
 class DaybookListView(LoginRequiredMixin, View):
     template_name = 'Daybook/daybook_list.html'
@@ -1007,6 +1038,7 @@ class DaybookListView(LoginRequiredMixin, View):
         # Get current balance (replace with your actual current balance logic)
         current_balance = 25000
         updated_balance = current_balance - total_todays_expenses
+        
 
         context = {
             'expenses': todays_expenses,
@@ -1027,10 +1059,6 @@ def daybook_create(request):
 
 
 # PROMOTER 
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Promoter  # Import the Promoter model
-from .forms import PromoterForm  # Import the PromoterForm
 
 class PromoterListView(LoginRequiredMixin, ListView):
     model = Promoter
@@ -1055,7 +1083,6 @@ def update_delete_promoter(request, promoter_id):
 
     return render(request, 'promoter/update_delete_promoter.html', {'form': form, 'promoter': promoter})
 
-
 def add_promoter(request):
     if request.method == 'POST':
         form = PromoterForm(request.POST)
@@ -1071,15 +1098,13 @@ def add_promoter(request):
 
 # PLOT REGISTRATION
 
-
-
-
 class PlotRegistrationView(LoginRequiredMixin, View):
     template_name = 'plot_registration/plot_registration.html'
 
     def get(self, request, *args, **kwargs):
         form = PlotBookingForm()
         agents = Agent.objects.all()
+        
         return render(request, self.template_name, {'form': form, 'agents': agents})
 
     def post(self, request, *args, **kwargs):
@@ -1092,6 +1117,14 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             emi_amount = form.cleaned_data.get('emi_amount')
             tenure = form.cleaned_data.get('emi_tenure')
             project = form.cleaned_data.get('project')
+            agent = form.cleaned_data.get('agent')
+            if agent:  # Check if agent exists
+                print("Agent Primary Key:", agent.pk)   # This will print the primary key (ID) of the agent
+            else:
+                print("No agent selected.")
+            agent_level = agent.level
+            print(agent)
+
             prop =  Property.objects.get(title=project)
             print(prop.is_sold)
             prop.is_sold=True
@@ -1141,7 +1174,6 @@ def generate_receipt_number():
     return f"REC-{current_time}"  # Receipt number with prefix 'REC-'
 
 
-
 def buyer_print_view(request, buyer_id):
     # Fetch the buyer instance or return a 404 error if not found
     buyer = get_object_or_404(PlotBooking, id=buyer_id)
@@ -1176,6 +1208,8 @@ def update_delete_buyer(request, id):
                 pd.is_sold=False
                 pd.save()
                 project = form.cleaned_data.get('project')
+                agent = form.cleaned_data.get('agent')
+                print(agent)
                 prop =  Property.objects.get(title=project)
                 print(prop.is_sold)
                 prop.is_sold=True
@@ -1239,8 +1273,7 @@ class GetProjectPriceView(View):
         except Exception as e:
             return JsonResponse({'error': str(e)})
 
-
-from django import forms
+#KISAN FORM
 
 class KisanForm(forms.ModelForm):
     class Meta:

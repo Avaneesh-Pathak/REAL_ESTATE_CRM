@@ -41,18 +41,18 @@ class AgentCreateForm(forms.ModelForm):
         label="Parent Agent",
         help_text="Select a parent agent if applicable."
     )
-    commission_percentage = forms.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        required=True,
-        help_text="Commission percentage to share with parent agent."
-    )
-    level = forms.ChoiceField(
-        choices=[(i, f'Level {i}') for i in range(1, 6)],  # Levels from 1 to 5
-        required=True,
-        label="Agent Level",
-        help_text="Select the level of the agent."
-    )
+    # commission_percentage = forms.DecimalField(
+    #     max_digits=5,
+    #     decimal_places=2,
+    #     required=True,
+    #     help_text="Commission percentage to share with parent agent."
+    # )
+    # level = forms.ChoiceField(
+    #     choices=[(i, f'Level {i}') for i in range(1, 6)],  # Levels from 1 to 5
+    #     required=True,
+    #     label="Agent Level",
+    #     help_text="Select the level of the agent."
+    # )
 
     class Meta:
         model = User
@@ -62,8 +62,8 @@ class AgentCreateForm(forms.ModelForm):
             'first_name',
             'last_name',
             'parent_agent',
-            'commission_percentage',
-            'level', 
+           
+             
         )
 
     def __init__(self, *args, **kwargs):

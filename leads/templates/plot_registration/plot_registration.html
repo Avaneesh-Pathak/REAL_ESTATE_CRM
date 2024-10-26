@@ -164,7 +164,8 @@
         </div>
         <div class="d-flex justify-content-between">
             <p><strong>Gender:</strong>{{ form.gender }}</p>
-            <p id="custom-gender-field" style="display:none;"><strong>{{ form.custom_gender.label }}</strong>{{form.custom_gender }}</p>
+            <p id="custom-gender-field" style="display:none;"><strong>{{ form.custom_gender.label
+                    }}</strong>{{form.custom_gender }}</p>
         </div>
         <div class="d-flex justify-content-between">
             <p><strong>DOB:</strong>{{ form.dob }}</p>
@@ -182,12 +183,13 @@
 
         <!-- Business Information Section -->
         <h3 class="section-heading">BUSINESS INFORMATION</h3>
-        <h4 class="section-subheading">PLC Charges</h4>
-        <div class="d-flex justify-content-between">
-            <p><strong>{{ form.corner_plot_10.label }}</strong>{{ form.corner_plot_10 }}</p>
-            <p><strong>{{ form.corner_plot_5.label }}</strong>{{ form.corner_plot_5 }}</p>
-            <p><strong>{{ form.full_pay_discount.label }}</strong>{{ form.full_pay_discount }}</p>
-        </div>
+        <!-- <h4 class="section-subheading">PLC Charges</h4>
+        <div class="d-flex justify-content-between align-items-center"
+            style="padding: 10px; background-color: #f0f0f0; border-radius: 8px; border: 1px solid #ddd;">
+            <div class="d-flex justify-content-between form-group">
+                {{ form.plc_charge }} Render the radio buttons here 
+            </div>
+        </div> -->
 
         <!-- Booking Details -->
         <h4 class="section-subheading">Booking Details</h4>
@@ -201,12 +203,12 @@
                     class="form-control">
                     <option value="">Select an Agent</option>
                     {% for agent in agents %}
-                    <option value="{{ agent.id }}">{{ agent.user.username }}</option>
+                    <option value="{{ agent.id }}">{{ agent.user.username }} level{{ agent.level}}</option>
                     {% endfor %}
                 </select></p>
         </div>
         <div class="d-flex justify-content-between">
-            <p><strong>Project Price:</strong> <span id="project-price"></span>{{ form.Plot_price }}</p>
+            <p><strong>Project Price:</strong> <span id="project-price"  id="id_plot_price" ></span>{{ form.Plot_price }}</p>
             <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>
         </div>
 
@@ -316,6 +318,18 @@
             $('#id_Plot_price').val('');
         }
     });
+
+    // FInal Price 
+    function calculateFinalPrice() {
+        const plotPrice = parseFloat(document.getElementById("id_plot_price").value) || 0;
+        const bookingAmount = parseFloat(document.getElementById("id_booking_amount").value) || 0;
+
+        const finalPrice = plotPrice - bookingAmount;
+        document.getElementById("id_final_price").value = finalPrice > 0 ? finalPrice.toFixed(2) : 0;
+    }
+
+    document.getElementById("id_booking_amount").addEventListener("input", calculateFinalPrice);
+    document.getElementById("id_plot_price").addEventListener("input", calculateFinalPrice);
 
 
 </script>

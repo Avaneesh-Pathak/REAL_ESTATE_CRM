@@ -109,10 +109,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'  # or your local timezone
+USE_TZ = True
 USE_I18N = True
 USE_L10N = True
-USE_TZ = True
+
 
 # Static files
 STATIC_URL = '/static/'

@@ -94,10 +94,12 @@ class FollowUpModelForm(forms.ModelForm):
         fields = (
             'notes',
             'file',
+            'status'
         )
         labels = {
                     'notes': 'Follow-Up Notes',
                     'file': 'Upload File (optional)',
+                    'status': 'Status',
                 }
 
 
@@ -237,6 +239,23 @@ class PlotBookingForm(forms.ModelForm):
 
     def __init__(self, *args,project=None, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Define PLC choices and add plc_charge field
+        PLC_CHOICES = [
+            ('corner_plot_10', 'Corner Plot 10% Increase'),
+            ('corner_plot_5', 'Corner Plot 5% Increase'),
+            ('full_pay_discount', 'Full Payment 5% Discount')
+        ]
+        
+        self.fields['plc_charge'] = forms.ChoiceField(
+            choices=PLC_CHOICES,
+            widget=forms.RadioSelect,
+            label="PLC Charge",
+            required=False
+        )
+
+        self.fields['final_price'] = forms.DecimalField(label='Final Price', required=False, initial=0.0, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+
         self.fields['agent'].queryset = Agent.objects.all()
         self.fields['project'].queryset = Property.objects.all()
 
@@ -255,25 +274,31 @@ class PlotBookingForm(forms.ModelForm):
     # Adding clean method to validate and calculate EMI
     def clean(self):
         cleaned_data = super().clean()
-        plot_price = cleaned_data.get('plot_price', 0)
+        plot_price = cleaned_data.get('plot_price', 0)  # Use 'Plot_price' here to reference the correct field
         booking_amount = cleaned_data.get('booking_amount', 0)
-        emi_tenure = cleaned_data.get('emi_tenure')
-        interest_rate = cleaned_data.get('interest_rate')
         
-        # Handle percentage-based adjustments
-        corner_plot_10 = cleaned_data.get('corner_plot_10')
-        corner_plot_5 = cleaned_data.get('corner_plot_5')
-        full_pay_discount = cleaned_data.get('full_pay_discount')
+         # Handle percentage-based adjustments
+        plc_charge = cleaned_data.get('plc_charge')
 
-        # Apply percentage-based increases or discounts on the plot price
-        if corner_plot_10:
-            plot_price *= Decimal('1.10')  # 10% increase for corner plot (10)
-        elif corner_plot_5:
-            plot_price *= Decimal('1.05')   # 5% increase for corner plot (5)
-        elif full_pay_discount:
-            plot_price *= Decimal('0.95')   # 5% discount for full payment
+        # Apply percentage-based increases or discounts on the plot price based on PLC charge selection
+        if plc_charge == 'corner_plot_10':
+            discount = booking_amount * Decimal('0.10')  # 10% increase
+            final_price = booking_amount + discount
+        elif plc_charge == 'corner_plot_5':
+            discount = booking_amount * Decimal('0.05')  # 5% increase
+            final_price = booking_amount + discount
+        elif plc_charge == 'full_pay_discount':
+            discount = booking_amount * Decimal('0.05')  # 5% discount
+            final_price = booking_amount - discount
+        else:
+            final_price = booking_amount  # No adjustment if no PLC charge selected
+
+        # Set the final price in cleaned_data for later use
+        cleaned_data['final_price'] = final_price
 
         # Calculate EMI if installment is selected
+        interest_rate = cleaned_data.get('interest_rate')
+        emi_tenure = cleaned_data.get('emi_tenure')
         payment_type = cleaned_data.get('payment_type')
         if payment_type == 'installment':
             emi_amount = calculate_emi(plot_price, booking_amount, emi_tenure, interest_rate)

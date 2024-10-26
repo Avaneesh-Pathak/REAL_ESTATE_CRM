@@ -1,74 +1,71 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<section class="text-gray-700 body-font">
+<section class="text-black-700 body-font">
     <div class="container px-5 py-24 mx-auto flex flex-wrap">
-        <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-gray-200">
-            
-            <div>
-                <!-- Optional content for organisor (if any) -->
-                {% if lead.pk %}
-                <button><a href="{% url 'leads:lead-followup-create' lead.pk %}" class="text-white hover:text-blue-300">Create
-                    Follow-up</a></button>
-                
-                {% endif %}
-               
+        <div class="container px-5 py-9 mx-auto flex flex-wrap">
+            <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-gray-200">
+                <div>
+                    <h1 class="text-4xl text-black-900 font-semibold">Follow-Ups</h1>
+                </div>
             </div>
-            
-        </div>
-
-        <div class="flex flex-col w-full">
-            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Follow-up Date
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Follow-up Type
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Notes
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th scope="col" class="relative px-6 py-3">
-                                        <span class="sr-only">Edit</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for followup in followups %}
-                                <tr class="bg-white">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ followup.date_added }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ followup.lead }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ followup.notes }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                    {% if followup.status == 'pending' %}
-                                        bg-yellow-100 text-yellow-800
-                                    {% elif followup.status == 'completed' %}
-                                        bg-green-100 text-green-800
-                                    {% elif followup.status == 'postponed' %}
-                                        bg-gray-100 text-gray-800
-                                    {% endif %}
-                                    ">
-                                            <li class="py-2">
+            <div class="flex flex-col w-full">
+                <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                            <table class="w-full divide-y divide-black-900">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-center bg-blue-900 text-xl font-medium text-white uppercase tracking-wider">
+                                            Follow-up Date
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-center bg-blue-900 text-xl font-medium text-white uppercase tracking-wider">
+                                            Follow-up Type
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-center bg-blue-900 text-xl font-medium text-white uppercase tracking-wider">
+                                            Notes
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-center bg-blue-900 text-xl font-medium text-white uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-center bg-blue-900 text-xl font-medium text-white uppercase tracking-wider">
+                                            Edit
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align: center; border-color: black;">
+                                    {% for followup in followups %}
+                                    <tr class="bg-white">
+                                        <td class="px-6 py-4 whitespace-nowrap text-xl font-medium text-black-900">
+                                            {{ followup.date_added }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-xl text-black-900">
+                                            {{ followup.lead }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-xl text-black-900">
+                                            {{ followup.notes }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-xl text-black-900">
+                                            <span class="px-2 inline-flex text-xl leading-5 font-semibold rounded-full 
+                                            {% if followup.status == 'pending' %}
+                                                bg-yellow-100 text-yellow-800
+                                            {% elif followup.status == 'completed' %}
+                                                bg-green-100 text-green-800
+                                            {% elif followup.status == 'postponed' %}
+                                                bg-gray-100 text-gray-800
+                                            {% elif followup.status == 'in-Progress' %}
+                                                bg-blue-100 text-blue-800
+                                            {% else %}
+                                                bg-gray-200 text-gray-600  
+                                            {% endif %}">
+                                                {{ followup.status }}
+                                            </span>
+                                            <li class="py-2 text-xm ">
                                                 <strong>Date:</strong> {{ followup.date_added }}<br>
                                                 <strong>Notes:</strong> {{ followup.notes }}<br>
                                                 {% if followup.file %}
@@ -80,29 +77,28 @@
                                                 <span>No file attached</span>
                                                 {% endif %}
                                             </li>
-                                        </span>
-                                    </td>
-                                    {% comment %} <td
-                                        class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{% url 'leads:followup-update' followup.pk %}"
-                                            class="text-indigo-600 hover:text-indigo-900">
-                                            Edit
-                                        </a>
-                                    </td> {% endcomment %}
-                                </tr>
-
-                                {% empty %}
-
-                                <p>There are currently no follow-ups</p>
-
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-xl font-medium">
+                                            <a href="{% url 'leads:lead-followup-update' followup.pk %}"
+                                                class="text-indigo-600 hover:text-indigo-900">
+                                                Edit
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-center">
+                                            <p>There are currently no follow-ups</p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 {% endblock content %}
