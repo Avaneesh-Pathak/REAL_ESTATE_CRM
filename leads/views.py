@@ -1,6 +1,7 @@
 import logging
 import datetime
 from datetime import timedelta
+from django.db import models  # Import models
 from decimal import Decimal, InvalidOperation
 
 from django import forms
@@ -1035,17 +1036,33 @@ class DaybookListView(LoginRequiredMixin, View):
         todays_expenses = Daybook.objects.filter(date=today)
         total_todays_expenses = sum(expense.amount for expense in todays_expenses)
 
+        # Calculate total expenses till now
+        total_expenses = Daybook.objects.aggregate(total_amount=models.Sum('amount'))['total_amount'] or 0
+
         # Get current balance (replace with your actual current balance logic)
-        current_balance = 25000
-        updated_balance = current_balance - total_todays_expenses
-        
+        current_balance = 25000  # You can replace this with your actual logic for getting the current balance
+        carryover_amount = current_balance - total_expenses
+
+        if carryover_amount < 0:
+            carryover_amount = abs(carryover_amount)
+            current_balance = 0
+        else:
+            current_balance = current_balance - total_todays_expenses
 
         context = {
             'expenses': todays_expenses,
-            'total_balance': updated_balance,
+            'total_balance': current_balance,
+            'carryover_amount': carryover_amount,
             'todays_expense': total_todays_expenses,
+            'total_expenses': total_expenses,
         }
         return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        if 'reset_expenses' in request.POST:
+            # Reset all expenses
+            Daybook.objects.all().delete()
+            return redirect('leads:daybook_list')  # Redirect to the daybook list after resetting
 
 def daybook_create(request):
     if request.method == 'POST':

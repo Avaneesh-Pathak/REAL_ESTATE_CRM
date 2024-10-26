@@ -180,12 +180,12 @@
 
     <!-- Business Information Section -->
     <h3 class="section-heading">BUSINESS INFORMATION</h3>
-    <h4 class="section-subheading">PLC Charges</h4>
+    {% comment %} <h4 class="section-subheading">PLC Charges</h4>
     <div class="d-flex justify-content-between">
         <p><strong>{{ form.corner_plot_10.label }}</strong>{{ form.corner_plot_10 }}</p>
         <p><strong>{{ form.corner_plot_5.label }}</strong>{{ form.corner_plot_5 }}</p>
         <p><strong>{{ form.full_pay_discount.label }}</strong>{{ form.full_pay_discount }}</p>
-    </div>
+    </div> {% endcomment %}
 
     <!-- Booking Details -->
     <h4 class="section-subheading">Booking Details</h4>
@@ -203,15 +203,6 @@
                 {% endfor %}
             </select></p>
     </div>
-    <!-- <div class="form-group" id="agent-field" style="display:none;">
-        <label>Agent</label>
-        <select id="agent-dropdown" name="agent" class="form-control">
-            <option value="">Select an Agent</option>
-            {% for agent in agents %}
-            <option value="{{ agent.id }}">{{ agent.user.username }}</option>
-            {% endfor %}
-        </select>
-    </div> -->
     <div class="d-flex justify-content-between">
         <p><strong>Project Price:</strong> <span id="project-price"></span>{{ form.Plot_price }}</p>
         <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>

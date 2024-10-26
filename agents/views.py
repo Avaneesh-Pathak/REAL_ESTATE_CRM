@@ -59,6 +59,8 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
         else:
             level = 1  # Top-level agent if no parent agent is provided
 
+            
+
         
 
         # # Create and save the Agent instance
@@ -66,6 +68,7 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
             user=user,
             organisation=self.request.user.userprofile,
             parent_agent=parent_agent,
+            
             level=level
         )
 

@@ -53,6 +53,7 @@ urlpatterns = [
     #DAYBOOK
     path('daybook/', DaybookListView.as_view(), name='daybook_list'),  # URL for listing expenses
     path('daybook/create/', daybook_create, name='daybook_create'),
+    
     #PROMOTER
     path('promoters/', PromoterListView.as_view(), name='promoter_list'),
     path('promoter/<int:promoter_id>/update-delete/', views.update_delete_promoter, name='update_delete_promoter'),

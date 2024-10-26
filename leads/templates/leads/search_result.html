@@ -236,16 +236,18 @@
             <ul>
                 {% for sale in sale_results %}
                 <li>
-                    <strong>Property:</strong> {{ sale.property.title }}<br>
-                    <strong>Agent:</strong> {{ sale.agent.username }}<br>
-                    <strong>Sale Price:</strong> ${{ sale.sale_price }}<br>
-                    <strong>Sale Date:</strong> {{ sale.sale_date }}<br>
-
-                    {% if sale.organisation %}
-                    <strong>Organisation:</strong> {{ sale.organisation.full_name }} - {{ sale.organisation.email }}
-                    {% else %}
-                    <strong>Organisation:</strong> Not specified
-                    {% endif %}
+                    <a href="{% url 'leads:sale_list' %}" style="text-decoration: none; color: inherit;">
+                        <strong>Property:</strong> {{ sale.property.title }}<br>
+                        <strong>Agent:</strong> {{ sale.agent.username }}<br>
+                        <strong>Sale Price:</strong> ${{ sale.sale_price }}<br>
+                        <strong>Sale Date:</strong> {{ sale.sale_date }}<br>
+        
+                        {% if sale.organisation %}
+                            <strong>Organisation:</strong> {{ sale.organisation.full_name }} - {{ sale.organisation.email }}
+                        {% else %}
+                            <strong>Organisation:</strong> Not specified
+                        {% endif %}
+                    </a>
                 </li>
                 <hr>
                 {% endfor %}
@@ -259,10 +261,12 @@
             <ul>
                 {% for salary in salary_result %}
                 <li class="p-4 bg-gray-100 rounded-lg mb-4 shadow-md">
-                    <p><strong>Agent:</strong> {{ salary.agent.username }}</p>
-                    <p><strong>Base Salary:</strong> ${{ salary.base_salary }}</p>
-                    <p><strong>Bonus:</strong> ${{ salary.bonus }}</p>
-                    <p><strong>Payment Date:</strong> {{ salary.payment_date }}</p>
+                    <a href="{% url 'leads:salary_list' %}" style="text-decoration: none; color: inherit;">
+                        <p><strong>Agent:</strong> {{ salary.agent.username }}</p>
+                        <p><strong>Base Salary:</strong> ${{ salary.base_salary }}</p>
+                        <p><strong>Bonus:</strong> ${{ salary.bonus }}</p>
+                        <p><strong>Payment Date:</strong> {{ salary.payment_date }}</p>
+                    </a>
                 </li>
                 {% endfor %}
             </ul>
@@ -275,12 +279,14 @@
             <ul>
                 {% for kisan in kisan_results %}
                 <li>
-                    <strong>Khasra Number:</strong> {{ kisan.khasra_number }}<br>
-                    <strong>Area of Land:</strong> {{ kisan.area }} Beegha<br>
-                    <strong>Land Cost:</strong> ${{ kisan.land_cost }}<br>
-                    <strong>Development Cost:</strong> ${{ kisan.development_cost }}<br>
-                    <strong>Payment to Kisan:</strong> ${{ kisan.payment_to_kisan }}<br>
-                    <strong>Basic Sales Price:</strong> ${{ kisan.basic_sales_price }}<br>
+                    <a href="{% url 'leads:kisan_list' %}" style="text-decoration: none; color: inherit;">
+                        <strong>Khasra Number:</strong> {{ kisan.khasra_number }}<br>
+                        <strong>Area of Land:</strong> {{ kisan.area }} Beegha<br>
+                        <strong>Land Cost:</strong> ${{ kisan.land_cost }}<br>
+                        <strong>Development Cost:</strong> ${{ kisan.development_cost }}<br>
+                        <strong>Payment to Kisan:</strong> ${{ kisan.payment_to_kisan }}<br>
+                        <strong>Basic Sales Price:</strong> ${{ kisan.basic_sales_price }}<br>
+                    </a>
                 </li>
                 <hr>
                 {% endfor %}
