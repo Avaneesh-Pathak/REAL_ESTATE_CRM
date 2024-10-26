@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/main.min.css" rel="stylesheet" />
-    
+
 
 
 
@@ -171,6 +171,10 @@
         /* Styles for the search box */
         .search-form {
             margin: 20px 0;
+            min-width: max-content;
+            /* Optional, control maximum size */
+            box-sizing: border-box;
+            /* Ensures padding doesn’t affect width */
             display: flex;
             /* Use flexbox for better alignment */
         }
@@ -256,11 +260,89 @@
                 /* Smaller bounce */
             }
         }
+
+        /* Media query for tablets (widths up to 992px) */
+        @media (max-width: 992px) {
+
+            /* Center the welcome message and adjust the search bar */
+            .navbar .welcome-message {
+                margin-left: 0;
+                text-align: center;
+                font-size: 1.2rem;
+            }
+
+            .navbar .search-bar {
+                width: 100%;
+                /* Expand search bar to full width */
+                margin-top: 10px;
+                /* Add space below welcome message */
+                text-align: center;
+            }
+
+            .navbar .search-bar input[type="text"] {
+                width: 80%;
+                /* Adjust input width for tablets */
+                font-size: 1rem;
+            }
+
+            /* Hide or collapse unnecessary nav items */
+            .navbar .nav-items {
+                display: none;
+                /* Optionally hide or stack items vertically */
+            }
+        }
+
+        /* Media query for mobile devices (widths up to 768px) */
+        @media (max-width: 768px) {
+
+            /* Stack the navbar content vertically */
+            .navbar {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            /* Center the logo */
+            .navbar .logo {
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .navbar .welcome-message {
+                margin-left: 0;
+                text-align: center;
+                font-size: 1rem;
+            }
+
+            .navbar .search-bar {
+                width: 100%;
+                /* Expand search bar to full width */
+                margin-top: 5px;
+            }
+
+            .navbar .search-bar input[type="text"] {
+                width: 90%;
+                /* Adjust input width for mobile */
+                font-size: 0.9rem;
+            }
+
+            /* Adjust navigation items to fit better on mobile */
+            .navbar .nav-items {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            /* Adjust user profile icon */
+            .navbar .profile {
+                margin-top: 5px;
+            }
+        }
     </style>
 </head>
 
 <body style="background-color: #E3FEF7">
     <div class="max-w-10xl mx-auto">
+
 
         <header style="background-color: #030648;" class="text-white body-font">
             <div style="max-width: 100%;"
@@ -365,7 +447,7 @@
                     <hr style="width: 100%; border: 1px solid #ffffff; margin: 2px auto;">
                 </div>
                 <!-- Search Box -->
-                <div style="margin-left: 12%; width:5px;">
+                <div style="margin-left: 10%; width:5px;">
                     <form action="{% url 'search' %}" method="GET" class="search-form flex ">
                         <input type="text" name="q" id="search-input" class="search-input" placeholder="Search..."
                             value="{{ query }}" required>
@@ -516,12 +598,7 @@
 
     <script>
         $(document).ready(function () {
-            // Initialize the datepicker for inputs with the ID that matches your date field in the form
-            $('input[type="date"]').datepicker({
-                format: 'yyyy-mm-dd',
-                autoclose: true,
-                todayHighlight: true
-            });
+
 
             // Toggle Sidebar
             $('#hamburger').click(function () {

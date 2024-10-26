@@ -9,7 +9,6 @@
         transition: transform 0.3s ease, background-color 0.3s ease;
     }
     
-
     .table {
         border: 2px solid #061a30;
         border-radius: 10px;
@@ -75,6 +74,51 @@
         }
         to {
             opacity: 1;
+        }
+    }
+
+    /* Media Queries for responsive design */
+    @media (max-width: 768px) {
+        .lead-section h1 {
+            font-size: 2rem; /* Adjust heading size for small screens */
+        }
+        
+        .card-body h3 {
+            font-size: 1.2rem; /* Adjust card heading size */
+        }
+
+        .display-4 {
+            font-size: 2rem; /* Adjust display size */
+        }
+
+        .table {
+            font-size: 0.9rem; /* Adjust table font size */
+        }
+
+        .col-md-4,
+        .col-md-6,
+        .col-md-5,
+        .col-md-7 {
+            flex: 0 0 100%; /* Stack columns vertically on small screens */
+            max-width: 100%;
+        }
+
+        .row {
+            margin: 0; /* Remove margin for rows on small screens */
+        }
+    }
+
+    @media (max-width: 576px) {
+        .lead-section h1 {
+            font-size: 1.5rem; /* Further adjust heading size for extra small screens */
+        }
+
+        .card-body h3 {
+            font-size: 1rem; /* Further adjust card heading size */
+        }
+
+        .display-4 {
+            font-size: 1.5rem; /* Further adjust display size */
         }
     }
 </style>

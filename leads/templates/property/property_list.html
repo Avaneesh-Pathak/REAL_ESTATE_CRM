@@ -2,36 +2,32 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<!-- <style>
-    .hide {
-        display: none;
+<style>
+    /* Responsive grid layout */
+    @media (max-width: 1200px) {
+        .grid {
+            grid-template-columns: repeat(4, 1fr); /* Show 4 columns on large screens */
+        }
     }
 
-    .myDIV:hover+ .hide {
-        display: block;
-        position:absolute; 
-        color: red;
-        z-index: 10;
-        transition: opacity 0.3s ease-in-out;
-        
+    @media (max-width: 992px) {
+        .grid {
+            grid-template-columns: repeat(3, 1fr); /* Show 3 columns on medium screens */
+        }
     }
-     -->
-    <!-- /* .myDIV:hover + .hide {
-        display: block; /* Show the popup on hover */
-        /* position: absolute; Position the popup absolutely */
-        /* left: 100%; Position it to the right of the property box */
-        /* top: 0; Align at the top of the property box */
-        /* z-index: 10; Ensure it appears above other content */
-        /* background-color: #fff; Background color for visibility */
-        /* border-radius: 10px; Rounded corners */
-        /* padding: 10px; Add some padding */
-        /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); Shadow for depth */
-        /* transition: opacity 0.3s ease-in-out; Transition for smooth appearance */
-        /* opacity: 1; Fully opaque when displayed */
-    } */ -->
 
+    @media (max-width: 768px) {
+        .grid {
+            grid-template-columns: repeat(2, 1fr); /* Show 2 columns on small screens */
+        }
+    }
 
-<!-- </style> -->
+    @media (max-width: 576px) {
+        .grid {
+            grid-template-columns: 1fr; /* Show 1 column on extra small screens */
+        }
+    }
+</style>
 
 <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-gray-200">
     <div>
