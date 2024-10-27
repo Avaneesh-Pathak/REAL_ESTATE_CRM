@@ -1152,27 +1152,28 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             project = form.cleaned_data.get('project')
             agent = form.cleaned_data.get('agent')
             print(agent)
-            agent_level = agent.level
-            print(agent_level)
-            for i in range(1,agent_level+1):
-                if i == 1:
-                    base_salary = int(Plot_price)/10
-                elif i == 2:
-                    base_salary = int(Plot_price)/25
-                elif i == 3:
-                    base_salary = int(Plot_price)*3/100
-                elif i == 4:
-                    base_salary = int(Plot_price)/50
-                elif i == 5:
-                    base_salary = int(Plot_price)/100
+            if agent:
+                agent_level = agent.level
+                print(agent_level)
+                for i in range(1,agent_level+1):
+                    if i == 1:
+                        base_salary = int(Plot_price)/10
+                    elif i == 2:
+                        base_salary = int(Plot_price)/25
+                    elif i == 3:
+                        base_salary = int(Plot_price)*3/100
+                    elif i == 4:
+                        base_salary = int(Plot_price)/50
+                    elif i == 5:
+                        base_salary = int(Plot_price)/100
 
-                Salary.objects.create(
-                    agent = agent.user,
-                    base_salary=base_salary,
-                    bonus = 0,
-                    payment_date=date.today()  # Adds the current date to payment_date
-                )
-                agent=agent.parent_agent
+                    Salary.objects.create(
+                        agent = agent.user,
+                        base_salary=base_salary,
+                        bonus = 0,
+                        payment_date=date.today()  # Adds the current date to payment_date
+                    )
+                    agent=agent.parent_agent
 
 
             prop =  Property.objects.get(title=project)
