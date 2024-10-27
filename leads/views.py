@@ -1,6 +1,6 @@
 import logging
 import datetime
-from datetime import timedelta
+from datetime import timedelta , date
 from decimal import Decimal, InvalidOperation
 
 from django import forms
@@ -766,6 +766,16 @@ class PropertyListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Property.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super().get_context_data(**kwargs)
+        
+        # Add projects to the context
+        context['projects'] = Project.objects.all()  # Fetch all projects
+        
+        return context
+
 
 class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
     model = Property

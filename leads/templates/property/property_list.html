@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 {% load tailwind_filters %}
 
@@ -33,6 +34,15 @@
     <div>
         <h1 class="ml-8 text-4xl text-gray-800">Properties</h1>
     </div>
+    <div  style="padding: 20px;">
+        <label for="project_id" class=" font-bold mr-2">Choose a Project:</label>
+        <select id="projectSelect" name="project_id" class="border border-gray-300 rounded-md p-2">
+            <option value="">-- Select Project --</option>
+            {% for project in projects %}
+                <option value="{{ project.id }}">{{ project.title }}</option>
+            {% endfor %}
+        </select>
+    </div>
     {% if request.user.is_organisor %}
     <div>
         <a class="mr-10 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
@@ -44,21 +54,46 @@
             Update
         </a>
     </div>
-    {% endif %}
+    {% endif %}  
 </div>
 
-<!-- Grid layout for properties with 5 columns -->
-<div style="border-radius:20%;" class="grid grid-cols-8 gap-7">
+<!-- Grid layout for properties with 8 columns -->
+<div id="propertyGrid" class="grid grid-cols-8 gap-7">
     {% for property in properties %}
-    <div style="border-radius:20%;background-color: {% if property.is_sold %} rgba(255, 0.5, 0.4, 0.4); {% else %} rgba(0, 255, 0, 0.3); {% endif %}"
-        class=" myDIV px-4 py-4">
+    <div data-project="{{ property.project_id.id }}" style="border-radius:20%;background-color: {% if property.is_sold %} rgba(255, 0.5, 0.4, 0.4); {% else %} rgba(0, 255, 0, 0.2); {% endif %}"
+        class="myDIV px-4 py-4">
         <h2 class="font-bold text-xl mb-2">{{ property.title }}</h2>
-        <p class="text-black-900 font-bold text-base">Total Price: ₹{{ property.totalprice }}</p>
-        <p class="text-black-900 font-bold text-base">Plot type: {{ property.type }}</p>
-        <p class="text-black-900 font-bold text-base">Price: ₹{{ property.price }}</p>
+        <p class="text-base">Total Price: ₹{{ property.totalprice }}</p>
+        <p class="text-base">Plot type: {{ property.type }}</p>
+        <p class="text-base">Price: ₹{{ property.price }}</p>
     </div>
     {% empty %}
     <div class="bg-red-100 p-4 rounded w-full">No properties available.</div>
     {% endfor %}
 </div>
+<!-- JavaScript for project-based filtering -->
+<script>
+    document.getElementById('projectSelect').addEventListener('change', function() {
+        const selectedProject = this.value;
+        const properties = document.querySelectorAll('#propertyGrid div[data-project]');
+
+        properties.forEach(function(property) {
+            if (selectedProject === "" || property.getAttribute('data-project') === selectedProject) {
+                property.style.display = "block"; // Show properties of the selected project
+            } else {
+                property.style.display = "none";  // Hide others
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover({
+            trigger: 'focus', // or 'hover' based on preference
+            placement: 'top' // or 'bottom', 'left', 'right'
+        });
+    });
+</script>
+
+
 {% endblock content %}

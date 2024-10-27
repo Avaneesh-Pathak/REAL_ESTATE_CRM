@@ -26,7 +26,7 @@
             <h2 class="text-lg font-medium mb-4">Select Properties</h2>
             <div id="propertyList" class="space-y-3">
                 {% for property in properties %}
-                    <div class="flex items-center" data-project="{{ property.project_id }}">
+                    <div class="flex items-center" data-project="{{ property.project_id.id }}">
                         <input type="checkbox" id="property_{{ property.id }}" name="properties"
                                value="{{ property.id }}" class="form-check-input w-4 h-4 text-blue-600">
                         <label for="property_{{ property.id }}" class="ml-2 text-sm text-gray-800">
@@ -50,8 +50,9 @@
     document.getElementById('projectSelect').addEventListener('change', function() {
         const selectedProject = this.value;
         const properties = document.querySelectorAll('#propertyList div[data-project]');
-
+        
         properties.forEach(function(property) {
+            // Show only properties matching the selected project ID
             if (selectedProject === "" || property.getAttribute('data-project') === selectedProject) {
                 property.style.display = "block"; // Show properties of the selected project
             } else {
