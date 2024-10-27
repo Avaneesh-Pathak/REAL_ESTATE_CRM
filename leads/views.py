@@ -846,6 +846,8 @@ class PropertyCreateView(LoginRequiredMixin, View):
         price = int(request.POST.get('price', ''))
         type = request.POST.get('type', '')
         dimension = request.POST.get('dimension', '')
+        projectid = request.POST.get('project_id', '')
+        projectinstance = Project.objects.get(id=projectid)
         # Split the string using '*' as the separator
         if dimension == 'others':
             l = int(request.POST.get('length'))
@@ -922,19 +924,17 @@ class PropertyUpdateView(LoginRequiredMixin,View):
 
     def post(self, request, ids):
         property_ids = ids.split(',')  # Convert the comma-separated string back to a list
-        project_name = request.POST.get('project_name', '')
+        length = request.POST.get('project_name', '')
         price = request.POST.get('price', '')
-        block = request.POST.get('block', '')
-        print(project_name)
-        print(block)
-        print(price)
+        breadth = request.POST.get('block', '')
+    
 
         for prop_id in property_ids:
             property_instance = Property.objects.get(id=prop_id)
             # Update the instance based on the form data (make sure to handle input correctly)
-            property_instance.project_name = project_name
+            property_instance.length = length
             property_instance.price = float(price)
-            property_instance.block = block 
+            property_instance.breadth = breadth 
             property_instance.save()
         return redirect(self.get_success_url())
     
