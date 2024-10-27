@@ -1,6 +1,6 @@
 import logging
 import datetime
-from datetime import timedelta
+from datetime import timedelta,date
 from decimal import Decimal, InvalidOperation
 
 from django import forms
@@ -1112,24 +1112,43 @@ class PlotRegistrationView(LoginRequiredMixin, View):
         agents = Agent.objects.all()
 
         if form.is_valid():
-            plot_booking = form.save()
+            
             # Retrieve EMI amount and tenure from the form
             emi_amount = form.cleaned_data.get('emi_amount')
+            Plot_price = form.cleaned_data.get('Plot_price')
             tenure = form.cleaned_data.get('emi_tenure')
             project = form.cleaned_data.get('project')
             agent = form.cleaned_data.get('agent')
-            if agent:  # Check if agent exists
-                print("Agent Primary Key:", agent.pk)   # This will print the primary key (ID) of the agent
-            else:
-                print("No agent selected.")
-            agent_level = agent.level
             print(agent)
+            agent_level = agent.level
+            print(agent_level)
+            for i in range(1,agent_level+1):
+                if i == 1:
+                    base_salary = int(Plot_price)/10
+                elif i == 2:
+                    base_salary = int(Plot_price)/25
+                elif i == 3:
+                    base_salary = int(Plot_price)*3/100
+                elif i == 4:
+                    base_salary = int(Plot_price)/50
+                elif i == 5:
+                    base_salary = int(Plot_price)/100
+
+                Salary.objects.create(
+                    agent = agent.user,
+                    base_salary=base_salary,
+                    bonus = 0,
+                    payment_date=date.today()  # Adds the current date to payment_date
+                )
+                agent=agent.parent_agent
+
 
             prop =  Property.objects.get(title=project)
             print(prop.is_sold)
             prop.is_sold=True
             prop.save()
             print(prop.is_sold)
+            plot_booking = form.save()
             # Ensure emi_amount is a Decimal and tenure is an integer
             if emi_amount is not None and tenure is not None and tenure > 0:
                 monthly_emi = emi_amount / tenure  # EMI per month
