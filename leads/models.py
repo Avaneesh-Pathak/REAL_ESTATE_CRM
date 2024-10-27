@@ -148,9 +148,13 @@ class Salary(models.Model):
     agent = models.ForeignKey(User, on_delete=models.DO_NOTHING)  # Or your Agent model
     base_salary = models.DecimalField(max_digits=10, decimal_places=2)
     bonus = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    commission = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # New commission field
     payment_date = models.DateField()
     organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.DO_NOTHING)
 
+    def total_compensation(self):
+        """Calculate the total compensation including salary, bonus, and commission."""
+        return self.base_salary + (self.bonus or 0) + self.commission
     
     def __str__(self):
         return f"Salary for {self.agent.username} on {self.payment_date}"
@@ -373,11 +377,11 @@ class PlotBooking(models.Model):
     def __str__(self):
         return f"Plot Booking - {self.name} - {self.booking_date}"
     
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        # Trigger commission distribution for the selected agent
-        if self.agent:
-            self.agent.distribute_commission(self.Plot_price)
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     # Trigger commission distribution for the selected agent
+    #     if self.agent:
+    #         self.agent.distribute_commission(self.Plot_price)
 
 class EMIPayment(models.Model):
 

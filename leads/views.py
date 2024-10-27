@@ -1,5 +1,6 @@
 import logging
 import datetime
+from .models import models
 from datetime import timedelta , date
 from decimal import Decimal, InvalidOperation
 
@@ -11,6 +12,7 @@ from django.db import IntegrityError
 from django.db.models import Count, Sum, Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.db.models import F, Value, ExpressionWrapper, DecimalField
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views import View, generic
@@ -206,7 +208,7 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         for sale in sales_data:
             profit = sale['total_sale_price'] - total_land_cost - total_development_cost
             profit_data.append(float(profit))  # Convert Decimal to float for JavaScript compatibility
-
+ 
         # Calculate total profit
         total_cost = total_land_cost + total_development_cost
         total_profit = total_sales - total_cost
@@ -963,6 +965,20 @@ class SalaryListView(LoginRequiredMixin,ListView):
     model = Salary
     template_name = 'salary/salary_list.html'  # Update with your template path
     context_object_name = 'salaries'
+
+    def get_queryset(self):
+        # Annotate the queryset with the total compensation calculation
+        return Salary.objects.annotate(
+            total_compensation=ExpressionWrapper(
+                F('base_salary') + Value(0) + F('bonus') + F('commission'),  # Adjusted for potential None values
+                output_field=DecimalField()
+            )
+        )
+
+
+
+
+
 
 class BonusInfoView(LoginRequiredMixin,ListView):
     model = Bonus
