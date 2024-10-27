@@ -313,6 +313,10 @@ class Daybook(models.Model):
     def __str__(self):
         return f"{self.date} - {self.activity} - {self.amount}"
 
+
+
+
+
 # PROMOTER MODEL
 
 class Promoter(models.Model):
