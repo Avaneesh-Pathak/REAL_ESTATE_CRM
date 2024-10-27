@@ -2,7 +2,6 @@
 {% load static %}
 {% block content %}
 <style>
-    
     .fade-in {
         animation: fadeIn 1s ease-in-out forwards;
     }
@@ -27,7 +26,7 @@
 
     .nav-link {
         flex-grow: 1;
-            }
+    }
 
     .nav-link:hover {
         border-color: #4f46e5;
@@ -167,7 +166,11 @@
                         class="btn-primary w-5px mt-4">FollowUp List</a>
                 </div>
             </div>
-           
+            <div style="align-items: center;" >
+                <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" onerror="this.onerror=null; this.src='{% static 'default.jpg' %}'" style="width: 150px; height: 150px;">
+
+
+            </div>
 
 
         </div>
