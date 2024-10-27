@@ -1,22 +1,127 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
+<style>
+    /* Simple styles for the form */
+    .container {
+        padding: 20px;
+        
+        max-width: 600px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-    <div class="container">
-        <!-- Back to leads link -->
-        <a href="{% url 'leads:lead-list' %}" class="back-link">← Go Back to Leads</a>
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
 
-        <!-- Header -->
-        <h1>Assign an Agent to This Lead</h1>
+    .form-group {
+        margin-bottom: 15px;
+    }
 
-        <!-- Form for assigning an agent -->
-        <form method="post" action=".">
-            {% csrf_token %}
-            {{ form.as_p }}
+    .form-label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
 
-            <!-- Submit button -->
-            <button type="submit">Assign Agent</button>
-        </form>
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #007bff; /* Blue color on focus */
+        outline: none;
+    }
+
+    .text-danger {
+        color: red;
+        font-size: 0.9em;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff; /* Bootstrap primary color */
+        border: none;
+        color: white;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn:hover {
+        background-color: #0056b3; /* Darker blue */
+        transform: scale(1.05);
+    }
+
+    .alert {
+        display: none; /* Initially hidden */
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #d4edda; /* Green background */
+        color: #155724; /* Dark green text */
+        border: 1px solid #c3e6cb; /* Border color */
+        border-radius: 5px;
+    }
+
+    .alert.show {
+        display: block; /* Show the alert */
+    }
+</style>
+
+<div class="container">
+    <a href="{% url 'leads:lead-list' %}" class="back-link mb-3 btn btn-primary">← Go Back to Leads</a>
+
+    <h1 style="font-size: large; font-weight: 500; ;" >Assign an Agent to This Lead</h1>
+
+    <form method="post" action="." >
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.agent.id_for_label }}" class="form-label">{{ form.agent.label }}</label>
+            <select id="{{ form.agent.id_for_label }}" name="{{ form.agent.name }}" class="form-control">
+                {% for choice in form.agent.field.choices %}
+                    <option value="{{ choice.0 }}" {% if choice.0 == form.agent.value %}selected{% endif %}>{{ choice.1 }}</option>
+                {% endfor %}
+            </select>
+            {% if form.agent.errors %}
+                <div class="text-danger">{{ form.agent.errors|first }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn" id="submit-button">Assign Agent</button>
+    </form>
+
+    <div id="success-message" class="alert" role="alert">
+        Agent has been successfully assigned!
     </div>
+</div>
 
-    {% endblock content%}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector('form');
+        const successMessage = document.getElementById('success-message');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Simulate a successful submission
+            successMessage.classList.add('show');
+
+            // Reset the form after a delay
+            setTimeout(function () {
+                successMessage.classList.remove('show');
+                form.reset();
+            }, 3000); // Show success message for 3 seconds
+        });
+    });
+</script>
+{% endblock content %}

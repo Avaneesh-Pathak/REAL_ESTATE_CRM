@@ -1064,14 +1064,20 @@ class DaybookListView(LoginRequiredMixin, View):
             return redirect('leads:daybook_list')  # Redirect to the daybook list after resetting
 
 def daybook_create(request):
+    today = timezone.now().date()  # Get today's date
+
     if request.method == 'POST':
-        form = DaybookEntryForm(request.POST)  # Update to use the new form name
+        form = DaybookEntryForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('leads:daybook_list')  # Redirect to the daybook list after saving
+            return redirect('leads:daybook_list')  # Redirect to daybook list after saving
     else:
-        form = DaybookEntryForm()  # Update to use the new form name
-    return render(request, 'Daybook/daybook_form.html', {'form': form})
+        form = DaybookEntryForm()  # Create a new form instance
+
+    return render(request, 'Daybook/daybook_form.html', {
+        'form': form,
+        'today': today  # Pass today's date to the context
+    })
 
 
 # PROMOTER 

@@ -1,4 +1,6 @@
 from django import forms
+from django.utils import timezone
+from datetime import date
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from .models import Lead, Agent, Category, FollowUp, Sale, Salary,Property,Promoter, Daybook,PlotBooking,Agent,Kisan,UserProfile
@@ -71,6 +73,7 @@ class AssignAgentForm(forms.Form):
         agents = Agent.objects.filter(organisation=request.user.userprofile)
         super(AssignAgentForm, self).__init__(*args, **kwargs)
         self.fields["agent"].queryset = agents
+        self.fields['agent'].widget.attrs.update({'class': 'form-control'})
 
 
 class LeadCategoryUpdateForm(forms.ModelForm):
@@ -164,19 +167,16 @@ class DaybookEntryForm(forms.ModelForm):
         model = Daybook
         fields = ['date', 'activity', 'custom_activity', 'amount', 'remark']
     
-    def clean(self):
-        cleaned_data = super().clean()
-        activity = cleaned_data.get('activity')
-        custom_activity = cleaned_data.get('custom_activity')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date'].initial = timezone.now().date()  # Set current date as the initial value
 
-        if activity == 'others' and not custom_activity:
-            raise forms.ValidationError("Please enter the custom activity.")
-        # elif activity == 'others':
-        #     Daybook.objects.create(
-        #         activity = custom_activity
-            # )
-
-        return cleaned_data
+    def clean_date(self):
+        date = self.cleaned_data.get('date')
+        today = timezone.now().date()
+        if date < today or date > today:
+            raise forms.ValidationError("Please enter today's date.")
+        return date
     
 # PROMOTER FORM
 
@@ -239,6 +239,8 @@ class PlotBookingForm(forms.ModelForm):
 
     def __init__(self, *args,project=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['project'].required = True  # Set the field as required
+        self.fields['booking_date'].initial = date.today()
 
         # Define PLC choices and add plc_charge field
         PLC_CHOICES = [
