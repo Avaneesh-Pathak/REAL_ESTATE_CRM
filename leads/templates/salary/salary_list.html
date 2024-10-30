@@ -15,7 +15,7 @@
         </div>
         {% if request.user.is_organisor %}
         <div>
-            <a class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+            <a style="margin-right: 8px;" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
                 href="{% url 'leads:create_salary' %}">
                 Add Salary Data
             </a>
@@ -23,9 +23,9 @@
         {% endif %}
     </div>
     <!-- Filter Form -->
-    <form id="date-filter-form" method="GET" class="mb-4">
+    <form id="date-filter-form" method="GET" class="ml-6px inline-flex items-center px-2 py-2 bg-blue-600 text-sm font-medium rounded-md hover:bg-blue-700">
         <div class="flex items-center">
-            <label for="payment_date" class="mr-2">Select Payment Date:</label>
+            <label for="payment_date" class="text-white">Select Payment Date:</label>
             <input type="date" id="payment_date" name="payment_date" class="border rounded p-2"
                 value="{{ request.GET.payment_date }}" onchange="this.form.submit()">
         </div>

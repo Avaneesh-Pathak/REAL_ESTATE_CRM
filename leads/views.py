@@ -1045,6 +1045,7 @@ class SalaryListView(LoginRequiredMixin,ListView):
             )
         )
    
+
         payment_date = self.request.GET.get('payment_date')
         if payment_date:
             # Filter salaries based on the selected payment date

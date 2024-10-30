@@ -185,7 +185,7 @@ class Sale(models.Model):
 class  Project(models.Model):
     project_name = models.CharField(max_length=255)
     block = models.CharField(max_length=2)
-
+    kisans = models.ManyToManyField('Kisan', related_name='projects')  # Link to Kisan model
     title = models.CharField(unique=True,max_length=255)
     
     def create_composite_key(self):
