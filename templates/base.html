@@ -7,6 +7,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DJCRM</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'path/to/styles.css' %}" rel="stylesheet"> <!-- Adjust path as needed -->
+
+
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -26,315 +33,120 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* General styles */
+        /* Base styles */
         body {
-            margin: 0;
-            padding: 0%;
-            background: linear-gradient(135deg, #9bbeeb 0%, #ffffff 100%);
-            color: #000000;
+            background-color: #E3FEF7;
         }
 
-        /* Nested menu styles */
-        .nested-menu {
-            display: none;
-            /* Hide nested menu by default */
-            padding-left: 20px;
-            /* Indent nested items */
+        header {
+            background-color: #030648;
         }
 
-        /* Sidebar styles */
+        .logo img {
+            border-radius: 50%;
+        }
+
+        .search-form {
+            margin-left: auto;
+            /* Aligns search form to the right */
+        }
+
+        .search-input {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        .search-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
 
         .sidebar {
             position: fixed;
-            top: 0;
-            left: -250px;
-            width: 250px;
-            height: 100%;
-            background: linear-gradient(135deg, #0e36e5 0%, #071904 100%);
-            transition: left 0.3s ease;
-            z-index: 1000;
-        }
-
-        .sidebar.active {
+            /* Fixed position for sidebar */
             left: 0;
-            /* Show the sidebar */
-        }
-
-        .sidebar a {
-            display: block;
-            padding: 15px;
-            color: #333;
-            text-decoration: none;
-        }
-
-
-        .sidebar a:hover {
-            background: linear-gradient(135deg, #6235f6 0%, #0f5420 100%);
-            /* Highlight on hover */
-        }
-
-        .hamburger {
-            cursor: pointer;
-            font-size: 24px;
-            margin: 15px;
-            /* Some margin for the icon */
-        }
-
-        .close-btn {
-            cursor: pointer;
-            font-size: 24px;
-            margin: 15px;
-            /* Some margin for the icon */
-            text-align: right;
-            /* Align to the right */
-        }
-
-
-        .theme-icon {
-            display: inline-block;
-            transition: transform 0.3s;
-            /* Smooth icon change */
-        }
-
-        /* Alert styles */
-        .alert-messages {
-            margin: 20px 0;
-            /* Add margin to alert messages */
-        }
-
-        .close-alert {
-            font-size: 20px;
-            font-weight: bold;
-            color: #f56565;
-            /* Change color if needed */
-        }
-
-        .close-alert:hover {
-            color: #c53030;
-            /* Darker on hover */
-        }
-
-
-
-        /* Sidebar transition styles */
-        .hamburger {
-            cursor: pointer;
-        }
-
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: #243642;
-            /* Dark Blue */
-            padding-top: 30px;
-            position: fixed;
-            left: -250px;
             top: 0;
+            /* Aligns to top */
+            bottom: 0;
+            /* Extends to bottom */
+            width: 250px;
+            /* Fixed width */
+            background-color: #030648;
+            padding-top: 1rem;
+            /* Spacing from top */
             z-index: 1000;
-            overflow: auto;
-            transform: translateX(-100%);
+            /* Ensures it stays on top */
             transition: transform 0.3s ease-in-out;
         }
 
         .sidebar a {
-            padding: 10px 15px;
-            text-decoration: none;
-            font-size: 18px;
             color: white;
+            text-decoration: none;
+            padding: 1rem;
             display: block;
         }
 
         .sidebar a:hover {
-            background-color: #3b82f6;
-            color: white;
+            background-color: #1a1a1a;
+            color: #007bff;
         }
 
-        /* Close button */
-        .close-btn {
-            font-size: 36px;
-            margin-left: 20px;
+        .nested-menu {
+            display: none;
+            /* Initially hide nested menus */
         }
 
-        /* Sidebar Toggle */
-        #hamburger {
-            display: block;
-            color: white;
-            font-size: 24px;
+        .nested-menu a {
+            padding-left: 2rem;
+            /* Indent nested menu items */
         }
 
-        /* Adjust main content when sidebar is active */
-        .sidebar.active+main {
-            margin-left: 250px;
-            /* Shift content to the right */
-        }
-
-        /* Styles for the search box */
-        .search-form {
-            margin: 20px 0;
-            min-width: max-content;
-            /* Optional, control maximum size */
-            box-sizing: border-box;
-            /* Ensures padding doesn’t affect width */
-            display: flex;
-            /* Use flexbox for better alignment */
-        }
-
-        .search-input {
-            flex: 1;
-            /* Allow input to grow */
-            padding: 10px;
-            /* Padding for better spacing */
-            font-size: 16px;
-            /* Font size for readability */
-            color: #333;
-            /* Text color */
-            background-color: #f9f9f9;
-            /* Background color of the input */
-            border: 1px solid #ccc;
-            /* Border for visibility */
-            border-radius: 4px;
-            /* Rounded corners */
-            transition: border 0.3s;
-            /* Transition effect for focus */
-        }
-
-        .search-input:focus {
-            border: 1px solid #007bff;
-            /* Change border color on focus */
-            outline: none;
-            /* Remove outline */
-        }
-
-        /* Style the button */
-        .search-button {
-            padding: 10px 15px;
-            /* Padding for the button */
-            background-color: #007bff;
-            /* Button background color */
-            color: white;
-            /* Button text color */
-            border: none;
-            /* Remove button border */
-            border-radius: 4px;
-            /* Rounded corners */
-            cursor: pointer;
-            /* Pointer cursor on hover */
-            margin-left: 10px;
-            /* Space between input and button */
-            transition: background-color 0.3s;
-            /* Smooth background color change */
-        }
-
-        .search-button:hover {
-            background-color: #0056b3;
-            /* Darker button color on hover */
-        }
-
-        .logo-container {
-            transition: transform 0.3s ease;
-            /* Smooth transition */
-        }
-
-        .logo-container:hover {
-            animation: bounce 0.5s;
-            /* Bounce animation */
-        }
-
-        @keyframes bounce {
-
-            0%,
-            20%,
-            50%,
-            80%,
-            100% {
-                transform: translateY(0);
-            }
-
-            40% {
-                transform: translateY(-10px);
-                /* Upward bounce */
-            }
-
-            60% {
-                transform: translateY(-5px);
-                /* Smaller bounce */
-            }
-        }
-
-        /* Media query for tablets (widths up to 992px) */
-        @media (max-width: 992px) {
-
-            /* Center the welcome message and adjust the search bar */
-            .navbar .welcome-message {
-                margin-left: 0;
-                text-align: center;
-                font-size: 1.2rem;
-            }
-
-            .navbar .search-bar {
-                width: 100%;
-                /* Expand search bar to full width */
-                margin-top: 10px;
-                /* Add space below welcome message */
-                text-align: center;
-            }
-
-            .navbar .search-bar input[type="text"] {
-                width: 80%;
-                /* Adjust input width for tablets */
-                font-size: 1rem;
-            }
-
-            /* Hide or collapse unnecessary nav items */
-            .navbar .nav-items {
-                display: none;
-                /* Optionally hide or stack items vertically */
-            }
-        }
-
-        /* Media query for mobile devices (widths up to 768px) */
+        /* Responsive styles */
         @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+                /* Adjust sidebar width for smaller screens */
+            }
 
-            /* Stack the navbar content vertically */
-            .navbar {
+            .search-input {
+                width: 150px;
+                /* Adjust search input width */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .search-form {
+                margin-left: 5%;
                 flex-direction: column;
-                align-items: center;
+                align-items: flex-start;
             }
 
-            /* Center the logo */
-            .navbar .logo {
-                margin-bottom: 10px;
-                text-align: center;
-            }
-
-            .navbar .welcome-message {
-                margin-left: 0;
-                text-align: center;
-                font-size: 1rem;
-            }
-
-            .navbar .search-bar {
+            .search-input {
                 width: 100%;
-                /* Expand search bar to full width */
-                margin-top: 5px;
+                /* Full width for small screens */
             }
 
-            .navbar .search-bar input[type="text"] {
-                width: 90%;
-                /* Adjust input width for mobile */
-                font-size: 0.9rem;
+            .search-button {
+                margin-left: 0;
+                /* Reset margin */
+                width: 100%;
+                /* Full width for button */
             }
 
-            /* Adjust navigation items to fit better on mobile */
-            .navbar .nav-items {
-                display: flex;
+            .sidebar {
+                width: 100%;
+                /* Full width for sidebar on small screens */
+            }
+
+            header {
                 flex-direction: column;
-                align-items: center;
-            }
-
-            /* Adjust user profile icon */
-            .navbar .profile {
-                margin-top: 5px;
+                /* Stack header elements vertically */
             }
         }
     </style>
@@ -448,14 +260,33 @@
                     <h2 style="font-size: 2rem; font-weight: bold; color: #7b87e4; margin-bottom: 10px;">Concept</h2>
                     <hr style="width: 100%; border: 1px solid #ffffff; margin: 2px auto;">
                 </div>
-                <!-- Search Box -->
-                <div style="margin-left: 10%; width:5px;">
-                    <form action="{% url 'search' %}" method="GET" class="search-form flex ">
+                <!-- Simplified Search Box with Better Accessibility -->
+                <div class="search-container" style="margin-left: 10%;">
+                    <form action="{% url 'search' %}" method="GET" class="search-form flex" role="search">
                         <input type="text" name="q" id="search-input" class="search-input" placeholder="Search..."
-                            value="{{ query }}" required>
-                        <button type="submit" class="search-button">Search</button>
+                            required aria-label="Search">
+                        <button type="submit" class="search-button" aria-label="Search button">Search</button>
                     </form>
                 </div>
+
+                <!-- Improved Dropdown Toggle -->
+                <script>
+                    document.getElementById('profile-menu-button').addEventListener('click', function (event) {
+                        event.stopPropagation();
+                        const dropdown = document.getElementById('profile-dropdown');
+                        dropdown.classList.toggle('hidden');
+                        this.setAttribute('aria-expanded', dropdown.classList.contains('hidden') ? 'false' : 'true');
+                    });
+
+                    document.addEventListener('click', function (event) {
+                        const dropdown = document.getElementById('profile-dropdown');
+                        if (!event.target.closest('#profile-menu-button')) {
+                            dropdown.classList.add('hidden');
+                            document.getElementById('profile-menu-button').setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                </script>
+
 
 
 
