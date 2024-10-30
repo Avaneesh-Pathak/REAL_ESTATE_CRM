@@ -899,8 +899,15 @@ class PropertyCreateView(LoginRequiredMixin, View):
         price = int(request.POST.get('price', ''))
         type = request.POST.get('type', '')
         dimension = request.POST.get('dimension', '')
-        projectid = request.POST.get('project_id', '')
-        projectinstance = Project.objects.get(id=projectid)
+
+        # Initialize form with total land
+        total_area_used = Property.objects.aggregate(total_area=Sum('area'))['total_area'] or 0
+        total_kisan_land = Kisan.objects.aggregate(total_land=Sum('area_in_beegha'))['total_land'] or 0
+        total_land = total_kisan_land * 27000  # Convert to sqft
+        available_land = total_land - total_area_used
+
+        form = PropertyModelForm(request.POST, total_land=available_land)
+
         # Split the string using '*' as the separator
         if dimension == 'others':
             l = int(request.POST.get('length'))
