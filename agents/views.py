@@ -1,10 +1,12 @@
 import random
 from django import forms
+from django.db.models import Sum
+from django.utils import timezone
 from django.core.mail import send_mail
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import reverse
-from leads.models import Agent
+from leads.models import Agent,Salary
 from .forms import AgentModelForm,AgentCreateForm,AgentUpdateForm
 from .mixins import OrganisorAndLoginRequiredMixin
 
@@ -83,6 +85,24 @@ class AgentDetailView(OrganisorAndLoginRequiredMixin, generic.DetailView):
     def get_queryset(self):
         organisation = self.request.user.userprofile
         return Agent.objects.filter(organisation=organisation)
+    
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+        
+    #     agent = self.get_object()
+    #     current_date = timezone.now()
+    #     current_month = current_date.month
+    #     current_year = current_date.year
+
+    #     # Calculate monthly commission for the agent
+    #     monthly_commission = Salary.objects.filter(
+    #         agent=agent,
+    #         payment_date__year=current_year,
+    #         payment_date__month=current_month
+    #     ).aggregate(total_commission=Sum('commission'))['total_commission'] or 0
+
+    #     context['monthly_commission'] = monthly_commission
+    #     return context
 
 
 class AgentUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):

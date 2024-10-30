@@ -43,7 +43,7 @@
             <p><strong>Available Land for New Plots:</strong> {{ available_land }} sqft</p>
         </div>
         <div style="padding: 20px;">
-            <label for="project_id" class=" font-bold mr-2">Choose a Project:</label>
+            <label for="project_id" class="mr-10 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">Choose a Project:</label>
             <select id="projectSelect" name="project_id" class="border border-gray-300 rounded-md p-2">
                 <option value="">-- Select Project --</option>
                 {% for project in projects %}
@@ -69,14 +69,14 @@
     <div id="propertyGrid" class="grid grid-cols-8 gap-7">
         {% for property in properties %}
         <div data-project="{{ property.project_id.id }}"
-            style="border-radius:20%;background-color: {% if property.is_sold %} rgba(255, 0.5, 0.4, 0.4); {% else %} rgba(0, 255, 0, 0.2); {% endif %}"
+            style="border-radius:10%;background-color: {% if property.is_sold %} rgba(255, 0.5, 0.4, 0.4); {% else %} rgba(0, 255, 0, 0.2); {% endif %}"
             class="myDIV px-4 py-4">
             <a href="{% url 'leads:property-detail' property.pk %}">
                 <h2 class="font-bold text-xl mb-2">{{ property.title }}</h2>
             </a>
-            <p class="text-base">Total Price: ₹{{ property.totalprice }}</p>
+            {% comment %} <p class="text-base">Total Price: ₹{{ property.totalprice }}</p>
             <p class="text-base">Plot type: {{ property.type }}</p>
-            <p class="text-base">Price: ₹{{ property.price }}</p>
+            <p class="text-base">Price: ₹{{ property.price }}</p> {% endcomment %}
         </div>
         {% empty %}
         <div class="bg-red-100 p-4 rounded w-full">No properties available.</div>

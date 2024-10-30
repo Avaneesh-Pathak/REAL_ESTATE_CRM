@@ -12,6 +12,8 @@ from django.db import IntegrityError
 from django.db.models import Count, Sum, Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from django.db.models import F, Value, ExpressionWrapper, DecimalField
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -1036,12 +1038,26 @@ class SalaryListView(LoginRequiredMixin,ListView):
 
     def get_queryset(self):
         # Annotate the queryset with the total compensation calculation
-        return Salary.objects.annotate(
+        queryset =  Salary.objects.annotate(
             total_compensation=ExpressionWrapper(
                 F('base_salary') + Value(0) + F('bonus') + F('commission'),  # Adjusted for potential None values
                 output_field=DecimalField()
             )
-        ).order_by('-payment_date') 
+        )
+   
+        payment_date = self.request.GET.get('payment_date')
+        if payment_date:
+            # Filter salaries based on the selected payment date
+            queryset = queryset.filter(payment_date=payment_date)
+
+        # Ensure that only agents with salaries on that date are shown
+        return queryset.order_by('-payment_date', '-id') # Show the latest payments first
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string('salary/salary_list.html', context)
+            
+            return JsonResponse({'html': html})
+        return super().render_to_response(context, **response_kwargs)
 
 
 

@@ -3,26 +3,34 @@
 
 {% block content %}
 <style>
-    
-    th{
+    th {
         background-color: rgb(58, 32, 142);
         color: white;
     }
 </style>
-<div class="main" >
+<div class="main">
     <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-gray-200">
         <div>
             <h1 class="text-4xl text-gray-800">Salary Data</h1>
         </div>
         {% if request.user.is_organisor %}
         <div>
-            <a class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" href="{% url 'leads:create_salary' %}">
+            <a class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                href="{% url 'leads:create_salary' %}">
                 Add Salary Data
             </a>
         </div>
         {% endif %}
     </div>
-    
+    <!-- Filter Form -->
+    <form id="date-filter-form" method="GET" class="mb-4">
+        <div class="flex items-center">
+            <label for="payment_date" class="mr-2">Select Payment Date:</label>
+            <input type="date" id="payment_date" name="payment_date" class="border rounded p-2"
+                value="{{ request.GET.payment_date }}" onchange="this.form.submit()">
+        </div>
+    </form>
+
     <table class="table table-striped mt-4 w-full">
         <thead>
             <tr>
@@ -30,7 +38,7 @@
                 <th class="text-center">Last Sale Commission</th>
                 <th class="text-center">Salary</th>
                 <th class="text-center">Property Sold</th>
-                <th class="text-center">Total Commission</th>
+                <!-- <th class="text-center">Total Commission</th> -->
                 <th class="text-center">Total Payout</th>
                 <th class="text-center">Payment Date</th>
                 <th class="text-center">Actions</th>
@@ -39,27 +47,49 @@
         <tbody>
             {% for salary in salaries %}
             <tr class="bg-gray-100 text-center">
-                <td style="font-size:large; font-weight: bold;" >{{ salary.agent.username }}</td>
+                <td style="font-size:large; font-weight: bold;">{{ salary.agent.username }}</td>
                 <td class="text-center">₹{{ salary.base_salary|floatformat:3 }}</td>
                 <td class="text-center">₹{{ salary.bonus }}</td>
                 <td class="text-center">{{ salary.property.title }}</td>
-                <td class="text-center">₹{{ salary.agent.total_profit }}</td> <!-- Total Commission -->
-                <td class="text-center">₹{{ salary.total_compensation|floatformat:3  }}</td> <!-- Last Sale Commission -->
+                <!-- <td class="text-center">₹{{ salary.agent.total_profit }}</td> Total Commission -->
+                <td class="text-center">₹{{ salary.total_compensation|floatformat:3 }}</td>
+                <!-- Last Sale Commission -->
                 <td class="text-center">{{ salary.payment_date|date:"F j, Y" }}</td>
                 <td class="text-center" style="vertical-align: bottom;">
-                    <a href="{% url 'leads:manage_salary' salary.id %}" class="btn btn-link text-indigo-600 hover:text-indigo-900">
+                    <a href="{% url 'leads:manage_salary' salary.id %}"
+                        class="btn btn-link text-indigo-600 hover:text-indigo-900">
                         Edit
                     </a>
                 </td>
             </tr>
             {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center bg-red-100 p-4 rounded">No salaries available.</td>
-                </tr>
+            <tr>
+                <td colspan="5" class="text-center bg-red-100 p-4 rounded">No salaries available.</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#payment_date').on('change', function() {
+            var selectedDate = $(this).val();
+            $.ajax({
+                url: "{% url 'leads:salary_list' %}", // Ensure this is the correct view URL
+                data: {
+                    'payment_date': selectedDate
+                },
+                success: function(data) {
+                    // Update the table body with new data
+                    $('#salary-table').html(data.html); // Corrected selector
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error occurred:', status, error);
+                }
+            });
+        });
+    });
+</script>
 {% endblock content %}
