@@ -17,14 +17,14 @@
             {% if properties %}
                 {% with property=properties.0 %}
                 <div class="form-group mb-3">
-                    <label for="project_name_{{ property.id }}" class="form-label">Project Name</label>
-                    <input type="text" class="form-control" id="project_name_{{ property.id }}" name="project_name" value="{{ property.project_name }}" required>
-
+                    <label for="project_name_{{ property.id }}" class="form-label">Property Length</label>
+                    <input type="number" class="form-control" id="project_name_{{ property.id }}" name="project_name" value="{{ property.project_name }}" required>
+                    
+                    <label for="block_{{ property.id }}" class="form-label mt-3">Property Breadth</label>
+                    <input type="number" class="form-control" id="block_{{ property.id }}" name="block" value="{{ property.block }}" required>
+                    
                     <label for="price_{{ property.id }}" class="form-label mt-3">Price</label>
                     <input type="number" class="form-control" id="price_{{ property.id }}" name="price" value="{{ property.price }}" required>
-
-                    <label for="block_{{ property.id }}" class="form-label mt-3">Block</label>
-                    <input type="text" class="form-control" id="block_{{ property.id }}" name="block" value="{{ property.block }}" required>
                 </div>
                 <hr class="my-4">
                 {% endwith %}

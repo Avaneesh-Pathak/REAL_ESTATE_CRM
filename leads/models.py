@@ -79,7 +79,7 @@ class Agent(models.Model):
     organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
     # New Addition Here
     parent_agent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='sub_agents')
-    commission_percentage = models.DecimalField(max_digits=5, decimal_places=2)  # Percentage of profit shared default 10 for level 1
+    commission_percentage = models.DecimalField(max_digits=5, decimal_places=2,default=0.0)  # Percentage of profit shared default 10 for level 1
     total_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Total profit earned
     level = models.IntegerField(default=1)
     # New Addition Ends
