@@ -45,7 +45,7 @@ urlpatterns = [
     path('properties/', PropertyListView.as_view(), name='property_list'),
     path('properties/create/', PropertyCreateView.as_view(), name='property-create'),
     path('properties/create/createProject', ProjectCreateView.as_view(), name='project-create'),
-    path('properties/<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
+     path('properties/<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
     path('properties/update/<str:ids>/', PropertyUpdateView.as_view(), name='property-update'),
     path('properties/delete/<str:ids>/', PropertyDeleteView.as_view(), name='delete_properties'),
     # URL for creating a new project

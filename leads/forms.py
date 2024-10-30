@@ -139,6 +139,29 @@ class PropertyModelForm(forms.ModelForm):
         model = Property
         fields = ['title', 'project_name', 'price', 'block', 'agent', 'organisation']
 
+    def __init__(self, *args, **kwargs):
+        self.total_land = kwargs.pop('total_land', None)  # Pass available land to the form
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        num_properties = cleaned_data.get('num_properties')
+        length = cleaned_data.get('length')
+        breadth = cleaned_data.get('breadth')
+
+        # Calculate area for custom dimensions if provided
+        if length and breadth:
+            area = length * breadth
+        else:
+            # You can define your own logic to get the area based on the selected dimension
+            area = 0
+
+        # Check if total area exceeds available land
+        if area * num_properties > self.total_land:
+            raise forms.ValidationError(f'You can only create properties for a maximum of {self.total_land} sqft of land available.')
+
+        return cleaned_data
+
 # PROJECT
 
 

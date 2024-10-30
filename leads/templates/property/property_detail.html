@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load tailwind_filters %}
+
+{% block content %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<style>
+    /* Additional Styling for Cards and Animations */
+    .fade-in {
+        animation: fadeInUp 1s ease-in-out;
+    }
+
+    .back-button button {
+        transition: background-color 0.3s ease;
+    }
+
+    .back-button button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Fade-in Up Animation */
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container my-5">
+    <!-- Back Button -->
+    <div class="back-button mb-4">
+        <a href="{% url 'leads:property_list' %}" class="text-decoration-none">
+            <button class="btn btn-primary">← Back to Property List</button>
+        </a>
+    </div>
+
+    <!-- Property Details Title -->
+    <h1 class="text-center text-uppercase font-weight-bold text-dark fade-in mb-4">
+        Property Details
+    </h1>
+
+    <!-- Row for Property Detail Cards -->
+    <div class="row">
+        <!-- Property Information Card -->
+        {% if property.title or property.project_name or property.price or property.area or property.type or property.is_sold %}
+            <div class="col-lg-6 col-md-6 col-sm-12 mb-4 fade-in">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h2 class="card-title text-primary border-bottom pb-2">Property Information</h2>
+                        <p><strong>Title:</strong> {{ property.title }}</p>
+                        <p><strong>Project Name:</strong> {{ property.project_name }}</p>
+                        <p><strong>Price:</strong> <span class="text-success">₹{{ property.price|floatformat:2 }} per sq ft</span></p>
+                        <p><strong>Area:</strong> {{ property.area }} sq ft</p>
+                        <p><strong>Plot Price:</strong> ₹{{ total_plot_price|floatformat:2 }}</p>
+                        <p><strong>Type:</strong> {{ property.type }}</p>
+                        <p><strong>Status:</strong>
+                            <span class="{% if property.is_sold %}text-danger{% else %}text-success{% endif %} font-weight-bold">
+                                {% if property.is_sold %} Sold {% else %} Available {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Plot Booking Information Card -->
+        {% if plot_booking %}
+            <div class="col-lg-6 col-md-6 col-sm-12 mb-4 fade-in">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h2 class="card-title text-primary border-bottom pb-2">Plot Booking Information</h2>
+                        <p><strong>Booking Name:</strong> {{ plot_booking.name }}</p>
+                        <p><strong>Booking Date:</strong> {{ plot_booking.booking_date|date:"F j, Y" }}</p>
+                        <p><strong>Payment Type:</strong> {{ plot_booking.payment_type }}</p>
+                        <p><strong>Plot Price:</strong> ₹{{ plot_booking.Plot_price|floatformat:2 }}</p>
+                        <p><strong>Booking Amount:</strong> ₹{{ plot_booking.booking_amount|floatformat:2 }}</p>
+                        <p><strong>Agent:</strong> {{ plot_booking.agent}}</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Profit Information Card -->
+        {% if profit_per_sqft %}
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-4 fade-in">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="card-title text-primary border-bottom pb-2">Profit Information</h2>
+                    <p><strong>Profit per SqFt:</strong> ₹{{ profit_per_sqft }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Agent Information Card -->
+        {% if agent %}
+            <div class="col-lg-6 col-md-6 col-sm-12 mb-4 fade-in">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h2 class="card-title text-primary border-bottom pb-2">Agent Information</h2>
+                        <p><strong>Agent Name:</strong> {{ agent.username }}</p>
+                        <p><strong>Commission:</strong> ₹{{ salary.base_salary|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Footer Note -->
+    <div class="text-center mt-4 fade-in">
+        <p class="text-secondary" style="font-size: 14px;">This property detail information has been verified and is accurate as per the latest records.</p>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock content %}

@@ -20,7 +20,7 @@ from django.views.generic import ListView, UpdateView, DeleteView
 
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot
 from agents.mixins import OrganisorAndLoginRequiredMixin
-from .models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook
+from .models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,ProfitCalculator
 from .forms import (
     LeadForm, 
     LeadModelForm, 
@@ -769,23 +769,59 @@ class PropertyListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Property.objects.all()
     
+    
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
         
-        # Add projects to the context
-        context['projects'] = Project.objects.all()  # Fetch all projects
-        
+        # Fetch all properties
+        properties = Property.objects.all()
+
+        # Fetch all projects and add them to context
+        context['projects'] = Project.objects.all()
+
+        # Calculate total Kisan land
+        total_kisan_land = Kisan.objects.aggregate(total_land=Sum('area_in_beegha')).get('total_land', 0)
+        total_land = total_kisan_land * 27000  # Convert to square feet
+
+        # Calculate total area used in properties
+        total_area_used = sum(property.area for property in properties if property.area)
+
+        # Calculate available land
+        available_land = Decimal(total_land) - Decimal(total_area_used)
+
+        # Add available land information to context
+        context['total_land'] = total_land  # Correctly setting values in context
+        context['available_land'] = available_land
+
         return context
 
 
-class PropertyDetailView(LoginRequiredMixin, generic.DetailView):
+class PropertyDetailView(generic.DetailView):
     model = Property
-    template_name = 'property/property_detail.html'  # Update with your template path
+    template_name = 'property/property_detail.html'
     context_object_name = 'property'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        property = self.get_object()
 
-    def get_queryset(self):
-        return Property.objects.filter(agent__user=self.request.user)
+        # Calculate total plot price
+        total_plot_price = Decimal(property.price or 0) * Decimal(property.area or 0)
+
+        # Fetch related PlotBooking
+        plot_booking = PlotBooking.objects.filter(project=property).first()
+        
+        
+        # Update context with all relevant details
+        context.update({
+            'property': property,
+            'total_plot_price': total_plot_price,
+            'plot_booking': plot_booking,   
+        })
+
+        return context
+        
 
 # Function-based view to display properties
 def properties_view(request):
@@ -798,15 +834,16 @@ def properties_view(request):
         
 
 class ProjectCreateView(LoginRequiredMixin, View):
-    model = Project,Area
+    model = Project,Area,Kisan
     template_name = 'property/create_project.html'
 
 
     def get(self, request):
+
         # Render the initial form for number of properties and common attributes
         return render(request, self.template_name)
 
-    
+
     def post(self, request):
         # Get the number of properties to create and common attributes
         project_name = request.POST.get('project_name', )
@@ -829,15 +866,31 @@ class ProjectCreateView(LoginRequiredMixin, View):
     def get_success_url(self):
         return reverse('leads:property-create')
     
+
+from .forms import PropertyModelForm   
+  
 class PropertyCreateView(LoginRequiredMixin, View):
     template_name = 'property/property_create.html'
 
+    # In the get method, calculate available land and add it to the context
     def get(self, request):
         projects = Project.objects.all()
         areas = Area.objects.all()
         types = Typeplot.objects.all()
-        # Render the initial form for number of properties and common attributes
-        return render(request, self.template_name,{'projects':  projects,'areas':areas,'types':types})
+
+        # Calculate available land
+        total_area_used = Property.objects.aggregate(total_area=Sum('area'))['total_area'] or 0
+        total_kisan_land = Kisan.objects.aggregate(total_land=Sum('area_in_beegha'))['total_land'] or 0
+        total_land = total_kisan_land * 27000  # Convert to sqft
+        available_land = total_land - total_area_used
+
+        # Pass available_land in context
+        return render(request, self.template_name, {
+            'projects': projects,
+            'areas': areas,
+            'types': types,
+            'available_land': available_land  # New addition
+        })
 
 
     def post(self, request):
@@ -846,6 +899,15 @@ class PropertyCreateView(LoginRequiredMixin, View):
         price = int(request.POST.get('price', ''))
         type = request.POST.get('type', '')
         dimension = request.POST.get('dimension', '')
+
+        # Initialize form with total land
+        total_area_used = Property.objects.aggregate(total_area=Sum('area'))['total_area'] or 0
+        total_kisan_land = Kisan.objects.aggregate(total_land=Sum('area_in_beegha'))['total_land'] or 0
+        total_land = total_kisan_land * 27000  # Convert to sqft
+        available_land = total_land - total_area_used
+
+        form = PropertyModelForm(request.POST, total_land=available_land)
+
         # Split the string using '*' as the separator
         if dimension == 'others':
             l = int(request.POST.get('length'))
@@ -873,6 +935,13 @@ class PropertyCreateView(LoginRequiredMixin, View):
         project = get_object_or_404(Project, id=key)
         tp = (l*b*price)
 
+        total_area_needed = area * num_properties
+            
+        if total_area_needed > available_land:
+            error_message = f"Only {available_land} sqft of land is available. Cannot create {total_area_needed} sqft of property."
+            print(error_message)
+            return render(request, self.template_name, {'projects': Project.objects.all(), 'areas': Area.objects.all(), 'types': Typeplot.objects.all(), 'error_message': error_message, 'form': form})
+
         # Create the properties in the database
         for _ in range(num_properties):
             Property.objects.create(
@@ -886,9 +955,10 @@ class PropertyCreateView(LoginRequiredMixin, View):
             )
 
         return redirect(self.get_success_url())
+        
 
     def get_success_url(self):
-        return reverse('leads:property_list')  # Redirect to property list after creation  # Redirect to property list after successful update
+        return reverse('leads:property_list')  # Redirect to property list after creation  # Redirect to property list after successful update  # Redirect to property list after creation  # Redirect to property list after successful update
 
 def select_properties_view(request):
     projects = Project.objects.all()
@@ -973,10 +1043,7 @@ class SalaryListView(LoginRequiredMixin,ListView):
                 F('base_salary') + Value(0) + F('bonus') + F('commission'),  # Adjusted for potential None values
                 output_field=DecimalField()
             )
-        )
-
-
-
+        ).order_by('-payment_date') 
 
 
 
@@ -1158,6 +1225,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = PlotBookingForm(request.POST)
         agents = Agent.objects.all()
+        
 
         if form.is_valid():
             
@@ -1183,16 +1251,20 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                     elif i == 5:
                         base_salary = int(Plot_price)/100
 
+                    prop = Property.objects.get(title=project)
                     Salary.objects.create(
                         agent = agent.user,
                         base_salary=base_salary,
                         bonus = 0,
-                        payment_date=date.today()  # Adds the current date to payment_date
+                        payment_date=date.today(),  # Adds the current date to payment_date
+                        property=prop
                     )
+                    print(property)
                     agent=agent.parent_agent
 
 
             prop =  Property.objects.get(title=project)
+            print(prop)
             print(prop.is_sold)
             prop.is_sold=True
             prop.save()
@@ -1230,7 +1302,7 @@ class BuyersListView(LoginRequiredMixin, View):
     template_name = 'plot_registration/buyers_list.html'
 
     def get(self, request, *args, **kwargs):
-        buyers = PlotBooking.objects.select_related('agent').all()
+        buyers = PlotBooking.objects.select_related('agent').all().order_by('-booking_date')
         return render(request, self.template_name, {'buyers': buyers})
 
 
@@ -1348,7 +1420,7 @@ class KisanForm(forms.ModelForm):
         model = Kisan
         fields = [
             'first_name', 'last_name', 'contact_number', 'address',
-            'khasra_number', 'area_in_beegha', 'land_costing',
+            'khasra_number', 'area_in_beegha','land_costing',
             'development_costing', 'kisan_payment', 'land_address',
             'payment_to_kisan', 'basic_sales_price'
         ]
@@ -1394,6 +1466,16 @@ class KisanListView(LoginRequiredMixin,ListView):
     template_name = 'kisan/kisan_list.html'
     context_object_name = 'kisans'
 
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        total_available_land = (Kisan.objects.filter(is_sold = False).aggregate(total_area=Sum('area_in_beegha')).get('total_area',0))
+
+        # Total land in sqft
+        total_land_in_sqft = total_available_land*27000
+
+        context['total_land_in_sqft'] = total_land_in_sqft
+        return context
+
 
 class KisanUpdateView(UpdateView):
 
@@ -1412,3 +1494,5 @@ class KisanDeleteView(DeleteView):
     model = Kisan
     template_name = 'kisan/kisan_confirm_delete.html'
     success_url = reverse_lazy('leads:kisan_list')
+
+

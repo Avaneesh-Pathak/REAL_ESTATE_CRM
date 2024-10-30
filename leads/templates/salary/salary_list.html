@@ -29,6 +29,7 @@
                 <th class="text-center">Agent</th>
                 <th class="text-center">Last Sale Commission</th>
                 <th class="text-center">Salary</th>
+                <th class="text-center">Property Sold</th>
                 <th class="text-center">Total Commission</th>
                 <th class="text-center">Total Payout</th>
                 <th class="text-center">Payment Date</th>
@@ -39,10 +40,11 @@
             {% for salary in salaries %}
             <tr class="bg-gray-100 text-center">
                 <td style="font-size:large; font-weight: bold;" >{{ salary.agent.username }}</td>
-                <td class="text-center">₹{{ salary.base_salary }}</td>
+                <td class="text-center">₹{{ salary.base_salary|floatformat:3 }}</td>
                 <td class="text-center">₹{{ salary.bonus }}</td>
+                <td class="text-center">{{ salary.property.title }}</td>
                 <td class="text-center">₹{{ salary.agent.total_profit }}</td> <!-- Total Commission -->
-                <td class="text-center">₹{{ salary.total_compensation }}</td> <!-- Last Sale Commission -->
+                <td class="text-center">₹{{ salary.total_compensation|floatformat:3  }}</td> <!-- Last Sale Commission -->
                 <td class="text-center">{{ salary.payment_date|date:"F j, Y" }}</td>
                 <td class="text-center" style="vertical-align: bottom;">
                     <a href="{% url 'leads:manage_salary' salary.id %}" class="btn btn-link text-indigo-600 hover:text-indigo-900">

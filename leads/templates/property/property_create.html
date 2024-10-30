@@ -23,7 +23,6 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         /* Increase shadow on hover */
     }
-
 </style>
 <div class="card max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
     <div class="text-center mb-6">
@@ -31,8 +30,16 @@
             class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md shadow-lg focus:outline-none">Create
             Project</a>
     </div>
-
     <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create New Properties</h1>
+
+    <!-- Error Message Display -->
+    {% if error_message %}
+    <div class="alert alert-danger text-red-600 text-center p-4 mb-6 bg-red-100 rounded-md shadow-md">
+        {{ error_message }}
+    </div>
+    {% endif %}
+
+    <p><strong>Available Land for New Plots:</strong> {{ available_land }} sqft</p>
 
     <form method="post" class="space-y-6">
         {% csrf_token %}

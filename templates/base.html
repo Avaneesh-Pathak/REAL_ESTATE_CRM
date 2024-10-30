@@ -30,7 +30,7 @@
         body {
             margin: 0;
             padding: 0%;
-            background: linear-gradient(135deg, #427bc6 0%, #fbfbfb 100%);
+            background: linear-gradient(135deg, #9bbeeb 0%, #ffffff 100%);
             color: #000000;
         }
 
@@ -361,19 +361,21 @@
                         <div class="close-btn mr-5 text-right cursor-pointer" id="close-btn"></div>&times;
                     </div>
                     <nav class="flex flex-col space-y-0">
-                        {% if request.user.is_organisor %}
-                        <a href="{% url 'agents:agent-list' %}"
-                            class="flex items-center text-white hover:text-blue-300 py-2 px-4 rounded-lg transition duration-200">
-                            <i class="fas fa-users mr-2"></i> Agents
-                        </a>
-                        {% endif %}
+
 
                         <a href="{% url 'dashboard' %}" class="flex items-center hover:text-blue-300">
                             <i class="fas fa-home mr-2"></i> Home
                         </a>
 
+
                         <!-- Nested menu for Leads -->
                         <div class="relative">
+                            {% if request.user.is_organisor %}
+                            <a href="{% url 'agents:agent-list' %}"
+                                class="flex items-left text-white hover:text-blue-300 py-2 px-4 rounded-lg transition duration-200">
+                                <i class="fas fa-users mr-0"></i> Agents
+                            </a>
+                            {% endif %}
                             <a href="#" class="flex items-center justify-between hover:text-blue-300"
                                 id="toggle-leads-menu">
                                 <span><i class="fas fa-user mr-2"></i> Leads</span>

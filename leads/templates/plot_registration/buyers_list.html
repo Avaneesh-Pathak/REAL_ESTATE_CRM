@@ -52,6 +52,7 @@
                     <th class="text-xm text-center font-semibold">Email</th>
                     <th class="text-xm text-center font-semibold">Property ID</th>
                     <th class="text-xm text-center font-semibold">Associate Detail</th>
+                    <th class="text-xm text-center font-semibold">Booking Date</th>
                     <th class="text-xm text-center font-semibold">Details</th>
                     <th class="text-xm text-center font-semibold">Print Receipt</th>
                 </tr>
@@ -68,6 +69,7 @@
                     <td><a href="mailto:{{ buyer.email }}">{{ buyer.email }}</a></td>
                     <td>{{ buyer.project.title }}</td>
                     <td>{{ buyer.agent.user.username }}</td>
+                    <td>{{ buyer.booking_date }}</td>
                     <td>
                         <a href="{% url 'leads:buyer_detail' buyer.id %}" class="hover:bg-red text-lightblue font-bold">View Details</a>
                     </td>
@@ -84,4 +86,5 @@
         </table>
     </div>
 </div>
+
 {% endblock %}

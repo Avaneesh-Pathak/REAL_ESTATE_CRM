@@ -191,7 +191,7 @@
             <h3>Properties:</h3>
             <ul>
                 {% for property in property_results %}
-                <li><a href="{% url 'leads:property_list' %}" style="color: #007BFF;">{{ property.title }} - {{ property.project_name }}</a></li>
+                <li><a href="{% url 'leads:property-detail' property.pk %}" style="color: #007BFF;">{{ property.title }} - {{ property.project_name }}</a></li>
                 {% endfor %}
             </ul>
             {% else %}

@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save , pre_save
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from decimal import Decimal
+from django.shortcuts import get_object_or_404
 
 
 class User(AbstractUser):
@@ -77,7 +79,7 @@ class Agent(models.Model):
     organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
     # New Addition Here
     parent_agent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='sub_agents')
-    commission_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=10.0)  # Percentage of profit shared default 10 for level 1
+    commission_percentage = models.DecimalField(max_digits=5, decimal_places=2)  # Percentage of profit shared default 10 for level 1
     total_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Total profit earned
     level = models.IntegerField(default=1)
     # New Addition Ends
@@ -151,6 +153,7 @@ class Salary(models.Model):
     commission = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # New commission field
     payment_date = models.DateField()
     organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.DO_NOTHING)
+    property = models.ForeignKey('Property',null=True, blank=True, on_delete=models.DO_NOTHING)  # Link to Property model
 
     def total_compensation(self):
         """Calculate the total compensation including salary, bonus, and commission."""
@@ -212,7 +215,6 @@ class Typeplot(models.Model):
     def __str__(self):
         return self.type    
 
-from django.db import models
 
 class Property(models.Model):
     id = models.AutoField(primary_key=True)
@@ -232,7 +234,8 @@ class Property(models.Model):
     # Removed the redundant ForeignKey to Property itself
     related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.DO_NOTHING)
   # This line is not needed
-   
+
+
     def if_sold(self):
         print(f"Checking if property {self.title} is sold")
         return self.is_sold  # Ensure this references the correct model
@@ -433,18 +436,56 @@ class Kisan(models.Model):
     area_in_beegha = models.DecimalField(max_digits=20, decimal_places=3)
     land_costing = models.DecimalField(max_digits=12, decimal_places=3)
     development_costing = models.DecimalField(max_digits=12, decimal_places=3)
-    
     # Make these fields optional
     kisan_payment = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     land_address = models.TextField(max_length=50, null=True, blank=True)
-
     payment_to_kisan = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  
-    basic_sales_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  
+    basic_sales_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True) 
+    is_sold = models.BooleanField(default=False)
+
+    def area_in_sqft(self):
+        convert_in_sqft = 27000 
+        return self.area_in_beegha*convert_in_sqft 
 
     def __str__(self) -> str:
         return f"{self.first_name} with khasra no {self.khasra_number}"
     
 
+
+class ProfitCalculator:
+    def __init__(self, kisan_id, agent_id, buyer_id, property_id):
+        self.kisan = get_object_or_404(Kisan, id=kisan_id)
+        self.salary = get_object_or_404(Salary, agent_id=agent_id)
+        self.buyer = get_object_or_404(PlotBooking, id=buyer_id)
+        self.property = get_object_or_404(Property, id=property_id)
+
+    def calculate_profit_per_sqft(self):
+        # Retrieve values from models
+        land_cost = self.kisan.land_cost
+        development_cost = self.kisan.development_cost
+        area_sqft = self.property.area_sqft
+        plot_price_per_sqft = self.property.plot_price / area_sqft
+        sale_price_per_sqft = self.buyer.sale_price / area_sqft
+        agent_commission_rate = self.salary.agent_commission_rate
+
+        # Calculate per-square-foot costs
+        land_cost_per_sqft = land_cost / area_sqft
+        development_cost_per_sqft = development_cost / area_sqft
+        print(development_cost_per_sqft)
+        agent_commission_per_sqft = (agent_commission_rate / Decimal('100.0')) * plot_price_per_sqft
+        print(agent_commission_per_sqft)
+        # Profit calculation before sale (using plot price)
+        total_cost_per_sqft = land_cost_per_sqft + development_cost_per_sqft + agent_commission_per_sqft
+        profit_per_sqft_before_sale = plot_price_per_sqft - total_cost_per_sqft
+        print(total_cost_per_sqft)
+        print(profit_per_sqft_before_sale)
+        # Profit calculation after sale (using sale price)
+        profit_per_sqft_after_sale = sale_price_per_sqft - total_cost_per_sqft
+        print(profit_per_sqft_after_sale)
+        return {
+            "profit_per_sqft_before_sale": profit_per_sqft_before_sale,
+            "profit_per_sqft_after_sale": profit_per_sqft_after_sale,
+        }
 
 
 

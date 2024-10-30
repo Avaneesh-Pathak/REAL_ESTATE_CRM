@@ -39,6 +39,11 @@
         </div>
         {% endif %}
 </div>
+{% comment %} <div style="align-items: center;" >
+    <p style="width: fit-content; background-color: azure; margin-bottom: 1%; border-radius: 5px; padding: 5px; " ><strong>Total Land:</strong> {{ total_land_in_sqft }} Sqft</p>
+    <p><strong>Available Land for New Plots:</strong> {{ available_land }} sqft</p>
+</div> {% endcomment %}
+
 
 <div class="table-container">
     <table class="bg-white border border-gray-200">
@@ -49,6 +54,7 @@
                 <th class="py-2 px-4 border-b">Contact Number</th>
                 <th class="py-2 px-4 border-b">Khasra Number</th>
                 <th class="py-2 px-4 border-b">Area (Beegha)</th>
+                <th class="py-2 px-4 border-b">Area (sqft)</th>
                 <th class="py-2 px-4 border-b">Land Costing</th>
                 <th class="py-2 px-4 border-b">Development Costing</th>
                 <th class="py-2 px-4 border-b">Payment to Kisan</th>
@@ -63,6 +69,7 @@
                 <td class="py-2 px-4 border-b">{{ kisan.contact_number }}</td>
                 <td class="py-2 px-4 border-b">{{ kisan.khasra_number }}</td>
                 <td class="py-2 px-4 border-b">{{ kisan.area_in_beegha }}</td>
+                <td class="py-2 px-4 border-b">{{ kisan.area_in_sqft }}</td>
                 <td class="py-2 px-4 border-b">{{ kisan.land_costing }}</td>
                 <td class="py-2 px-4 border-b">{{ kisan.development_costing }}</td>
                 <td class="py-2 px-4 border-b">{{ kisan.payment_to_kisan }}</td>
