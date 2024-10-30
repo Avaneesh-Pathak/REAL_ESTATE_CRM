@@ -34,10 +34,10 @@
                                         class="px-6 py-3 text-left text-xm font-medium text-white uppercase tracking-wider">
                                         Email
                                     </th>
-                                    <th scope="col"
+                                    {% comment %} <th scope="col"
                                         class="px-6 py-3 text-left text-xm font-medium text-white uppercase tracking-wider">
                                         Commission %
-                                    </th>
+                                    </th> {% endcomment %}
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xm font-medium text-white uppercase tracking-wider">
                                         Agent Level
@@ -59,9 +59,9 @@
                                     <td class="px-6 py-4  text-align-center whitespace-nowrap text-sl text-black-900">
                                         {{ agent.user.email }}
                                     </td>
-                                    <td class="px-6 py-4 text-align-center  whitespace-nowrap text-sl text-black-900">
+                                    {% comment %} <td class="px-6 py-4 text-align-center  whitespace-nowrap text-sl text-black-900">
                                         {{ agent.commission_percentage }}
-                                    </td>
+                                    </td> {% endcomment %}
                                     <td class="px-6 py-4  text-align-center whitespace-nowrap text-sl text-black-900">
                                         {{ agent.level }}
                                     </td>

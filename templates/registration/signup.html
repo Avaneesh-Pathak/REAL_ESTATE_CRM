@@ -1,97 +1,71 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-    }
-
-    body {
-        background: linear-gradient(135deg, #1481af 0%, #fbfbfb 100%);
-    }
-
-    .container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-    }
-
-    .form-container {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        padding: 20px;
-        width: 300px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-title {
-        font-size: 20px;
-        color: #333;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .login__field {
-        margin-bottom: 15px;
-    }
-
-    .login__input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    .form-button {
-        width: 100%;
-        padding: 10px;
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .form-button:hover {
-        background-color: #0056b3;
-    }
-
-    .footer-link {
-        display: block;
-        text-align: center;
-        margin-top: 15px;
-        color: #007bff;
-        text-decoration: none;
-    }
-
-    .footer-link:hover {
-        text-decoration: underline;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        color: #333;
-    }
-</style>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Add Font Awesome CDN link -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <div class="container">
-    <div class="form-container">
-        <h2 class="form-title">Sign Up</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p}}
-            
-            <button type="submit" class="form-button">Sign Up</button>
-        </form>
-        <a class="footer-link" href="{% url 'login' %}">Already have an account?</a>
+    <div class="row justify-content-center align-items-center" style="min-height: 100vh;">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Sign Up</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {% if field.name == 'password1' or field.name == 'password2' %}
+                                    <div class="input-group">
+                                        {{ field|add_class:"form-control" }}
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('{{ field.id_for_label }}')">
+                                                <span id="eye-icon-{{ field.id_for_label }}" class="fas fa-eye"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    {{ field|add_class:"form-control" }}
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="text-danger mt-1">
+                                        {{ field.errors|striptags }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'login' %}">Already have an account?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function togglePasswordVisibility(fieldId) {
+        var passwordField = document.getElementById(fieldId);
+        var eyeIcon = document.getElementById('eye-icon-' + fieldId);
+        
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            eyeIcon.classList.remove("fa-eye-slash");
+            eyeIcon.classList.add("fa-eye");
+        }
+    }
+</script>
+
 {% endblock content %}

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',
     'widget_tweaks',
+    'django_distill',
     
     # Local Apps
     'leads',

@@ -110,7 +110,7 @@
             <div class="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0">
                 <h2 class="text-sm title-font text-gray-500 tracking-widest">Agent</h2>
                 <h1 class="text-gray-900 text-4xl title-font font-bold mb-4">{{agent.user.username}}</h1>
-                <div class="flex mb-4">
+                <div style="align-items:center;" class="flex mb-4">
                     <a href="{% url 'agents:agent-detail' agent.pk %}" class="nav-link">Overview</a>
                     <a href="#" class="nav-link">Category</a>
                     <a href="{% url 'agents:agent-update' agent.pk  %}" class="nav-link">Update Details</a>

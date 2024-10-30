@@ -1,0 +1,15 @@
+<div class="node">
+    <div class="agent-info">
+        <strong>{{ agent.user.username }}</strong>
+        <p>Commission: {{ agent.commission_percentage }}%</p>
+        <p>Level: {{ agent.level }}</p>
+        <a href="{% url 'agents:agent-update' agent.id %}" class="btn">Update Agent</a>
+    </div>
+    {% if agent.sub_agents_list %}
+        <div class="children">
+            {% for sub_agent in agent.sub_agents_list %}
+                {% include 'agents/agent_node.html' with agent=sub_agent %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

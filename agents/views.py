@@ -70,7 +70,7 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
             user=user,
             organisation=self.request.user.userprofile,
             parent_agent=parent_agent,
-            commission_percentage=commission_percentage,
+            # commission_percentage=commission_percentage,
             
             level=level
         )
