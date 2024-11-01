@@ -98,7 +98,22 @@
                     <p><strong>Total Salary Expense:</strong> ₹{{ total_salary_paid }}</p>
                     <p><strong>Profit per SqFt:</strong> ₹{{ profit_per_sqft|floatformat:2 }}</p>
                     <p><strong>Total Profit:</strong> ₹{{ total_profit_per_sqft|floatformat:2 }}</p>
-                    <p><strong>Individual Profit per SqFt for This Property:</strong> ₹{{ profit_per_sqft_individual|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Individual Profit Information Card -->
+        {% if profit_per_sqft_individual %}
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-4 fade-in">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="card-title text-primary border-bottom pb-2">Individual Profit Information</h2>
+                    <p><strong>Individual Land Cost for Property:</strong> ₹{{ individual_land_cost|floatformat:2 }}</p>
+                    <p><strong>Individual Development Cost for Property:</strong> ₹{{ individual_development_cost|floatformat:2 }}</p>
+                    <p><strong>Individual Sale Price:</strong> ₹{{ individual_plot_price|floatformat:2 }}</p>
+                    <p><strong>Individual Profit per SqFt:</strong> ₹{{ profit_per_sqft_individual|floatformat:2 }}</p>
+                    <p><strong>Total Individual Profit:</strong> ₹{{ individual_profit_per_sqft|floatformat:2 }}</p>
                 </div>
             </div>
         </div>
@@ -123,7 +138,6 @@
         <p class="text-secondary" style="font-size: 14px;">This property detail information has been verified and is accurate as per the latest records.</p>
     </div>
 </div>
-
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>

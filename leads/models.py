@@ -188,6 +188,10 @@ class  Project(models.Model):
     kisans = models.ManyToManyField('Kisan', related_name='projects_kisan')  # Link to Kisan model
     title = models.CharField(unique=True,max_length=255)
     lands = models.ManyToManyField('Kisan', related_name='projects_lands')
+
+    # Add aggregate cost fields
+    total_land_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    total_development_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     
     def create_composite_key(self):
         letters = f"{self.project_name[:]}" # Ensure uppercase
@@ -236,10 +240,20 @@ class Property(models.Model):
     related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.DO_NOTHING)
   # This line is not needed
 
-    # Fields to track individual land information
+    # Link specific land data for profit calculation
     land_area = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     land_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     development_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+
+    # Calculate the total cost of the property
+    def calculate_total_cost(self):
+        return (self.land_cost or 0) + (self.development_cost or 0)
+
+    def calculate_profit(self):
+        if self.price:
+            return self.price - (self.land_cost + self.development_cost)
+        return 0
+
 
     def if_sold(self):
         print(f"Checking if property {self.title} is sold")

@@ -914,20 +914,18 @@ class ProjectCreateView(LoginRequiredMixin, View):
             messages.error(request, 'Selected lands are not available.')
             return redirect('leads:property-create')
         
-        # selected_lands = Kisan.objects.filter(id__in=selected_land_ids, is_assigned=False)
-        # total_area = sum(land.area_in_beegha for land in selected_lands)
-        # print(total_area)
-        # total_land_cost = sum(land.land_costing for land in selected_lands)
-        # print(total_land_cost)
-        # total_development_cost = sum(land.development_costing for land in selected_lands)
-        # print(total_development_cost)
+        # Aggregate costs
+        total_land_cost = sum(land.land_costing for land in selected_lands)
+        total_development_cost = sum(land.development_costing for land in selected_lands)
+
         try:
             # Assuming you have a Project model
             project=Project.objects.create(
                 project_name=project_name,
                 block=block,  # Example size, modify as needed
-                
             )
+            project.lands.set(selected_lands)  # Link selected lands to the project
+
             # Create individual properties from each selected land
             for land in selected_lands:
                 Property.objects.create(
@@ -938,6 +936,8 @@ class ProjectCreateView(LoginRequiredMixin, View):
                     development_cost=land.development_costing,
                     is_sold=False  # Default to unsold
                 ) 
+                # Optionally print the cost and profit for debug purposes
+
             selected_lands.update(is_assigned=True)  # Mark lands as assigned
 
             messages.success(request, 'Project created successfully!')
