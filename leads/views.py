@@ -22,7 +22,7 @@ from django.views.generic import ListView, UpdateView, DeleteView
 
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot
 from agents.mixins import OrganisorAndLoginRequiredMixin
-from .models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,ProfitCalculator
+from .models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook
 from .forms import (
     LeadForm, 
     LeadModelForm, 
@@ -200,16 +200,16 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         
 
         # Sales Report
-        sales_data = Sale.objects.values('sale_date').annotate(
-            total_sale_price=Sum('sale_price'),
+        sales_data = PlotBooking.objects.values('booking_date').annotate(
+            total_sale_price=Sum('Plot_price'),
             properties_sold=Count('id')
-        ).order_by('sale_date')
+        ).order_by('booking_date')
 
-        labels = [sale['sale_date'].strftime("%Y-%m-%d") for sale in sales_data]  # Format dates
+        labels = [sale['booking_date'].strftime("%Y-%m-%d") for sale in sales_data]  # Format dates
         data = [sale['properties_sold'] for sale in sales_data]
 
         # Calculate total sales amount and total costs
-        total_sales = Sale.objects.aggregate(total=Sum('sale_price'))['total'] or 0
+        total_sales = PlotBooking.objects.aggregate(total=Sum('Plot_price'))['total'] or 0
         total_land_cost = Kisan.objects.aggregate(total=Sum('land_costing'))['total'] or 0
         total_development_cost = Kisan.objects.aggregate(total=Sum('development_costing'))['total'] or 0
 
@@ -792,7 +792,8 @@ class PropertyListView(LoginRequiredMixin, ListView):
 
         # Calculate total Kisan land
         total_kisan_land = Kisan.objects.aggregate(total_land=Sum('area_in_beegha')).get('total_land', 0)
-        total_land = total_kisan_land * 27000  # Convert to square feet
+        total_kisan_land = total_kisan_land or 0  # Default to 0 if None
+        total_land = (total_kisan_land * 27000)  # Convert to square feet
 
         # Calculate total area used in properties
         total_area_used = sum(property.area for property in properties if property.area)
@@ -811,26 +812,67 @@ class PropertyDetailView(generic.DetailView):
     model = Property
     template_name = 'property/property_detail.html'
     context_object_name = 'property'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         property = self.get_object()
 
-        # Calculate total plot price
-        total_plot_price = Decimal(property.price or 0) * Decimal(property.area or 0)
+        # Calculate total plot price for the specific property
+        total_plot_price_of_prop = Decimal(property.price or 0) * Decimal(property.area or 0)
 
-        # Fetch related PlotBooking
+        # Fetch related PlotBooking for the specific property
         plot_booking = PlotBooking.objects.filter(project=property).first()
+
+        # Initialize variables for overall calculations
+        total_area_in_beegha = 0
+        total_land_cost = 0
+        total_development_cost = 0
+        total_plot_price = 0
+
+        # Calculate overall land costs and development costs from Kisan data
+        kisan_data = Kisan.objects.filter(is_assigned=True)
+        print(kisan_data)
+        for kisan in kisan_data:
+            total_area_in_beegha += kisan.area_in_beegha
+            total_land_cost += kisan.land_costing
+            total_development_cost += kisan.development_costing
+        print(total_area_in_beegha)
+        print(total_land_cost)
+        print(total_development_cost)
+        # Calculate total plot price from all bookings
+        buyer_data = PlotBooking.objects.all()
+        total_plot_price = sum(plotbooking.Plot_price for plotbooking in buyer_data)
+
+        # Calculate total salary expenses
+        total_salary_paid = Salary.objects.aggregate(total=Sum('base_salary'))['total'] or 0
+
+        # Calculate profit per sqft for the whole
+        total_area_in_sqft = total_area_in_beegha * 27000  # Conversion factor
+        if total_area_in_sqft > 0:
+            profit_per_sqft = (total_plot_price - (total_land_cost + total_development_cost + total_salary_paid)) / total_area_in_sqft
+        else:
+            profit_per_sqft = 0
+
+        property_area = ((property.length)* (property.breadth))
+
+        total_profit_per_sqft = Decimal(profit_per_sqft * property_area)
         
-        
+
         # Update context with all relevant details
         context.update({
             'property': property,
-            'total_plot_price': total_plot_price,
-            'plot_booking': plot_booking,   
+            'total_plot_price_of_prop': total_plot_price_of_prop,
+            'plot_booking': plot_booking,
+            'total_land_cost': total_land_cost,
+            'total_development_cost': total_development_cost,
+            'total_salary_paid': total_salary_paid,
+            'profit_per_sqft': profit_per_sqft,
+            'total_profit_per_sqft':total_profit_per_sqft,
+            # 'profit_per_sqft_individual': profit_per_sqft_individual,
         })
 
         return context
+        
         
 
 # Function-based view to display properties
@@ -849,21 +891,55 @@ class ProjectCreateView(LoginRequiredMixin, View):
 
 
     def get(self, request):
-
+        available_lands = Kisan.objects.filter(is_assigned=False)
         # Render the initial form for number of properties and common attributes
-        return render(request, self.template_name)
+        return render(request, self.template_name, {'available_lands': available_lands})
 
 
     def post(self, request):
         # Get the number of properties to create and common attributes
         project_name = request.POST.get('project_name', )
         block = request.POST.get('block', '')
+        selected_land_ids = request.POST.getlist('lands')  # List of selected Kisan IDs
+
+        if not selected_land_ids:
+            messages.error(request, 'Please select at least one land plot for the project.')
+            return redirect('leads:property-create')  # Replace with your create project URL name
+
+        # Calculate total area and costs for selected lands
+        selected_lands = Kisan.objects.filter(id__in=selected_land_ids, is_assigned=False)
+        print(selected_land_ids)
+        print(selected_lands)
+        if not selected_lands.exists():
+            messages.error(request, 'Selected lands are not available.')
+            return redirect('leads:property-create')
+        
+        # selected_lands = Kisan.objects.filter(id__in=selected_land_ids, is_assigned=False)
+        # total_area = sum(land.area_in_beegha for land in selected_lands)
+        # print(total_area)
+        # total_land_cost = sum(land.land_costing for land in selected_lands)
+        # print(total_land_cost)
+        # total_development_cost = sum(land.development_costing for land in selected_lands)
+        # print(total_development_cost)
         try:
             # Assuming you have a Project model
-            Project.objects.create(
+            project=Project.objects.create(
                 project_name=project_name,
                 block=block,  # Example size, modify as needed
-            ) 
+                
+            )
+            # Create individual properties from each selected land
+            for land in selected_lands:
+                Property.objects.create(
+                    project_id=project,
+                    project_name=project.project_name,
+                    land_area=land.area_in_beegha,
+                    land_cost=land.land_costing,
+                    development_cost=land.development_costing,
+                    is_sold=False  # Default to unsold
+                ) 
+            selected_lands.update(is_assigned=True)  # Mark lands as assigned
+
             messages.success(request, 'Project created successfully!')
         except IntegrityError:
             # Catch the unique constraint error and send a message to the user
@@ -1492,7 +1568,7 @@ class KisanListView(LoginRequiredMixin,ListView):
     def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
         total_available_land = (Kisan.objects.filter(is_sold = False).aggregate(total_area=Sum('area_in_beegha')).get('total_area',0))
-
+        total_available_land = total_available_land or 0  # Default to 0 if None
         # Total land in sqft
         total_land_in_sqft = total_available_land*27000
 
@@ -1517,5 +1593,63 @@ class KisanDeleteView(DeleteView):
     model = Kisan
     template_name = 'kisan/kisan_confirm_delete.html'
     success_url = reverse_lazy('leads:kisan_list')
+
+
+class Profit(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        Kisan_data = Kisan.objects.all()
+        Salary_data = Salary.objects.all()
+        buyer_data = PlotBooking.objects.all()
+
+        total_area_in_beegha = 0
+        total_land_cost = 0
+        total_development_cost = 0
+        total_plot_price = 0
+        total_salary_expense = 0
+
+        for kisan in Kisan_data:
+            total_area_in_beegha += Kisan.area_in_beegha
+            total_land_cost += Kisan.land_costing
+            total_development_cost += Kisan.development_costing
+
+        for Plotbooking in buyer_data:
+            total_plot_price += PlotBooking.Plot_price
+
+        for salary in Salary_data:
+            total_salary_expense += Salary.base_salary
+
+        #Profit per Sqft
+
+        if total_area_in_beegha > 0:
+            profit_per_sqft = (total_plot_price - (total_land_cost + total_development_cost + total_salary_expense)) / total_area_in_beegha
+        else:
+            profit_per_sqft = 0
+            print("Buy a land")
+
+        print(total_land_cost)
+        print(total_development_cost)
+        print(total_plot_price)
+        print(total_salary_expense)
+        print(profit_per_sqft)
+
+        # Send calculated values to the template
+        context = {
+            'total_land_cost': total_land_cost,
+            'total_development_cost': total_development_cost,
+            'total_plot_price': total_plot_price,
+            'total_salary_expense': total_salary_expense,
+            'profit_per_sqft': profit_per_sqft
+        }
+        return render(request, 'property-detail.html', context)
+
+
+
+    
+   
+
+
+
+
 
 

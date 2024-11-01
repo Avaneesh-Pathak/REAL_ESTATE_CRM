@@ -15,22 +15,10 @@ from .views import (
 
 app_name = "leads"
 
-# Define the function that will provide data for static pages
-def get_data():
-    return None 
-# Helper function for a view that requires an integer ID
-def get_buyer_data():
-    # Replace with IDs if static pages for specific IDs are required
-    return [{'buyer_id': 1}, {'buyer_id': 2}]
+
 
 urlpatterns = [
 
-     # Static views using distill_path
-    distill_path('', views.LeadListView.as_view(), name='lead-list', distill_func=get_data),
-    distill_path('profile/<int:user_id>/', views.user_profile_view, name='user-profile', distill_func=get_data),
-    distill_path('sales/', views.SaleListView.as_view(), name='sale_list', distill_func=get_data),
-    distill_path('buyer/<int:buyer_id>/', views.buyer_detail_view, name='buyer_detail', distill_func=get_buyer_data),
-    
     path('sales/', SaleListView.as_view(), name='sale_list'),
     path('profile/<int:user_id>/', user_profile_view, name='user-profile'),
     path('salaries/', SalaryListView.as_view(), name='salary_list'),

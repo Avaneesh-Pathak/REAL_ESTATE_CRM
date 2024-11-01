@@ -2,34 +2,55 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<div class="max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-    <h1 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Create a New Project</h1>
-    
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-    <form method="post" class="space-y-6">
+<div class="container my-5">
+    <!-- Back Button -->
+    <div class="mb-4">
+        <a href="{% url 'leads:property_list' %}" class="text-decoration-none">
+            <button class="btn btn-secondary">← Back to Property List</button>
+        </a>
+    </div>
+
+    <!-- Project Creation Form -->
+    <h2 class="text-center font-weight-bold text-primary mb-4">Create New Project</h2>
+
+    <form method="post" action="{% url 'leads:project-create' %}">
         {% csrf_token %}
         
-        <div>
-            <label for="project_name" class="block text-gray-700 font-medium">Name of Project:</label>
-            <input type="text" name="project_name" required class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <!-- Project Name Input -->
+        <div class="form-group">
+            <label for="project_name">Project Name</label>
+            <input type="text" name="project_name" id="project_name" class="form-control" required>
         </div>
 
-        <div>
-            <label for="block" class="block text-gray-700 font-medium">Name of Block:</label>
-            <input type="text" name="block" required class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <!-- Block Input -->
+        <div class="form-group">
+            <label for="block">Block</label>
+            <input type="text" name="block" id="block" class="form-control">
         </div>
 
+        <!-- Available Lands Selection -->
+        <div class="form-group">
+            <label for="lands">Available Lands</label>
+            <select name="lands" id="lands" class="form-control" multiple required>
+                {% for land in available_lands %}
+                    <option value="{{ land.id }}">{{ land.khasra_number }} - {{ land.area_in_beegha }} Beegha</option>
+                {% empty %}
+                    <option disabled>No available lands found</option>
+                {% endfor %}
+            </select>
+            <small class="form-text text-muted">Hold down Ctrl (Windows) / Command (Mac) to select multiple plots.</small>
+        </div>
+
+        <!-- Submit Button -->
         <div class="text-center">
-            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md shadow-lg focus:outline-none">Create Project</button>
+            <button type="submit" class="btn btn-primary">Create Project</button>
         </div>
     </form>
-
-    <div class="mt-8">
-        <ul class="space-y-2">
-            {% for pro in project %}
-                <li class="p-2 bg-gray-100 rounded-md">{{ pro.block }}</li>
-            {% endfor %}
-        </ul>
-    </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
 {% endblock content %}

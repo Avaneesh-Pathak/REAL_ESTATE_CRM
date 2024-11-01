@@ -185,8 +185,9 @@ class Sale(models.Model):
 class  Project(models.Model):
     project_name = models.CharField(max_length=255)
     block = models.CharField(max_length=2)
-    # kisans = models.ManyToManyField('Kisan', related_name='projects')  # Link to Kisan model
+    kisans = models.ManyToManyField('Kisan', related_name='projects_kisan')  # Link to Kisan model
     title = models.CharField(unique=True,max_length=255)
+    lands = models.ManyToManyField('Kisan', related_name='projects_lands')
     
     def create_composite_key(self):
         letters = f"{self.project_name[:]}" # Ensure uppercase
@@ -235,6 +236,10 @@ class Property(models.Model):
     related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.DO_NOTHING)
   # This line is not needed
 
+    # Fields to track individual land information
+    land_area = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    land_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    development_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
 
     def if_sold(self):
         print(f"Checking if property {self.title} is sold")
@@ -380,11 +385,6 @@ class PlotBooking(models.Model):
     def __str__(self):
         return f"Plot Booking - {self.name} - {self.booking_date}"
     
-    # def save(self, *args, **kwargs):
-    #     super().save(*args, **kwargs)
-    #     # Trigger commission distribution for the selected agent
-    #     if self.agent:
-    #         self.agent.distribute_commission(self.Plot_price)
 
 class EMIPayment(models.Model):
 
@@ -431,7 +431,7 @@ class Kisan(models.Model):
     last_name = models.CharField(max_length=100)
     contact_number = models.IntegerField()
     address = models.TextField(max_length=50)
-
+    is_assigned = models.BooleanField(default=False)
     khasra_number = models.IntegerField(unique=True)
     area_in_beegha = models.DecimalField(max_digits=20, decimal_places=3)
     land_costing = models.DecimalField(max_digits=12, decimal_places=3)
@@ -450,44 +450,3 @@ class Kisan(models.Model):
     def __str__(self) -> str:
         return f"{self.first_name} with khasra no {self.khasra_number}"
     
-
-
-class ProfitCalculator:
-    def __init__(self, kisan_id, agent_id, buyer_id, property_id):
-        self.kisan = get_object_or_404(Kisan, id=kisan_id)
-        self.salary = get_object_or_404(Salary, agent_id=agent_id)
-        self.buyer = get_object_or_404(PlotBooking, id=buyer_id)
-        self.property = get_object_or_404(Property, id=property_id)
-
-    def calculate_profit_per_sqft(self):
-        # Retrieve values from models
-        land_cost = self.kisan.land_cost
-        development_cost = self.kisan.development_cost
-        area_sqft = self.property.area_sqft
-        plot_price_per_sqft = self.property.plot_price / area_sqft
-        sale_price_per_sqft = self.buyer.sale_price / area_sqft
-        agent_commission_rate = self.salary.agent_commission_rate
-
-        # Calculate per-square-foot costs
-        land_cost_per_sqft = land_cost / area_sqft
-        development_cost_per_sqft = development_cost / area_sqft
-        print(development_cost_per_sqft)
-        agent_commission_per_sqft = (agent_commission_rate / Decimal('100.0')) * plot_price_per_sqft
-        print(agent_commission_per_sqft)
-        # Profit calculation before sale (using plot price)
-        total_cost_per_sqft = land_cost_per_sqft + development_cost_per_sqft + agent_commission_per_sqft
-        profit_per_sqft_before_sale = plot_price_per_sqft - total_cost_per_sqft
-        print(total_cost_per_sqft)
-        print(profit_per_sqft_before_sale)
-        # Profit calculation after sale (using sale price)
-        profit_per_sqft_after_sale = sale_price_per_sqft - total_cost_per_sqft
-        print(profit_per_sqft_after_sale)
-        return {
-            "profit_per_sqft_before_sale": profit_per_sqft_before_sale,
-            "profit_per_sqft_after_sale": profit_per_sqft_after_sale,
-        }
-
-
-
-
- 
