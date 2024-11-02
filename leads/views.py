@@ -831,7 +831,17 @@ class PropertyDetailView(generic.DetailView):
 
         # Calculate overall land costs and development costs from Kisan data
         kisan_data = Kisan.objects.filter(is_assigned=True)
+        property_data = Property.objects.filter(is_sold=True)
+        # for property in property_data:
+        #     total_property_price += property.totalprice
+        #     print(total_property_price)
+
+       
+
+        print(property_data)
+        
         print(kisan_data)
+        
         for kisan in kisan_data:
             total_area_in_beegha += kisan.area_in_beegha
             total_land_cost += kisan.land_costing
@@ -842,6 +852,7 @@ class PropertyDetailView(generic.DetailView):
         # Calculate total plot price from all bookings
         buyer_data = PlotBooking.objects.all()
         total_plot_price = sum(plotbooking.Plot_price for plotbooking in buyer_data)
+        print(total_plot_price)
 
         # Calculate total salary expenses
         total_salary_paid = Salary.objects.aggregate(total=Sum('base_salary'))['total'] or 0
@@ -853,7 +864,7 @@ class PropertyDetailView(generic.DetailView):
         else:
             profit_per_sqft = 0
 
-        property_area = ((property.length)* (property.breadth))
+        property_area = ((property.length)* (property.breadth)) 
 
         total_profit_per_sqft = Decimal(profit_per_sqft * property_area)
         

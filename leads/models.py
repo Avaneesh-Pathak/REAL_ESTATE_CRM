@@ -53,7 +53,6 @@ class Lead(models.Model):
 def handle_upload_follow_ups(instance, filename):
     return f"lead_followups/lead_{instance.lead.pk}/{filename}"
 
-
 class FollowUp(models.Model):
     lead = models.ForeignKey(Lead, related_name="followups", on_delete=models.DO_NOTHING)
     date_added = models.DateTimeField(auto_now_add=True)
@@ -71,8 +70,6 @@ class FollowUp(models.Model):
 
     def __str__(self):
         return f"{self.lead.first_name} {self.lead.last_name}"
-
-
 
 class Agent(models.Model):
     user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
@@ -140,10 +137,7 @@ def post_user_created_signal(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
         
-
-
 post_save.connect(post_user_created_signal, sender=User)
-
 
 
 class Salary(models.Model):
@@ -162,7 +156,6 @@ class Salary(models.Model):
     def __str__(self):
         return f"Salary for {self.agent.username} on {self.payment_date}"
 
-
 class Sale(models.Model):
     property = models.ForeignKey('Property', on_delete=models.DO_NOTHING)
     agent = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -179,7 +172,6 @@ class Sale(models.Model):
 
     def __str__(self):
         return f"Sale by {self.agent.username} for ${self.sale_price}"
-
 
 ## Project
 class  Project(models.Model):
@@ -212,14 +204,13 @@ class  Project(models.Model):
 
     def __str__(self):
         return self.project_name
-    
+
 #TypeofPlot
 class Typeplot(models.Model):
     type = models.CharField(max_length=200,unique=True)
 
     def __str__(self):
         return self.type    
-
 
 class Property(models.Model):
     id = models.AutoField(primary_key=True)
@@ -237,23 +228,7 @@ class Property(models.Model):
     title = models.CharField(max_length=7, blank=True)
     is_sold = models.BooleanField(default=False)
     # Removed the redundant ForeignKey to Property itself
-    related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.DO_NOTHING)
-  # This line is not needed
-
-    # Link specific land data for profit calculation
-    land_area = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    land_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
-    development_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
-
-    # Calculate the total cost of the property
-    def calculate_total_cost(self):
-        return (self.land_cost or 0) + (self.development_cost or 0)
-
-    def calculate_profit(self):
-        if self.price:
-            return self.price - (self.land_cost + self.development_cost)
-        return 0
-
+    related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.DO_NOTHING) 
 
     def if_sold(self):
         print(f"Checking if property {self.title} is sold")
@@ -274,7 +249,6 @@ class Property(models.Model):
             self.title = self.create_composite_key()
             self.__class__.objects.filter(pk=self.pk).update(title=self.title)
 
-
 class Bonus(models.Model):
     agent = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     bonus_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -282,7 +256,6 @@ class Bonus(models.Model):
 
     def __str__(self):
         return f"{self.agent.username} - Bonus of {self.bonus_amount}"
-
 
 # Area
 class Area(models.Model):
@@ -316,8 +289,6 @@ class EmiPlan(models.Model):
         return self.name
 
 # DAYBOOK
-
-
 class Daybook(models.Model):
     ACTIVITY_CHOICES = [
         ('pantry', 'Pantry'),
@@ -339,12 +310,7 @@ class Daybook(models.Model):
     def __str__(self):
         return f"{self.date} - {self.activity} - {self.amount}"
 
-
-
-
-
 # PROMOTER MODEL
-
 class Promoter(models.Model):
     # Personal Information
     name = models.CharField(max_length=255)
@@ -360,11 +326,7 @@ class Promoter(models.Model):
     def __str__(self):
         return self.name
 
-
-
-
 # PLOT BOOKING
-
 class PlotBooking(models.Model):
     booking_date = models.DateField()
     name = models.CharField(max_length=100)
@@ -431,6 +393,7 @@ class EMIPayment(models.Model):
 
     class Meta:
         ordering = ['due_date']  # Order EMI payments by due date
+
 
 class Level(models.Model):
     level = models.CharField(max_length=222)
