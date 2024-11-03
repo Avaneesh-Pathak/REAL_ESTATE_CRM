@@ -225,8 +225,10 @@ class Property(models.Model):
     agent = models.ForeignKey('Agent', null=True, blank=True, on_delete=models.SET_NULL)
     project_id = models.ForeignKey('Project', null=True, blank=True, on_delete=models.SET_NULL)
     organisation = models.ForeignKey('UserProfile', null=True, blank=True, on_delete=models.DO_NOTHING)
+    land = models.ForeignKey('Kisan', null=True, blank=True, on_delete=models.DO_NOTHING)
     title = models.CharField(max_length=7, blank=True)
     is_sold = models.BooleanField(default=False)
+    is_in_emi = models.BooleanField(default=False)
     # Removed the redundant ForeignKey to Property itself
     related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.DO_NOTHING) 
 
@@ -395,6 +397,8 @@ class EMIPayment(models.Model):
         ordering = ['due_date']  # Order EMI payments by due date
 
 
+
+
 class Level(models.Model):
     level = models.CharField(max_length=222)
     interest = models.IntegerField()
@@ -419,11 +423,19 @@ class Kisan(models.Model):
     payment_to_kisan = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  
     basic_sales_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True) 
     is_sold = models.BooleanField(default=False)
+    usable_land_total = models.FloatField(null=True, blank=True)
+    LAND_TYPE_CHOICES = [
+        ('plot', 'Plot'),
+        ('rowhouse', 'Rowhouse'),
+        ('flat', 'Flat'),
+    ]
+    
+    land_type = models.CharField(max_length=50, choices=LAND_TYPE_CHOICES,default=False)
 
     def area_in_sqft(self):
         convert_in_sqft = 27000 
         return self.area_in_beegha*convert_in_sqft 
-
+    
     def __str__(self) -> str:
         return f"{self.first_name} with khasra no {self.khasra_number}"
     

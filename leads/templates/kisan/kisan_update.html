@@ -2,162 +2,171 @@
 
 {% block content %}
 <style>
-    /* Form Container */
-    .kisan-form {
-        max-width: 50%;
-        margin: 0 auto;
-        padding: 20px;
-        border: 2px solid #007bff; /* Change border color */
-        border-radius: 10px; /* Round corners */
-        background-color: #f9f9f9;
-        box-shadow: 0 4px 20px rgba(0, 123, 255, 0.2); /* Subtle shadow for depth */
-        transition: transform 0.3s; /* Animation effect */
-    }
+  .container {
+    max-width: 700px;
+    margin: auto;
+    padding: 20px;
+  }
+  .form-container {
+    background-color: #0b0456; /* Change this to the desired background color for the form */
+    padding: 20px; /* Add padding for the form */
+    border-radius: 4px; /* Rounded corners for the form */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: add shadow to the form */
+  }
 
-    .kisan-form:hover {
-        transform: scale(1.02); /* Slightly enlarge on hover */
-    }
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 4px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0);
+  }
+  label {
+    color: white; /* Change label color to white */
+    font-weight: bold; /* Make labels bold */
+  }
+  .error-message {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
 
-    /* Input Styling */
-    input[type="text"],
-    input[type="email"],
-    input[type="date"],
-    input[type="number"],
-    select,
-    textarea {
-        width: 100%;
-        padding: 12px;
-        border-radius: 6px;
-        border: 1px solid #007bff; /* Change border color */
-        font-size: 16px;
-        box-sizing: border-box;
-        transition: border-color 0.3s, box-shadow 0.3s;
-    }
+  .back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
 
-    /* Input focus effect */
-    input:focus,
-    select:focus,
-    textarea:focus {
-        border-color: #0056b3; /* Darker border on focus */
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Blue shadow on focus */
-    }
+  .back-button:hover {
+    background-color: #0056b3;
+  }
 
-    /* Grouping for form fields */
-    .form-group {
-        margin-bottom: 20px; /* More space between groups */
-    }
+  button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+  }
 
-    /* Button Styling */
-    .btn-primary {
-        background-color: #007bff;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s; /* Animation effects */
-    }
-
-    /* Button hover effect */
-    .btn-primary:hover {
-        background-color: #0056b3; /* Darker shade on hover */
-        transform: translateY(-2px); /* Slight lift effect */
-    }
-
-    /* Back Button Styling */
-    .btn-secondary {
-        background-color: #0056b3; /* Change to a blue shade */
-        color: white; /* Text color */
-        padding: 10px 20px; /* Same padding as primary button */
-        border: none; /* No border */
-        border-radius: 5px; /* Rounded corners */
-        transition: background-color 0.3s; /* Transition for hover effect */
-    }
-
-    /* Back Button hover effect */
-    .btn-secondary:hover {
-        background-color: #003f7f; /* Darker shade on hover */
-    }
-
-    h2 {
-        text-align: center;
-        font-size: 2.5em;
-        font-weight: bold;
-        color: rgb(63, 69, 193);
-    }
-    .form-group{
-        text-align:center;
-    }
+  button[type="submit"]:hover {
+    background-color: #0056b3;
+  }
 </style>
-
-<h2>Add Details</h2>
-
-<!-- Back to Kisan List Button -->
-<h3 style="text-align: center;">
-    <a href="{% url 'leads:kisan_list' %}" class="btn btn-secondary">Back to Kisan List</a>
-</h3>
-
-<form method="POST" class="kisan-form">
+<div class="container mx-auto mt-5">
+  <h2 class="text-2xl font-semibold mb-4">Create Kisan</h2>
+  <a href="{% url 'leads:kisan_list' %}" class="back-button">Back to Kisan List</a>
+  
+  <form method="POST" class="form-container">
     {% csrf_token %}
+    
+    {% if form.errors %}
+      <div class="error-message" role="alert">
+        <strong class="font-bold">There were some errors:</strong>
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
 
-    <div class="d-flex justify-content-between">
-        <p><strong>First Name:</strong> {{ form.first_name }} {{ form.first_name.errors }}</p>
-        <p><strong>Last Name:</strong> {{ form.last_name }} {{ form.last_name.errors }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label for="{{ form.first_name.id_for_label }}" class="block mb-1">{{ form.first_name.label }}</label>
+        <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" 
+               value="{{ form.first_name.value|default:'' }}" placeholder="First Name">
+      </div>
+
+      <div>
+        <label for="{{ form.last_name.id_for_label }}" class="block mb-1">{{ form.last_name.label }}</label>
+        <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" 
+               value="{{ form.last_name.value|default:'' }}" placeholder="Last Name">
+      </div>
+
+      <div>
+        <label for="{{ form.contact_number.id_for_label }}" class="block mb-1">{{ form.contact_number.label }}</label>
+        <input type="number" name="{{ form.contact_number.name }}" id="{{ form.contact_number.id_for_label }}" 
+               value="{{ form.contact_number.value|default:'' }}" placeholder="Contact Number">
+      </div>
+
+      <div>
+        <label for="{{ form.address.id_for_label }}" class="block mb-1">{{ form.address.label }}</label>
+        <textarea name="{{ form.address.name }}" id="{{ form.address.id_for_label }}" 
+                  placeholder="Address">{{ form.address.value|default:'' }}</textarea>
+      </div>
+
+      <div>
+        <label for="{{ form.khasra_number.id_for_label }}" class="block mb-1">{{ form.khasra_number.label }}</label>
+        <input type="number" name="{{ form.khasra_number.name }}" id="{{ form.khasra_number.id_for_label }}" 
+               value="{{ form.khasra_number.value|default:'' }}" placeholder="Khasra Number">
+      </div>
+
+      <div>
+        <label for="{{ form.area_in_beegha.id_for_label }}" class="block mb-1">{{ form.area_in_beegha.label }}</label>
+        <input type="number" step="0.001" name="{{ form.area_in_beegha.name }}" id="{{ form.area_in_beegha.id_for_label }}" 
+               value="{{ form.area_in_beegha.value|default:'' }}" placeholder="Area in Beegha">
+      </div>
+
+      <div>
+        <label for="{{ form.land_costing.id_for_label }}" class="block mb-1">{{ form.land_costing.label }}</label>
+        <input type="number" step="0.01" name="{{ form.land_costing.name }}" id="{{ form.land_costing.id_for_label }}" 
+               value="{{ form.land_costing.value|default:'' }}" placeholder="Land Costing">
+      </div>
+
+      <div>
+        <label for="{{ form.development_costing.id_for_label }}" class="block mb-1">{{ form.development_costing.label }}</label>
+        <input type="number" step="0.01" name="{{ form.development_costing.name }}" id="{{ form.development_costing.id_for_label }}" 
+               value="{{ form.development_costing.value|default:'' }}" placeholder="Development Costing">
+      </div>
+
+      <div>
+        <label for="{{ form.land_address.id_for_label }}" class="block mb-1">{{ form.land_address.label }}</label>
+        <input type="text" name="{{ form.land_address.name }}" id="{{ form.land_address.id_for_label }}" 
+               value="{{ form.land_address.value|default:'' }}" placeholder="Land Address">
+      </div>
+
+      <div>
+        <label for="{{ form.payment_to_kisan.id_for_label }}" class="block mb-1">{{ form.payment_to_kisan.label }}</label>
+        <input type="number" step="0.01" name="{{ form.payment_to_kisan.name }}" id="{{ form.payment_to_kisan.id_for_label }}" 
+               value="{{ form.payment_to_kisan.value|default:'' }}" placeholder="Payment to Kisan">
+      </div>
+
+      <div>
+        <label for="{{ form.basic_sales_price.id_for_label }}" class="block mb-1">{{ form.basic_sales_price.label }}</label>
+        <input type="number" step="0.01" name="{{ form.basic_sales_price.name }}" id="{{ form.basic_sales_price.id_for_label }}" 
+               value="{{ form.basic_sales_price.value|default:'' }}" placeholder="Basic Sales Price">
+      </div>
+
+      <div>
+        <label for="{{ form.land_type.id_for_label }}" class="block mb-1">{{ form.land_type.label }}</label>
+        <select name="{{ form.land_type.name }}" id="{{ form.land_type.id_for_label }}">
+          {% for value, display in form.land_type.field.choices %}
+            <option value="{{ value }}"{% if value == form.land_type.value %} selected{% endif %}>{{ display }}</option>
+          {% endfor %}
+        </select>
+      </div>
     </div>
 
-    <div class="form-group">
-        <p><strong for="id_contact_number">Contact Number:</strong></p>
-        {{ form.contact_number }}
-        {{ form.contact_number.errors }}
-    </div>
-
-    <div class="form-group">
-        <p><strong for="id_address">Address:</strong></p>
-        {{ form.address }}
-        {{ form.address.errors }}
-    </div>
-
-    <div class="form-group">
-        <p><strong for="id_khasra_number">Khasra Number:</strong></p>
-        {{ form.khasra_number }}
-        {{ form.khasra_number.errors }}
-    </div>
-
-    <div class="form-group">
-        <p><strong for="id_area_in_beegha">Area in Beegha:</strong></p>
-        {{ form.area_in_beegha }}
-        {{ form.area_in_beegha.errors }}
-    </div>
-
-    <div class="form-group">
-        <p><strong for="id_land_costing">Land Costing:</strong></p>
-        {{ form.land_costing }}
-        {{ form.land_costing.errors }}
-    </div>
-
-    <div class="form-group">
-        <p><strong for="id_development_costing">Development Costing:</strong></p>
-        {{ form.development_costing }}
-        {{ form.development_costing.errors }}
-    </div>
-
-    <div class="form-group">
-        <p><strong for="id_payment_to_kisan">Payment to Kisan:</strong></p>
-        {{ form.payment_to_kisan }}
-        {{ form.payment_to_kisan.errors }}
-    </div>
-
-    <div class="form-group">
-        <p><strong for="id_basic_sales_price">Basic Sales Price:</strong></p>
-        {{ form.basic_sales_price }}
-        {{ form.basic_sales_price.errors }}
-    </div>
-
-    <!-- Centered Update Button -->
-    <div style="text-align: center;">
-        <button type="submit" class="btn btn-primary">
-            {% if kisan %}Update{% else %}Create{% endif %}
-        </button>
-    </div>
-</form>
+    <button type="submit">Save Kisan</button>
+  </form>
+  
+</div>
 {% endblock %}

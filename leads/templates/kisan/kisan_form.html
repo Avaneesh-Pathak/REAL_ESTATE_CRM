@@ -1,14 +1,79 @@
-<!-- leads/templates/kisan/kisan_form.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Create Kisan</h2>
+<style>
+  .container {
+    max-width: 700px;
+    margin: auto;
+    padding: 20px;
+  }
+  .form-container {
+    background-color: #0b0456; /* Change this to the desired background color for the form */
+    padding: 20px; /* Add padding for the form */
+    border-radius: 4px; /* Rounded corners for the form */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: add shadow to the form */
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 4px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0);
+  }
+  label {
+    color: white; /* Change label color to white */
+    font-weight: bold; /* Make labels bold */
+  }
+  .error-message {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  .back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+
+  .back-button:hover {
+    background-color: #0056b3;
+  }
+
+  button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+</style>
+<div class="container mx-auto mt-5">
+  <h2 class="text-2xl font-semibold mb-4">Create Kisan</h2>
+  <a href="{% url 'leads:kisan_list' %}" class="back-button">Back to Kisan List</a>
   
-  <form method="POST">
+  <form method="POST" class="form-container">
     {% csrf_token %}
     
     {% if form.errors %}
-      <div class="bg-red-200 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <div class="error-message" role="alert">
         <strong class="font-bold">There were some errors:</strong>
         <ul>
           {% for field in form %}
@@ -23,10 +88,85 @@
       </div>
     {% endif %}
 
-    {{ form.as_p }}  <!-- Render the form fields -->
-    
-    <button type="submit" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded">Save Kisan</button>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label for="{{ form.first_name.id_for_label }}" class="block mb-1">{{ form.first_name.label }}</label>
+        <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" 
+               value="{{ form.first_name.value|default:'' }}" placeholder="First Name">
+      </div>
+
+      <div>
+        <label for="{{ form.last_name.id_for_label }}" class="block mb-1">{{ form.last_name.label }}</label>
+        <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" 
+               value="{{ form.last_name.value|default:'' }}" placeholder="Last Name">
+      </div>
+
+      <div>
+        <label for="{{ form.contact_number.id_for_label }}" class="block mb-1">{{ form.contact_number.label }}</label>
+        <input type="number" name="{{ form.contact_number.name }}" id="{{ form.contact_number.id_for_label }}" 
+               value="{{ form.contact_number.value|default:'' }}" placeholder="Contact Number">
+      </div>
+
+      <div>
+        <label for="{{ form.address.id_for_label }}" class="block mb-1">{{ form.address.label }}</label>
+        <textarea name="{{ form.address.name }}" id="{{ form.address.id_for_label }}" 
+                  placeholder="Address">{{ form.address.value|default:'' }}</textarea>
+      </div>
+
+      <div>
+        <label for="{{ form.khasra_number.id_for_label }}" class="block mb-1">{{ form.khasra_number.label }}</label>
+        <input type="number" name="{{ form.khasra_number.name }}" id="{{ form.khasra_number.id_for_label }}" 
+               value="{{ form.khasra_number.value|default:'' }}" placeholder="Khasra Number">
+      </div>
+
+      <div>
+        <label for="{{ form.area_in_beegha.id_for_label }}" class="block mb-1">{{ form.area_in_beegha.label }}</label>
+        <input type="number" step="0.001" name="{{ form.area_in_beegha.name }}" id="{{ form.area_in_beegha.id_for_label }}" 
+               value="{{ form.area_in_beegha.value|default:'' }}" placeholder="Area in Beegha">
+      </div>
+
+      <div>
+        <label for="{{ form.land_costing.id_for_label }}" class="block mb-1">{{ form.land_costing.label }}</label>
+        <input type="number" step="0.01" name="{{ form.land_costing.name }}" id="{{ form.land_costing.id_for_label }}" 
+               value="{{ form.land_costing.value|default:'' }}" placeholder="Land Costing">
+      </div>
+
+      <div>
+        <label for="{{ form.development_costing.id_for_label }}" class="block mb-1">{{ form.development_costing.label }}</label>
+        <input type="number" step="0.01" name="{{ form.development_costing.name }}" id="{{ form.development_costing.id_for_label }}" 
+               value="{{ form.development_costing.value|default:'' }}" placeholder="Development Costing">
+      </div>
+
+      <div>
+        <label for="{{ form.land_address.id_for_label }}" class="block mb-1">{{ form.land_address.label }}</label>
+        <input type="text" name="{{ form.land_address.name }}" id="{{ form.land_address.id_for_label }}" 
+               value="{{ form.land_address.value|default:'' }}" placeholder="Land Address">
+      </div>
+
+      <div>
+        <label for="{{ form.payment_to_kisan.id_for_label }}" class="block mb-1">{{ form.payment_to_kisan.label }}</label>
+        <input type="number" step="0.01" name="{{ form.payment_to_kisan.name }}" id="{{ form.payment_to_kisan.id_for_label }}" 
+               value="{{ form.payment_to_kisan.value|default:'' }}" placeholder="Payment to Kisan">
+      </div>
+
+      <div>
+        <label for="{{ form.basic_sales_price.id_for_label }}" class="block mb-1">{{ form.basic_sales_price.label }}</label>
+        <input type="number" step="0.01" name="{{ form.basic_sales_price.name }}" id="{{ form.basic_sales_price.id_for_label }}" 
+               value="{{ form.basic_sales_price.value|default:'' }}" placeholder="Basic Sales Price">
+      </div>
+
+      <div>
+        <label for="{{ form.land_type.id_for_label }}" class="block mb-1">{{ form.land_type.label }}</label>
+        <select name="{{ form.land_type.name }}" id="{{ form.land_type.id_for_label }}">
+          {% for value, display in form.land_type.field.choices %}
+            <option value="{{ value }}"{% if value == form.land_type.value %} selected{% endif %}>{{ display }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <button type="submit">Save Kisan</button>
   </form>
   
-  <a href="{% url 'leads:kisan_list' %}" class="mt-2 inline-block text-blue-500">Back to Kisan List</a>
+</div>
 {% endblock %}

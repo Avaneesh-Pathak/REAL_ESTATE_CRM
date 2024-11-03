@@ -5,6 +5,8 @@
 <style>
     th {
         background-color: rgb(58, 32, 142);
+        color: white; /* White text color for headers */
+        font-weight: bold; /* Make header text bold */
     }
     .table-container {
         width: 100%;
@@ -18,9 +20,6 @@
         padding: 12px; /* Adds some padding */
         border: 1px solid #d1d5db; /* Gray border for table cells */
         text-align: center; /* Aligns text to the left */
-    }
-    th {
-        color: white; /* White text color for headers */
     }
     tbody tr:hover {
         background-color: #f0f0f0; /* Light gray background on row hover */
@@ -38,52 +37,52 @@
             </a>
         </div>
         {% endif %}
-</div>
-{% comment %} <div style="align-items: center;" >
-    <p style="width: fit-content; background-color: azure; margin-bottom: 1%; border-radius: 5px; padding: 5px; " ><strong>Total Land:</strong> {{ total_land_in_sqft }} Sqft</p>
-    <p><strong>Available Land for New Plots:</strong> {{ available_land }} sqft</p>
-</div> {% endcomment %}
+    </div>
 
-
-<div class="table-container">
-    <table class="bg-white border border-gray-200">
-        <thead>
-            <tr class="bg-gray-200">
-                <th class="py-2 px-4 border-b">First Name</th>
-                <th class="py-2 px-4 border-b">Last Name</th>
-                <th class="py-2 px-4 border-b">Contact Number</th>
-                <th class="py-2 px-4 border-b">Khasra Number</th>
-                <th class="py-2 px-4 border-b">Area (Beegha)</th>
-                <th class="py-2 px-4 border-b">Area (sqft)</th>
-                <th class="py-2 px-4 border-b">Land Costing</th>
-                <th class="py-2 px-4 border-b">Development Costing</th>
-                <th class="py-2 px-4 border-b">Payment to Kisan</th>
-                <th class="py-2 px-4 border-b">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for kisan in kisans %}
-            <tr>
-                <td class="py-2 px-4 border-b">{{ kisan.first_name }}</td>
-                <td class="py-2 px-4 border-b">{{ kisan.last_name }}</td>
-                <td class="py-2 px-4 border-b">{{ kisan.contact_number }}</td>
-                <td class="py-2 px-4 border-b">{{ kisan.khasra_number }}</td>
-                <td class="py-2 px-4 border-b">{{ kisan.area_in_beegha }}</td>
-                <td class="py-2 px-4 border-b">{{ kisan.area_in_sqft }}</td>
-                <td class="py-2 px-4 border-b">{{ kisan.land_costing }}</td>
-                <td class="py-2 px-4 border-b">{{ kisan.development_costing }}</td>
-                <td class="py-2 px-4 border-b">{{ kisan.payment_to_kisan }}</td>
-                <td class="py-2 px-4 border-b">
-                    <a href="{% url 'leads:kisan_edit' kisan.id %}" class="hover:bg-Blue text-lightblue font-bold">Edit</a>
-                    <a href="{% url 'leads:kisan_delete' kisan.id %}" class="bg-red text-red-600 hover:text-red-800 ml-4">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="9" class="text-center py-4">No Kisan records available.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table class="bg-white border border-gray-200">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="py-2 px-4 border-b">First Name</th>
+                    <th class="py-2 px-4 border-b">Last Name</th>
+                    <th class="py-2 px-4 border-b">Contact Number</th>
+                    <th class="py-2 px-4 border-b">Khasra Number</th>
+                    <th class="py-2 px-4 border-b">Area (Beegha)</th>
+                    <th class="py-2 px-4 border-b">Area (sqft)</th>
+                    <th class="py-2 px-4 border-b">Usable Land (sqft)</th> <!-- New column for usable land -->
+                    <th class="py-2 px-4 border-b">Land Type</th> <!-- New column for land type -->
+                    <th class="py-2 px-4 border-b">Land Costing</th>
+                    <th class="py-2 px-4 border-b">Development Costing</th>
+                    <th class="py-2 px-4 border-b">Payment to Kisan</th>
+                    <th class="py-2 px-4 border-b">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for kisan in kisans %}
+                <tr>
+                    <td class="py-2 px-4 border-b">{{ kisan.first_name }}</td>
+                    <td class="py-2 px-4 border-b">{{ kisan.last_name }}</td>
+                    <td class="py-2 px-4 border-b">{{ kisan.contact_number }}</td>
+                    <td class="py-2 px-4 border-b">{{ kisan.khasra_number }}</td>
+                    <td class="py-2 px-4 border-b">{{ kisan.area_in_beegha }}</td>
+                    <td class="py-2 px-4 border-b">{{ kisan.area_in_sqft }}</td>
+                    <td class="py-2 px-4 border-b">{{ kisan.usable_land_total }}</td> <!-- Display usable land -->
+                    <td class="py-2 px-4 border-b">{{ kisan.land_type }}</td> <!-- Display land type -->
+                    <td class="py-2 px-4 border-b">{{ kisan.land_costing }}</td>
+                    <td class="py-2 px-4 border-b">{{ kisan.development_costing }}</td>
+                    <td class="py-2 px-4 border-b">{{ kisan.payment_to_kisan }}</td>
+                    <td class="py-2 px-4 border-b">
+                        <a href="{% url 'leads:kisan_edit' kisan.id %}" class="hover:bg-Blue text-lightblue font-bold">Edit</a>
+                        <a href="{% url 'leads:kisan_delete' kisan.id %}" class="bg-red text-red-600 hover:text-red-800 ml-4">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="12" class="text-center py-4">No Kisan records available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock content %}
