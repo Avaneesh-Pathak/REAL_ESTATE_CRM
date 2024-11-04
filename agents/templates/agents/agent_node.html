@@ -1,7 +1,6 @@
 <div class="node">
     <div class="agent-info">
         <strong>{{ agent.user.username }}</strong>
-        <p>Commission: {{ agent.commission_percentage }}%</p>
         <p>Level: {{ agent.level }}</p>
         <a href="{% url 'agents:agent-update' agent.id %}" class="btn">Update Agent</a>
     </div>
