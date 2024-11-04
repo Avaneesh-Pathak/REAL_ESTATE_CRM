@@ -842,7 +842,7 @@ class PropertyDetailView(generic.DetailView):
 
         total_cost = total_land_cost+total_development_cost
         total_land = projectused.total_land_available_fr_plotting
-        cost_psqft = total_cost/total_land
+        cost_psqft = (total_cost/total_land)
         cost_for_land = cost_psqft*(property.area)
         
         for kisan in kisan_data:
@@ -1628,14 +1628,14 @@ class KisanListView(LoginRequiredMixin, ListView):
         total_available_land = total_available_land or 0  # Default to 0 if None
 
         # Total land in sqft
-        total_land_in_sqft = total_available_land * 27000
+        total_land_in_sqft = total_available_land * 27200
         context['total_land_in_sqft'] = total_land_in_sqft
 
         # Calculate usable land based on land type
         usable_land_total = 0
         for kisan in Kisan.objects.filter(is_sold=False):
             area_in_beegha = kisan.area_in_beegha  # Get the area in beegha
-            area_in_sqft = area_in_beegha * 27000  # Convert beegha to sqft
+            area_in_sqft = area_in_beegha * 27200  # Convert beegha to sqft
             land_type = kisan.land_type.lower()  # Ensure it is in lowercase for comparison
 
             # Determine development percentage based on land type

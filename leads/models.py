@@ -461,7 +461,7 @@ class Kisan(models.Model):
     land_type = models.CharField(max_length=50, choices=LAND_TYPE_CHOICES,default=False)
 
     def area_in_sqft(self):
-        convert_in_sqft = 27000 
+        convert_in_sqft = 27200 
         return self.area_in_beegha*convert_in_sqft 
     
     def __str__(self) -> str:
