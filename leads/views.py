@@ -975,7 +975,7 @@ class ProjectCreateView(LoginRequiredMixin, View):
         total_area = sum(land.area_in_beegha for land in selected_lands)
         print(total_area)
         # total_development_cost = sum(land.development_costing for land in selected_lands)
-        area = float(total_area*27000)
+        area = float(total_area*27200)
         if projectTypeSelect == "Flat":
             tarea= area*0.6
         else:
