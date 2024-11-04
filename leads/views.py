@@ -818,9 +818,7 @@ class PropertyDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         property = self.get_object()
 
-        # Calculate total plot price for the specific property
-        total_plot_price_of_prop = Decimal(property.price or 0) * Decimal(property.area or 0)
-
+        cost_p_sqft = property.price
         # Fetch related PlotBooking for the specific property
         plot_booking = PlotBooking.objects.filter(project=property).first()
 
@@ -833,28 +831,23 @@ class PropertyDetailView(generic.DetailView):
         # Calculate overall land costs and development costs from Kisan data
         idr = property.project_id
         ids = idr.id
-        projectused = Project.objects.get(id= ids)
-        lands = projectused.lands
-        landse = projectused.block
-        # total_land_cost = sum( land.land_costing for land in lands)
-
+        projectused = Project.objects.get(id= ids) 
+        lands = projectused.lands.all()
         print(lands)
+        total_land_cost = sum( land.land_costing for land in lands)
+        print(total_land_cost)
+        total_development_cost = sum( land.development_costing for land in lands)
 
         kisan_data = Kisan.objects.filter(is_assigned=True) # Only Used land taken
-        property_data = Property.objects.filter(is_sold=True) # only sold property taken
 
-        print(property_data) 
-        print(kisan_data)
+        total_cost = total_land_cost+total_development_cost
+        total_land = projectused.total_land_available_fr_plotting
+        cost_psqft = total_cost/total_land
+        cost_for_land = cost_psqft*(property.area)
         
         for kisan in kisan_data:
             total_area_in_beegha += kisan.area_in_beegha
-            total_land_cost += kisan.land_costing
-            total_development_cost += kisan.development_costing
 
-        print(total_area_in_beegha)
-        print(total_land_cost)
-        print(total_development_cost)
-        # Calculate total plot price from all bookings
         buyer_data = PlotBooking.objects.all()
         total_plot_price = sum(plotbooking.Plot_price for plotbooking in buyer_data)
         print(total_plot_price)
@@ -919,13 +912,15 @@ class PropertyDetailView(generic.DetailView):
         # Update context with all relevant details
         context.update({
             'property': property,
-            'total_plot_price_of_prop': total_plot_price_of_prop,
+            'total_plot_price_of_prop': cost_for_land,
+            'total_plot_price_of_pro': property.totalprice,
             'plot_booking': plot_booking,
             'total_land_cost': total_land_cost,
             'total_development_cost': total_development_cost,
             'total_salary_paid': total_salary_paid,
-            'profit_per_sqft': profit_per_sqft,
-            'total_profit_per_sqft':total_profit_per_sqft,
+            'profit_per_sqft': cost_p_sqft - cost_psqft ,
+            'cost_per_sqft':cost_psqft ,
+            'total_profit_per_sqft':property.totalprice - cost_for_land,
             # New fields added for specific land calculations
             'specific_land_cost':specific_land_cost,
             'specific_development_cost':specific_development_cost,
