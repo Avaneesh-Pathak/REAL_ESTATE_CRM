@@ -180,9 +180,10 @@ class  Project(models.Model):
     kisans = models.ManyToManyField('Kisan', related_name='projects_kisan')  # Link to Kisan model
     title = models.CharField(unique=True,max_length=255)
     lands = models.ManyToManyField('Kisan', related_name='projects_lands')
+    type = models.CharField(max_length=255,null=True,blank=True)
 
     # Add aggregate cost fields
-    total_land_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    total_land_available_fr_plotting = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     total_development_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     
     def create_composite_key(self):
@@ -418,7 +419,7 @@ class Kisan(models.Model):
     land_costing = models.DecimalField(max_digits=12, decimal_places=3)
     development_costing = models.DecimalField(max_digits=12, decimal_places=3)
     # Make these fields optional
-    kisan_payment = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    kisan_payment = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True,default=0)
     land_address = models.TextField(max_length=50, null=True, blank=True)
     payment_to_kisan = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)  
     basic_sales_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True) 

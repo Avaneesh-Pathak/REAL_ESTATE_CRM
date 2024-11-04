@@ -17,7 +17,7 @@
 
     <form method="post" action="{% url 'leads:project-create' %}">
         {% csrf_token %}
-        
+
         <!-- Project Name Input -->
         <div class="form-group">
             <label for="project_name">Project Name</label>
@@ -29,19 +29,32 @@
             <label for="block">Block</label>
             <input type="text" name="block" id="block" class="form-control">
         </div>
+        <div class="form-group">
+                    <!-- Project Type Dropdown -->
+                    <label for="projectTypeSelect" class="font-bold">Choose Project Type:</label><br>
+                    <select id="projectTypeSelect" name="projectTypeSelect" class="dropdown">
+                        <option value="">-- Select Project Type --</option>
+                        <option value="rowhouse">Rowhouse</option>
+                        <option value="plot">Plot</option>
+                        <option value="flat">Flat</option>
+                    </select>
+                </div>
 
         <!-- Available Lands Selection -->
         <div class="form-group">
             <label for="lands">Available Lands</label>
             <select name="lands" id="lands" class="form-control" multiple required>
                 {% for land in available_lands %}
-                    <option value="{{ land.id }}">{{ land.khasra_number }} - {{ land.area_in_beegha }} Beegha</option>
+                <option value="{{ land.id }}">{{ land.khasra_number }} - {{ land.area_in_beegha }} Beegha</option>
                 {% empty %}
-                    <option disabled>No available lands found</option>
+                <option disabled>No available lands found</option>
                 {% endfor %}
             </select>
-            <small class="form-text text-muted">Hold down Ctrl (Windows) / Command (Mac) to select multiple plots.</small>
+            <small class="form-text text-muted">Hold down Ctrl (Windows) / Command (Mac) to select multiple
+                plots.</small>
         </div>
+
+        
 
         <!-- Submit Button -->
         <div class="text-center">

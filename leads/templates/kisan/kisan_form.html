@@ -108,7 +108,7 @@
       </div>
 
       <div>
-        <label for="{{ form.address.id_for_label }}" class="block mb-1">{{ form.address.label }}</label>
+        <label for="{{ form.address.id_for_label }}" class="block mb-1">Kisan {{ form.address.label }}</label>
         <textarea name="{{ form.address.name }}" id="{{ form.address.id_for_label }}" 
                   placeholder="Address">{{ form.address.value|default:'' }}</textarea>
       </div>
@@ -126,13 +126,13 @@
       </div>
 
       <div>
-        <label for="{{ form.land_costing.id_for_label }}" class="block mb-1">{{ form.land_costing.label }}</label>
+        <label for="{{ form.land_costing.id_for_label }}" class="block mb-1">Total {{ form.land_costing.label }}</label>
         <input type="number" step="0.01" name="{{ form.land_costing.name }}" id="{{ form.land_costing.id_for_label }}" 
                value="{{ form.land_costing.value|default:'' }}" placeholder="Land Costing">
       </div>
 
       <div>
-        <label for="{{ form.development_costing.id_for_label }}" class="block mb-1">{{ form.development_costing.label }}</label>
+        <label for="{{ form.development_costing.id_for_label }}" class="block mb-1">Total {{ form.development_costing.label }}</label>
         <input type="number" step="0.01" name="{{ form.development_costing.name }}" id="{{ form.development_costing.id_for_label }}" 
                value="{{ form.development_costing.value|default:'' }}" placeholder="Development Costing">
       </div>
@@ -144,25 +144,25 @@
       </div>
 
       <div>
-        <label for="{{ form.payment_to_kisan.id_for_label }}" class="block mb-1">{{ form.payment_to_kisan.label }}</label>
+        <label for="{{ form.payment_to_kisan.id_for_label }}" class="block mb-1">Total {{ form.payment_to_kisan.label }}</label>
         <input type="number" step="0.01" name="{{ form.payment_to_kisan.name }}" id="{{ form.payment_to_kisan.id_for_label }}" 
                value="{{ form.payment_to_kisan.value|default:'' }}" placeholder="Payment to Kisan">
       </div>
-
+<!-- 
       <div>
         <label for="{{ form.basic_sales_price.id_for_label }}" class="block mb-1">{{ form.basic_sales_price.label }}</label>
         <input type="number" step="0.01" name="{{ form.basic_sales_price.name }}" id="{{ form.basic_sales_price.id_for_label }}" 
                value="{{ form.basic_sales_price.value|default:'' }}" placeholder="Basic Sales Price">
-      </div>
+      </div> -->
 
-      <div>
+      <!-- <div>
         <label for="{{ form.land_type.id_for_label }}" class="block mb-1">{{ form.land_type.label }}</label>
         <select name="{{ form.land_type.name }}" id="{{ form.land_type.id_for_label }}">
           {% for value, display in form.land_type.field.choices %}
             <option value="{{ value }}"{% if value == form.land_type.value %} selected{% endif %}>{{ display }}</option>
           {% endfor %}
         </select>
-      </div>
+      </div> -->
     </div>
 
     <button type="submit">Save Kisan</button>

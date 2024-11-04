@@ -39,7 +39,7 @@
     </div>
     {% endif %}
 
-    <p><strong>Available Land for New Plots:</strong> {{ available_land }} sqft</p>
+    <!-- <p><strong>Available Land for New Plots:</strong> {{ available_land }} sqft</p> -->
 
     <form method="post" class="space-y-6">
         {% csrf_token %}
@@ -56,7 +56,7 @@
                 class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 <option value="">Choose a project</option>
                 {% for project in projects %}
-                <option value="{{ project.id }}">{{ project.title }}</option>
+                <option value="{{ project.id }}">{{ project.title }} {{project.type }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -138,7 +138,7 @@
         </script>
 
         <div>
-            <label for="price" class="block text-gray-700 font-medium">Common Price:</label>
+            <label for="price" class="block text-gray-700 font-medium">Price per sqft:</label>
             <input type="number" name="price" required
                 class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>

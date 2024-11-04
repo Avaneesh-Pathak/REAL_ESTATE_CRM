@@ -24,7 +24,7 @@
         {% csrf_token %}
         <div class="form-group mb-6">
             <h2 class="text-lg font-medium mb-4">Select Properties</h2>
-            <div id="propertyList" class="space-y-3">
+            <div id="propertyList" class="grid grid-cols-5 gap-4">
                 {% for property in properties %}
                     <div class="flex items-center" data-project="{{ property.project_id.id }}">
                         <input type="checkbox" id="property_{{ property.id }}" name="properties"
@@ -36,6 +36,9 @@
                 {% endfor %}
             </div>
         </div>
+
+        
+        
 
         <div class="text-center">
             <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded">

@@ -55,6 +55,7 @@
                     <h2 class="card-title text-primary border-bottom pb-2">Property Information</h2>
                     <p style="font-size: x-large; font-weight: bold;" ><strong>Title:</strong> {{ property.title }}</p>
                     <p><strong>Project Name:</strong> {{ property.project_name }}</p>
+                    <p><strong>Block:</strong> {{ property.block }}</p>
                     <p><strong>Price:</strong> <span class="text-success">₹{{ property.price|floatformat:2 }} per sq ft</span></p>
                     <p><strong>Area:</strong> {{ property.area }} sq ft</p>
                     <p><strong>Plot Price:</strong> ₹{{ total_plot_price_of_prop|floatformat:2 }}</p>
