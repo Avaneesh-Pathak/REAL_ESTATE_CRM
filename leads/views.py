@@ -975,7 +975,7 @@ class ProjectCreateView(LoginRequiredMixin, View):
         total_area = sum(land.area_in_beegha for land in selected_lands)
         print(total_area)
         # total_development_cost = sum(land.development_costing for land in selected_lands)
-        area = float(total_area*27000)
+        area = float(total_area*27200)
         if projectTypeSelect == "Flat":
             tarea= area*0.6
         else:
@@ -1019,7 +1019,7 @@ class PropertyCreateView(LoginRequiredMixin, View):
         # Calculate available land
         total_area_used = Property.objects.aggregate(total_area=Sum('area'))['total_area'] or 0
         total_kisan_land = Kisan.objects.aggregate(total_land=Sum('area_in_beegha'))['total_land'] or 0
-        total_land = total_kisan_land * 27000  # Convert to sqft
+        total_land = total_kisan_land * 27200  # Convert to sqft
         available_land = total_land - total_area_used
 
         # Pass available_land in context
@@ -1041,7 +1041,7 @@ class PropertyCreateView(LoginRequiredMixin, View):
         # Initialize form with total land
         total_area_used = Property.objects.aggregate(total_area=Sum('area'))['total_area'] or 0
         total_kisan_land = Kisan.objects.aggregate(total_land=Sum('area_in_beegha'))['total_land'] or 0
-        total_land = total_kisan_land * 27000  # Convert to sqft
+        total_land = total_kisan_land * 27200  # Convert to sqft
         available_land = total_land - total_area_used
 
         form = PropertyModelForm(request.POST, total_land=available_land)
