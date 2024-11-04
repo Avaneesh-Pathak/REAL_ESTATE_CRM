@@ -818,9 +818,7 @@ class PropertyDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         property = self.get_object()
 
-        # Calculate total plot price for the specific property
-        total_plot_price_of_prop = Decimal(property.price or 0) * Decimal(property.area or 0)
-
+        cost_p_sqft = property.price
         # Fetch related PlotBooking for the specific property
         plot_booking = PlotBooking.objects.filter(project=property).first()
 
@@ -831,21 +829,25 @@ class PropertyDetailView(generic.DetailView):
         total_plot_price = 0
 
         # Calculate overall land costs and development costs from Kisan data
-        kisan_data = Kisan.objects.filter(is_assigned=True) # Only Used land taken
-        property_data = Property.objects.filter(is_sold=True) # only sold property taken
+        idr = property.project_id
+        ids = idr.id
+        projectused = Project.objects.get(id= ids) 
+        lands = projectused.lands.all()
+        print(lands)
+        total_land_cost = sum( land.land_costing for land in lands)
+        print(total_land_cost)
+        total_development_cost = sum( land.development_costing for land in lands)
 
-        print(property_data) 
-        print(kisan_data)
+        kisan_data = Kisan.objects.filter(is_assigned=True) # Only Used land taken
+
+        total_cost = total_land_cost+total_development_cost
+        total_land = projectused.total_land_available_fr_plotting
+        cost_psqft = total_cost/total_land
+        cost_for_land = cost_psqft*(property.area)
         
         for kisan in kisan_data:
             total_area_in_beegha += kisan.area_in_beegha
-            total_land_cost += kisan.land_costing
-            total_development_cost += kisan.development_costing
 
-        print(total_area_in_beegha)
-        print(total_land_cost)
-        print(total_development_cost)
-        # Calculate total plot price from all bookings
         buyer_data = PlotBooking.objects.all()
         total_plot_price = sum(plotbooking.Plot_price for plotbooking in buyer_data)
         print(total_plot_price)
@@ -910,13 +912,15 @@ class PropertyDetailView(generic.DetailView):
         # Update context with all relevant details
         context.update({
             'property': property,
-            'total_plot_price_of_prop': total_plot_price_of_prop,
+            'total_plot_price_of_prop': cost_for_land,
+            'total_plot_price_of_pro': property.totalprice,
             'plot_booking': plot_booking,
             'total_land_cost': total_land_cost,
             'total_development_cost': total_development_cost,
             'total_salary_paid': total_salary_paid,
-            'profit_per_sqft': profit_per_sqft,
-            'total_profit_per_sqft':total_profit_per_sqft,
+            'profit_per_sqft': cost_p_sqft - cost_psqft ,
+            'cost_per_sqft':cost_psqft ,
+            'total_profit_per_sqft':property.totalprice - cost_for_land,
             # New fields added for specific land calculations
             'specific_land_cost':specific_land_cost,
             'specific_development_cost':specific_development_cost,
@@ -955,6 +959,7 @@ class ProjectCreateView(LoginRequiredMixin, View):
         project_name = request.POST.get('project_name', )
         block = request.POST.get('block', '')
         selected_land_ids = request.POST.getlist('lands')  # List of selected Kisan IDs
+        projectTypeSelect = request.POST.get('projectTypeSelect')  # List of selected project type
 
         if not selected_land_ids:
             messages.error(request, 'Please select at least one land plot for the project.')
@@ -962,36 +967,29 @@ class ProjectCreateView(LoginRequiredMixin, View):
 
         # Calculate total area and costs for selected lands
         selected_lands = Kisan.objects.filter(id__in=selected_land_ids, is_assigned=False)
-        print(selected_land_ids)
-        print(selected_lands)
         if not selected_lands.exists():
             messages.error(request, 'Selected lands are not available.')
             return redirect('leads:property-create')
         
         # Aggregate costs
-        # total_land_cost = sum(land.land_costing for land in selected_lands)
+        total_area = sum(land.area_in_beegha for land in selected_lands)
+        print(total_area)
         # total_development_cost = sum(land.development_costing for land in selected_lands)
+        area = float(total_area*27000)
+        if projectTypeSelect == "Flat":
+            tarea= area*0.6
+        else:
+            tarea= area*0.7
 
         try:
             # Assuming you have a Project model
             project=Project.objects.create(
                 project_name=project_name,
                 block=block,  # Example size, modify as needed
+                type =projectTypeSelect,
+                total_land_available_fr_plotting = tarea
             )
             project.lands.set(selected_lands)  # Link selected lands to the project
-
-            # Create individual properties from each selected land
-            for land in selected_lands:
-                Property.objects.create(
-                    project_id=project,
-                    project_name=project.project_name,
-                    # land_area=land.area_in_beegha,
-                    # land_cost=land.land_costing,
-                    # development_cost=land.development_costing,
-                    is_sold=False  # Default to unsold
-                ) 
-                # Optionally print the cost and profit for debug purposes
-
             selected_lands.update(is_assigned=True)  # Mark lands as assigned
 
             messages.success(request, 'Project created successfully!')
@@ -1072,8 +1070,11 @@ class PropertyCreateView(LoginRequiredMixin, View):
             type = newtype
         key = int(request.POST.get('project_id', ''))
                 # Fetch the Project instance using `get_object_or_404`
-        project = get_object_or_404(Project, id=key)
+        project = Project.objects.get(id=key)
+        
         tp = (l*b*price)
+        project_nam= project.project_name
+        blocks = project.block
 
         total_area_needed = area * num_properties
             
@@ -1086,6 +1087,8 @@ class PropertyCreateView(LoginRequiredMixin, View):
         for _ in range(num_properties):
             Property.objects.create(
                 project_id = project , # Example size, modify as needed
+                project_name = project_nam ,
+                block = blocks ,
                 price=price , # Example price, modify as needed
                 type=type,  # Example price, modify as needed
                 area=area,  # Example price, modify as needed
@@ -1579,34 +1582,6 @@ class GetProjectPriceView(View):
                 return JsonResponse({'error': 'No properties found for this project.'})
         except Exception as e:
             return JsonResponse({'error': str(e)})
-
-#KISAN FORM
-
-class KisanForm(forms.ModelForm):
-    class Meta:
-        model = Kisan
-        fields = [
-            'first_name', 'last_name', 'contact_number', 'address',
-            'khasra_number', 'area_in_beegha','land_costing',
-            'development_costing','land_address',
-            'payment_to_kisan', 'basic_sales_price','land_type'
-        ]
-        
-
-    def clean(self): 
-        cleaned_data = super().clean()
-        payment_to_kisan = cleaned_data.get("payment_to_kisan")
-        land_address = cleaned_data.get("land_address")
-
-        # Example validation logic
-        if payment_to_kisan is None and land_address is None:
-            raise forms.ValidationError("At least one of 'Kisan Payment' or 'Land Address' must be provided.")
-        # Optionally, you can also add validation for land_type if needed
-        land_type = cleaned_data.get("land_type")
-        if not land_type:
-            raise forms.ValidationError("Please select a land type.")
-
-        return cleaned_data
 
 # View for creating Kisan
 

@@ -54,9 +54,10 @@
                     <h2 class="card-title text-primary border-bottom pb-2">Property Information</h2>
                     <p style="font-size: x-large; font-weight: bold;"><strong>Title:</strong> {{ property.title }}</p>
                     <p><strong>Project Name:</strong> {{ property.project_name }}</p>
-                    <p><strong>Price:</strong> <span class="text-success">₹{{ property.price|floatformat:2 }} per sqft</span></p>
+                    <p><strong>Block:</strong> {{ property.block }}</p>
+                    <p><strong>Price:</strong> <span class="text-success">₹{{ property.price|floatformat:2 }} per sq ft</span></p>
                     <p><strong>Area:</strong> {{ property.area }} sq ft</p>
-                    <p><strong>Plot Price:</strong> ₹{{ total_plot_price_of_prop|floatformat:2 }}</p>
+                    <p><strong>Plot Price:</strong> ₹{{ total_plot_price_of_pro|floatformat:2 }}</p>
                     <p><strong>Type:</strong> {{ property.type }}</p>
                     <p><strong>Status:</strong>
                         <span class="{% if property.is_in_emi %}text-warning{% elif property.is_sold %}text-danger{% else %}text-success{% endif %} font-weight-bold">
@@ -93,10 +94,11 @@
                     <h2 class="card-title text-primary border-bottom pb-2">Profit Information</h2>
                     <p><strong>Total Land Cost:</strong> ₹{{ total_land_cost }}</p>
                     <p><strong>Total Development Cost:</strong> ₹{{ total_development_cost }}</p>
-                    <p><strong>Total Plot Price:</strong> ₹{{ total_plot_price_of_prop }}</p>
-                    <p><strong>Total Salary Expense:</strong> ₹{{ total_salary_paid }}</p>
+                    <p><strong>Cost per SqFt:</strong> ₹{{ cost_per_sqft|floatformat:2 }}</p>
                     <p><strong>Profit per SqFt:</strong> ₹{{ profit_per_sqft|floatformat:2 }}</p>
+                    <p><strong>Total Plot Price:</strong> ₹{{ total_plot_price_of_prop|floatformat:2  }}</p>
                     <p><strong>Total Profit:</strong> ₹{{ total_profit_per_sqft|floatformat:2 }}</p>
+                    <!-- <p><strong>Total Salary Expense:</strong> ₹{{ total_salary_paid }}</p> -->
                 </div>
             </div>
         </div>

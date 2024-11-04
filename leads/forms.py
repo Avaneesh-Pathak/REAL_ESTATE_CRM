@@ -346,7 +346,7 @@ class KisanForm(forms.ModelForm):
         fields = [
             'first_name', 'last_name', 'contact_number', 'address',
             'khasra_number', 'area_in_beegha', 'land_costing', 'development_costing',
-            'payment_to_kisan', 'basic_sales_price'
+            'payment_to_kisan','land_address'
         ]
     def __init__(self, *args, **kwargs):
         super(KisanForm, self).__init__(*args, **kwargs)
