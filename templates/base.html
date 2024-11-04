@@ -30,10 +30,17 @@
         /* Base styles */
         body {
             background-color: #E3FEF7;
+            padding-top: 80px; /* Same as the header height */
+        
         }
 
         header {
             background-color: #030648;
+            position:fixed; /* Make the header fixed */
+            top: 0; /* Align to the top */
+            width: 100%; /* Ensure it takes full width */
+            z-index: 1000; /* Keep it above other content */
+            height: 95px; /* Set a height if it isn’t already defined */
         }
 
         .logo img {
