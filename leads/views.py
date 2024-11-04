@@ -21,7 +21,7 @@ from django.views.generic import ListView, UpdateView, DeleteView
 
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot
 from agents.mixins import OrganisorAndLoginRequiredMixin
-from leads.models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook
+from leads.models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,EMIPayment
 from leads.forms import (
     LeadModelForm, 
     CustomUserCreationForm, 
@@ -842,7 +842,7 @@ class PropertyDetailView(generic.DetailView):
 
         total_cost = total_land_cost+total_development_cost
         total_land = projectused.total_land_available_fr_plotting
-        cost_psqft = total_cost/total_land
+        cost_psqft = (total_cost/total_land)
         cost_for_land = cost_psqft*(property.area)
         
         for kisan in kisan_data:
@@ -1431,7 +1431,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             else:
                 prop.is_in_emi = False
             prop.save()  # Save the updated property
-            print(prop.status)
+            
             print(prop.is_sold)
             plot_booking = form.save()
             # Ensure emi_amount is a Decimal and tenure is an integer
@@ -1550,17 +1550,23 @@ def mark_as_paid(request, payment_id):
         payment.pay_emi(payment.emi_amount)  # Pay the full EMI amount
     return redirect('leads:buyer_detail', buyer_id=payment.plot_booking.id)
 
+
 def pay_emi(request, emi_id):
     emi_payment = get_object_or_404(EMIPayment, id=emi_id)
 
     if request.method == 'POST':
-        amount_paid = request.POST.get('amount_paid', 0)
-        emi_payment.pay_emi(Decimal(amount_paid))  # Update the EMI payment
+        amount_paid = Decimal(request.POST.get('amount_paid', 0))
 
-        return redirect('leads:buyers_list')  # Redirect after updating
+        # Attempt to pay the EMI
+        payment_result = emi_payment.pay_emi(amount_paid)
+
+        if payment_result['success']:
+            messages.success(request, payment_result['message'])  # Use messages framework to inform the user
+            return redirect('leads:buyers_list')  # Redirect after successful update
+        else:
+            messages.error(request, payment_result['message'])  # Inform user about the error
 
     return render(request, 'plot_registration/pay_emi.html', {'emi_payment': emi_payment})
-
 
 class GetProjectPriceView(View):
     def get(self, request):
@@ -1622,14 +1628,14 @@ class KisanListView(LoginRequiredMixin, ListView):
         total_available_land = total_available_land or 0  # Default to 0 if None
 
         # Total land in sqft
-        total_land_in_sqft = total_available_land * 27000
+        total_land_in_sqft = total_available_land * 27200
         context['total_land_in_sqft'] = total_land_in_sqft
 
         # Calculate usable land based on land type
         usable_land_total = 0
         for kisan in Kisan.objects.filter(is_sold=False):
             area_in_beegha = kisan.area_in_beegha  # Get the area in beegha
-            area_in_sqft = area_in_beegha * 27000  # Convert beegha to sqft
+            area_in_sqft = area_in_beegha * 27200  # Convert beegha to sqft
             land_type = kisan.land_type.lower()  # Ensure it is in lowercase for comparison
 
             # Determine development percentage based on land type
