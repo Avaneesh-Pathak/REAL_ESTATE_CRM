@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,39 +7,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DJCRM</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'path/to/styles.css' %}" rel="stylesheet"> <!-- Adjust path as needed -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/main.min.css" rel="stylesheet" />
-    <link id="theme-style" rel="stylesheet" href="{% static 'CSS/styles.css' %}"> <!-- Main CSS -->
-
-    <!-- Add Chart.js CDN here -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Add Chart.js CDN here -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         /* Base styles */
         body {
             background-color: #E3FEF7;
-            padding-top: 80px; /* Same as the header height */
-        
+            padding-top: 80px;
+            /* Same as the header height */
         }
 
         header {
             background-color: #030648;
-            position:fixed; /* Make the header fixed */
-            top: 0; /* Align to the top */
-            width: 100%; /* Ensure it takes full width */
-            z-index: 1000; /* Keep it above other content */
-            height: 95px; /* Set a height if it isn’t already defined */
+            position: fixed;
+            /* Make the header fixed */
+            top: 0;
+            /* Align to the top */
+            width: 100%;
+            /* Ensure it takes full width */
+            z-index: 1000;
+            /* Keep it above other content */
+            height: 95px;
+            /* Set a height */
         }
 
         .logo img {
@@ -129,25 +122,47 @@
             }
 
             .search-input {
-                width: 100%;
+                width: 20%;
                 /* Full width for small screens */
             }
 
             .search-button {
                 margin-left: 0;
                 /* Reset margin */
-                width: 100%;
+                width: 20%;
                 /* Full width for button */
             }
 
             .sidebar {
-                width: 100%;
+                width: 0%;
                 /* Full width for sidebar on small screens */
+                transform: translateX(-100%);
+                /* Hide sidebar initially */
             }
 
             header {
                 flex-direction: column;
                 /* Stack header elements vertically */
+            }
+
+            .hamburger {
+                font-size: 30px;
+                /* Smaller icon for mobile */
+            }
+
+            .logo-container {
+                text-align: center;
+                /* Center align logo in mobile */
+            }
+
+            .title-font {
+                font-size: 1.5rem;
+                /* Reduce font size for titles */
+            }
+
+            .text {
+                font-size: 1.25rem;
+                /* Reduce text size */
             }
         }
     </style>
@@ -155,36 +170,29 @@
 
 <body style="background-color: #E3FEF7">
     <div class="max-w-10xl mx-auto">
-
-
         <header style="background-color: #030648;" class="text-white body-font">
             <div style="max-width: 100%;"
                 class="container mx-auto flex flex-wrap p-0 flex-col md:flex-row items-center justify-between">
-
                 <!-- Hamburger Icon -->
                 <div style="font-size: 40px;" class="hamburger cursor-pointer text-white ml-4" id="hamburger">
                     &#9776; <!-- Unicode character for hamburger icon -->
                 </div>
-
                 <!-- Sidebar -->
                 <div class="sidebar fixed  left-0 w-30 h-full bg-blue-900 text-white transform -translate-x-full transition-transform duration-300 ease-in-out"
                     id="sidebar">
-                    <div class="close-btn flex ml-2 text-right cursor-pointer logo-container" id="close-btn"><span
+                    <div class="close-btn flex ml-2 cursor-pointer logo-container" id="close-btn"><span
                             style="font-size:18px; margin-top: 17px;">PMA Software</span>
-                        <div class="close-btn mr-5 text-right cursor-pointer" id="close-btn"></div>&times;
+                        <button style="margin-left: 80px; margin-top: 15px;" class="btn btn-danger btn-sm"
+                            id="close-button">X</button>
                     </div>
                     <nav class="flex flex-col space-y-0">
-
                         <a href="{% url 'dashboard' %}" class="flex items-center hover:text-blue-300">
                             <i class="fas fa-home mr-2"></i> Home
                         </a>
-
-
                         <!-- Nested menu for Leads -->
                         <div class="relative">
                             {% if request.user.is_organisor %}
-                            <a href="{% url 'agents:agent-list' %}"
-                                class="flex items-left text-white hover:text-blue-300 py-2 px-4 rounded-lg transition duration-200">
+                            <a href="{% url 'agents:agent-list' %}" class="flex items-center hover:text-blue-300">
                                 <i class="fas fa-users mr-0"></i> Agents
                             </a>
                             {% endif %}
@@ -200,8 +208,6 @@
                                     Category</a>
                             </div>
                         </div>
-
-
                         <!-- Nested menu for Sales -->
                         <div class="relative">
                             <a href="#" class="flex items-center justify-between hover:text-blue-300"
@@ -214,7 +220,6 @@
                                 <a href="{% url 'leads:create_sale' %}" class="hover:text-blue-300">Add New Sale</a>
                             </div>
                         </div>
-
                         <!-- Nested menu for Properties -->
                         <div class="relative">
                             <a href="#" class="flex items-center justify-between hover:text-blue-300"
@@ -228,11 +233,9 @@
                                     Plot</a>
                             </div>
                         </div>
-
                         <a href="{% url 'leads:salary_list' %}" class="flex items-center hover:text-blue-300">
                             <i class="fas fa-wallet mr-2"></i> Salary
                         </a>
-
                         <a href="{% url 'leads:daybook_list' %}" class="flex items-center hover:text-blue-300">
                             <i class="fas fa-book mr-2"></i> Daybook
                         </a>
@@ -244,9 +247,7 @@
                         </a>
                     </nav>
                 </div>
-
                 <!-- Brand and Title -->
-
                 <div style="margin-top: 12px;">
                     <a href="{% url 'dashboard' %}"
                         class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5 logo-container">
@@ -255,7 +256,6 @@
                         <span class="ml-3 text-xl py-2 text">PMA Software</span>
                     </a>
                 </div>
-
                 <div style="text-align: center; margin-left: 380px;">
                     <p style="font-size: 1.5rem; font-weight: bold; color: #f3f3f3;">CRM</p>
                     <h2 style="font-size: 2rem; font-weight: bold; color: #7b87e4; margin-bottom: 10px;">Concept</h2>
@@ -269,7 +269,6 @@
                         <button type="submit" class="search-button" aria-label="Search button">Search</button>
                     </form>
                 </div>
-
                 <!-- Improved Dropdown Toggle -->
                 <script>
                     document.getElementById('profile-menu-button').addEventListener('click', function (event) {
@@ -278,7 +277,6 @@
                         dropdown.classList.toggle('hidden');
                         this.setAttribute('aria-expanded', dropdown.classList.contains('hidden') ? 'false' : 'true');
                     });
-
                     document.addEventListener('click', function (event) {
                         const dropdown = document.getElementById('profile-dropdown');
                         if (!event.target.closest('#profile-menu-button')) {
@@ -287,19 +285,12 @@
                         }
                     });
                 </script>
-
-
-
-
                 <!-- Navigation Links -->
                 <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center space-x-4">
                     {% if not request.user.is_authenticated %}
                     <a href="{% url 'signup' %}" class="text-white hover:text-blue-300">Signup</a>
-
-
                     {% endif %}
                 </nav>
-
                 <!-- User Info and Logout/Login -->
                 {% if request.user.is_authenticated %}
                 <div class="relative inline-block text-left">
@@ -323,7 +314,6 @@
                             </svg>
                         </button>
                     </div>
-
                     <!-- Dropdown Content -->
                     <div class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                         role="menu" aria-orientation="vertical" aria-labelledby="profile-menu-button"
@@ -344,7 +334,6 @@
                         </div>
                     </div>
                 </div>
-
                 <script>
                     // Toggle the dropdown menu
                     document.getElementById('profile-menu-button').addEventListener('click', function (event) {
@@ -352,7 +341,6 @@
                         const dropdown = document.getElementById('profile-dropdown');
                         dropdown.classList.toggle('hidden');
                     });
-
                     // Close dropdown when clicking outside
                     document.addEventListener('click', function (event) {
                         const profileButton = document.getElementById('profile-menu-button');
@@ -372,20 +360,16 @@
                     </svg>
                 </a>
                 {% endif %}
-
             </div>
         </header>
         <script>
-
             // Sidebar toggle functionality
             const sidebar = document.getElementById('sidebar');
             const hamburger = document.getElementById('hamburger');
             const closeBtn = document.getElementById('close-btn');
-
             hamburger.addEventListener('click', function () {
                 sidebar.style.transform = 'translateX(0)';
             });
-
             closeBtn.addEventListener('click', function () {
                 sidebar.style.transform = 'translateX(-100%)';
             });
@@ -416,11 +400,9 @@
         }, 5000); // 5000 milliseconds = 5 seconds
     </script>
     {% endif %}
-
     {% block content %}
     {% endblock content %}
     </div>
-
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -428,28 +410,19 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-
     <script>
         $(document).ready(function () {
-
-
             // Toggle Sidebar
             $('#hamburger').click(function () {
                 $('#sidebar').addClass('active');
             });
-
-            // Close Sidebar
-            $('#close-btn').click(function () {
-                $('#sidebar').removeClass('active');
-            });
-
             // Close sidebar when clicking outside of it
             $(document).click(function (event) {
-                if (!$(event.target).closest('#sidebar, #hamburger').length) {
+                if (!$(event.target).closest('#sidebar, #hamburger, #close-button').length) {
                     $('#sidebar').removeClass('active');
+                    $('#sidebar').css('transform', 'translateX(-100%)'); // Adjusts for CSS transform
                 }
             });
-
 
             // On page load, check for saved theme preference
             const currentTheme = localStorage.getItem('theme');
@@ -477,10 +450,7 @@
             $('#properties-menu').slideToggle(); // Use slideToggle for animation
         });
 
-        // Other existing JavaScript...
 
     </script>
-
 </body>
-
 </html>

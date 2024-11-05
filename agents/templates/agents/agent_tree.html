@@ -1,143 +1,152 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Agent Tree</title>
-        <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                color: #333;
-                margin: 0;
-                padding: 0px;
-            }
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        color: #b30c0c;
+        margin-top: 50px;
 
-            h1 {
-                text-align: center;
-                margin-bottom: 30px;
-                color: #070264; /* Professional Dark Blue */
-                font-size: 2.5em;
-            }
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #070264;
+        /* Professional Dark Blue */
+        font-size: 2.5em;
+    }
+    .tree {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-            .tree {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
+    .node {
+        margin: 20px 0;
+        position: relative;
+        transition: transform 0.3s ease;
+    }
 
-            .node {
-                margin: 20px 0;
-                position: relative;
-                transition: transform 0.3s ease;
-            }
+    .node:hover {
+        transform: scale(1.05);
+    }
 
-            .node:hover {
-                transform: scale(1.05);
-            }
+    .agent-info {
+        background-color: #e3f2fd;
+        color: #000000;
+        padding: 15px 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 1;
+        /* Ensure the agent info appears above lines */
+    }
 
-            .agent-info {
-                background-color: #e3f2fd;
-                color: #000000;
-                padding: 15px 20px;
-                border-radius: 8px;
-                text-align: center;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                position: relative;
-                z-index: 1; /* Ensure the agent info appears above lines */
-            }
+    .agent-info strong {
+        display: block;
+        font-size: 1.4em;
+        margin-bottom: 5px;
+        color: #001220;
+        /* Darker Blue */
+    }
 
-            .agent-info strong {
-                display: block;
-                font-size: 1.4em;
-                margin-bottom: 5px;
-                color: #001220; /* Darker Blue */
-            }
+    .agent-info p {
+        margin: 0;
+        font-size: 1.2em;
+    }
 
-            .agent-info p {
-                margin: 0;
-                font-size: 1.2em;
-            }
+    .children {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+        position: relative;
+    }
 
-            .children {
-                display: flex;
-                justify-content: center;
-                margin-top: 15px;
-                position: relative;
-            }
+    .children .node {
+        margin: 0 30px;
+    }
 
-            .children .node {
-                margin: 0 30px;
-            }
+    /* Connecting lines */
+    .node::before,
+    .node::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        width: 2px;
+        height: 20px;
+        background-color: #010407;
+        /* Soft Blue */
+        z-index: 0;
+        /* Ensure lines are below agent info */
+    }
 
-            /* Connecting lines */
-            .node::before, .node::after {
-                content: '';
-                position: absolute;
-                top: 10px;
-                left: 50%;
-                width: 2px;
-                height: 20px;
-                background-color: #5a9bd4; /* Soft Blue */
-                z-index: 0; /* Ensure lines are below agent info */
-            }
+    .node::before {
+        height: 100%;
+        /* For parent lines */
+        margin-left: -1px;
+        /* Center line */
+        top: 0;
+        /* Start at the top of the node */
+    }
 
-            .node::before {
-                height: 100%; /* For parent lines */
-                margin-left: -1px; /* Center line */
-                top: 0; /* Start at the top of the node */
-            }
+    .children .node::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        width: 2px;
+        height: 10px;
+        background-color: #000306;
+        /* Soft Blue */
+        z-index: 0;
+        /* Ensure lines are below agent info */
+    }
 
-            .children .node::before {
-                content: '';
-                position: absolute;
-                top: -10px;
-                left: 50%;
-                width: 2px;
-                height: 10px;
-                background-color: #5a9bd4; /* Soft Blue */
-                z-index: 0; /* Ensure lines are below agent info */
-            }
+    /* Create connecting lines between nodes */
+    .children::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 20px;
+        border-top: 2px solid #000306;
+        /* Soft Blue */
+        z-index: 0;
+    }
 
-            /* Create connecting lines between nodes */
-            .children::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 20px;
-                border-top: 2px solid #5a9bd4; /* Soft Blue */
-                z-index: 0;
-            }
+    /* Buttons Styling */
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 1em;
+        color: #fff;
+        background-color: #0277bd;
+        /* Button Blue */
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        text-align: center;
+        margin: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
 
-            /* Buttons Styling */
-            .btn {
-                display: inline-block;
-                padding: 10px 20px;
-                font-size: 1em;
-                color: #fff;
-                background-color: #0277bd; /* Button Blue */
-                border: none;
-                border-radius: 5px;
-                text-decoration: none;
-                text-align: center;
-                margin: 10px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
+    .btn:hover {
+        background-color: #01579b;
+        color: #fff;
+        /* Darker Blue on hover */
+    }
 
-            .btn:hover {
-                background-color: #01579b; /* Darker Blue on hover */
-            }
+    .btn-container {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+</style>
+<div>
 
-            .btn-container {
-                text-align: center;
-                margin-bottom: 30px;
-            }
-        </style>
-    </head>
-    
     <h1>Agent Tree Structure</h1>
 
     <!-- Button container for actions -->
@@ -147,9 +156,9 @@
     </div>
     <div class="tree">
         {% for agent in agents %}
-            {% include 'agents/agent_node.html' with agent=agent %}
+        {% include 'agents/agent_node.html' with agent=agent %}
         {% endfor %}
     </div>
+</div>
 
-   
 {% endblock content %}
