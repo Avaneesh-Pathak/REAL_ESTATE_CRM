@@ -204,7 +204,7 @@ class  Project(models.Model):
         self.__class__.objects.filter(pk=self.pk).update(title=self.title)
 
     def __str__(self):
-        return self.project_name
+        return self.title
 
 #TypeofPlot
 class Typeplot(models.Model):

@@ -10,18 +10,20 @@
 <body>
     <div class="container mt-5 p-5 bg-light shadow rounded">
         <h1 class="text-center mb-4">Edit Selected Properties</h1>
-
+        Total Land In <b>{{project.title }}</b> : {{ project.total_land_available_fr_plotting }}sq/ft<br>
+        Total Land Available For Cutting : {{ project.available_land }}sq/ft
         <form method="POST">
             {% csrf_token %}
             <!-- Assuming 'properties' is passed and you want the first property -->
+             
             {% if properties %}
                 {% with property=properties.0 %}
                 <div class="form-group mb-3">
                     <label for="project_name_{{ property.id }}" class="form-label">Property Length</label>
-                    <input type="number" class="form-control" id="project_name_{{ property.id }}" name="project_name" value="{{ property.project_name }}" required>
+                    <input type="number" class="form-control" id="project_name_{{ property.id }}" name="project_name" value="{{ property.length }}" required>
                     
                     <label for="block_{{ property.id }}" class="form-label mt-3">Property Breadth</label>
-                    <input type="number" class="form-control" id="block_{{ property.id }}" name="block" value="{{ property.block }}" required>
+                    <input type="number" class="form-control" id="block_{{ property.id }}" name="block" value="{{ property.breadth }}" required>
                     
                     <label for="price_{{ property.id }}" class="form-label mt-3">Price</label>
                     <input type="number" class="form-control" id="price_{{ property.id }}" name="price" value="{{ property.price }}" required>

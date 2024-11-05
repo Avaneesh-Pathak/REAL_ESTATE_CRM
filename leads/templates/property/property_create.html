@@ -53,13 +53,50 @@
         <div>
             <label for="project_id" class="block text-gray-700 font-medium">Select Project:</label>
             <select id="project_id" name="project_id" required
-                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"  onchange="toggleCustomInputs()">
                 <option value="">Choose a project</option>
                 {% for project in projects %}
                 <option value="{{ project.id }}">{{ project.title }} {{project.type }}</option>
                 {% endfor %}
             </select>
         </div>
+        <div id="propertyGrid" class=""  >
+            {% for project in projects %}
+            <div data-project="{{ project.id }}">
+                Total land in : <b>{{ project.title}}:</b> {{ project.total_land_available_fr_plotting }} sq/ft
+                <p>Total land Used: <b>{{ project.total_land_area }} sq/ft</b></p> 
+                <p>Total land Available: <b>{{ project.total_land_available }} sq/ft</b></p> 
+            </div>
+            {% endfor %}
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const projectDropdown = document.getElementById('project_id');
+        
+                function updatePropertyDisplay() {
+                    const selectedProject = projectDropdown.value;
+                    const properties = document.querySelectorAll('#propertyGrid div[data-project]');
+        
+                    properties.forEach(function(property) {
+                        if (property.getAttribute('data-project') === selectedProject) {
+                            property.style.display = "block"; // Show properties of the selected project
+                        } else if(selectedProject === '') {
+                            property.style.display = "none";  // Hide others if no project selected
+                        } else {
+                            property.style.display = "none";  // Hide others
+                        }
+                    });
+                }
+        
+                // Call the function on page load
+                updatePropertyDisplay();
+        
+                // Update the display whenever the project dropdown changes
+                projectDropdown.addEventListener('change', updatePropertyDisplay);
+            });
+        </script>
+        
+    
 
         <div>
             <label for="dimension" class="block text-gray-700 font-medium">Select Dimension:</label>

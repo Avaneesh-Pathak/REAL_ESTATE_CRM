@@ -1015,19 +1015,19 @@ class PropertyCreateView(LoginRequiredMixin, View):
         projects = Project.objects.all()
         areas = Area.objects.all()
         types = Typeplot.objects.all()
+        properties = Property.objects.all()
 
-        # Calculate available land
-        total_area_used = Property.objects.aggregate(total_area=Sum('area'))['total_area'] or 0
-        total_kisan_land = Kisan.objects.aggregate(total_land=Sum('area_in_beegha'))['total_land'] or 0
-        total_land = total_kisan_land * 27000  # Convert to sqft
-        available_land = total_land - total_area_used
+        for project in projects:
+            project.total_land_area = Property.objects.filter(project_id=project).aggregate(total_area=Sum('area'))['total_area'] or 0
+            tla = project.total_land_area
+            project.total_land_available = project.total_land_available_fr_plotting - tla
 
         # Pass available_land in context
         return render(request, self.template_name, {
             'projects': projects,
             'areas': areas,
-            'types': types,
-            'available_land': available_land  # New addition
+            'types': types, # New addition
+            'properties': properties, # New addition
         })
 
 
@@ -1037,12 +1037,15 @@ class PropertyCreateView(LoginRequiredMixin, View):
         price = int(request.POST.get('price', ''))
         type = request.POST.get('type', '')
         dimension = request.POST.get('dimension', '')
+        key = int(request.POST.get('project_id', ''))
+        # Fetch the Project instance using `get_object_or_404`
+        project = Project.objects.get(id=key)
+        project.total_land = Property.objects.filter(project_id=project).aggregate(total_area=Sum('area'))['total_area'] or 0
+        tla = project.total_land
+        project.total_land_available = project.total_land_available_fr_plotting - tla
+        available_land =  project.total_land_available
 
-        # Initialize form with total land
-        total_area_used = Property.objects.aggregate(total_area=Sum('area'))['total_area'] or 0
-        total_kisan_land = Kisan.objects.aggregate(total_land=Sum('area_in_beegha'))['total_land'] or 0
-        total_land = total_kisan_land * 27000  # Convert to sqft
-        available_land = total_land - total_area_used
+
 
         form = PropertyModelForm(request.POST, total_land=available_land)
 
@@ -1068,14 +1071,12 @@ class PropertyCreateView(LoginRequiredMixin, View):
                 type = newtype
             )
             type = newtype
-        key = int(request.POST.get('project_id', ''))
-                # Fetch the Project instance using `get_object_or_404`
-        project = Project.objects.get(id=key)
+
         
         tp = (l*b*price)
         project_nam= project.project_name
         blocks = project.block
-
+#
         total_area_needed = area * num_properties
             
         if total_area_needed > available_land:
@@ -1109,8 +1110,31 @@ def select_properties_view(request):
 
     if request.method == 'POST':
         selected_ids = request.POST.getlist('properties')  # Get list of selected IDs
-        # Redirect to the update view with the selected IDs
-        return redirect('leads:property-update', ids=','.join(selected_ids))  # Join IDs as a comma-separated string
+        print (selected_ids)  # Print selected IDs for debugging
+        x= 0 
+        if selected_ids:
+            test  = selected_ids[0]
+            prop = Property.objects.get(id=test)
+            pr_id = prop.project_id
+
+            for prop_id in selected_ids:
+                property_in = Property.objects.get(id=prop_id)
+                property_title = property_in.project_id
+                if  property_title == pr_id:
+                    x = 1
+                else:
+                    x = 0
+                    break
+
+        if x==0:
+            return render(request, 'property/select_properties.html', {
+            'projects': projects,
+            'properties': properties
+            })
+        else:
+            # Redirect to the update view with the selected IDs
+            return redirect('leads:property-update', ids=','.join(selected_ids))  # Join IDs as a comma-separated string
+
 
     return render(request, 'property/select_properties.html', {
         'projects': projects,
@@ -1125,30 +1149,70 @@ def get_properties_by_project(request, project_id):
 
 # View to edit selected properties
 class PropertyUpdateView(LoginRequiredMixin,View):
+    template_name = 'property/property_update.html'
 
-    template_name = 'property/property_update.html'  # Update with your template 
+    def get_project_and_properties(self, ids):
+        # Split the comma-separated list of property IDs
+        property_ids = ids.split(',')
+        properties = Property.objects.filter(id__in=property_ids)
+        if not properties.exists():
+            return None, None  # Handle if no properties are found
+        
+        # Assume the first property's project ID is relevant for all properties
+        project_id = properties[0].project_id.id
+        project = Project.objects.get(id=project_id)
+
+        # Calculate total land area and available land
+        project.total_land_area = Property.objects.filter(project_id=project).aggregate(total_area=Sum('area'))['total_area'] or 0
+        area_in_selected_properties = sum(prop.area for prop in properties)
+        project.available_land = project.total_land_available_fr_plotting - project.total_land_area + area_in_selected_properties
+
+        return project, properties
 
     def get(self, request, ids):
-        property_ids = ids.split(',')  # Convert the comma-separated string back to a list
-        properties = Property.objects.filter(id__in=property_ids)  # Fetch selected properties
-        return render(request, self.template_name, {'properties': properties})
+        project, properties = self.get_project_and_properties(ids)
+        if project is None or properties is None:
+            return redirect('error_page')  # Redirect to an error page if data is missing
+
+        return render(request, self.template_name, {'properties': properties, 'project': project})
 
     def post(self, request, ids):
-        property_ids = ids.split(',')  # Convert the comma-separated string back to a list
-        length = request.POST.get('project_name', '')
-        price = request.POST.get('price', '')
-        breadth = request.POST.get('block', '')
-    
+        # Retrieve project and properties using helper method
+        project, properties = self.get_project_and_properties(ids)
+        if project is None or properties is None:
+            return redirect('error_page')
 
-        for prop_id in property_ids:
-            property_instance = Property.objects.get(id=prop_id)
-            # Update the instance based on the form data (make sure to handle input correctly)
+        # Get form values
+        count = len(properties)
+        length = int(request.POST.get('project_name', ''))
+        price = request.POST.get('price', '')
+        breadth = int(request.POST.get('block', ''))
+
+        # Calculate required area
+        required_area = length * breadth * count
+
+        # Check if available land is sufficient
+        if required_area > project.available_land:
+            return self.get(request, ids)  # Re-render `get` view if there's not enough land
+
+        # Update properties if sufficient land is available
+        for property_instance in properties:
             property_instance.length = length
             property_instance.price = float(price)
-            property_instance.breadth = breadth 
+            property_instance.breadth = breadth
+            property_instance.area = breadth*length
             property_instance.save()
+
         return redirect(self.get_success_url())
-    
+
+
+
+
+
+
+
+
+
     def get_success_url(self):
         return reverse('leads:property_list')
 
