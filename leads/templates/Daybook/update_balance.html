@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-8">
+    <h2 class="text-3xl font-semibold mb-4">Update Balance</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="action" class="block text-gray-700">Action</label>
+            {{ form.action }}
+        </div>
+        <div class="mb-4">
+            <label for="amount" class="block text-gray-700">Amount</label>
+            {{ form.amount }}
+        </div>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+            Update Balance
+        </button>
+    </form>
+</div>
+{% endblock %}

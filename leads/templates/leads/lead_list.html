@@ -54,6 +54,10 @@
                                     </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        Agent Assigned
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                         Category
                                     </th>
                                     <th scope="col"
@@ -80,6 +84,13 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ lead.phone_number }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {% if lead.agent %}
+                                        {{ lead.agent.user.get_full_name }}
+                                        {% else %}
+                                        <span class="text-red-500">Unassigned</span>
+                                        {% endif %}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {% if lead.category %}
@@ -121,7 +132,8 @@
             </div>
             {% for lead in unassigned_leads %}
             <div class="p-4 lg:w-1/2 md:w-full">
-                <div style="background-color:whitesmoke;" class="flex border-2 rounded-lg border-darker-900 p-8 sm:flex-row flex-col">
+                <div style="background-color:whitesmoke;"
+                    class="flex border-2 rounded-lg border-darker-900 p-8 sm:flex-row flex-col">
                     <div
                         class="w-16 h-16 sm:mr-8 sm:mb-0 mb-4 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 flex-shrink-0">
                         <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"

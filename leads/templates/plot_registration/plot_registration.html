@@ -179,7 +179,6 @@
             <p><strong>Nominee Name:</strong>{{ form.nominee_name }}</p>
         </div>
 
-
         <!-- Business Information Section -->
         <h3 class="section-heading">BUSINESS INFORMATION</h3>
         <!-- <h4 class="section-subheading">PLC Charges</h4>
@@ -199,9 +198,14 @@
             <div class="error">{{ form.project.errors }}</div>
             {% endif %}
         </div>
+        <!-- Element to display the price -->
+
+
+
+        
         <div class="d-flex justify-content-between">
-            <p><strong>{{ form.associate_detail.label }}</strong>{{ form.associate_detail }}</p>
-            <p id="agent-field" style="display:none;"><strong>Agent</strong><select id="agent-dropdown" name="agent"
+            <p><strong>Agent</strong>
+                <select name="agent"
                     class="form-control">
                     <option value="">Select an Agent</option>
                     {% for agent in agents %}
@@ -210,10 +214,37 @@
                 </select></p>
         </div>
         <div class="d-flex justify-content-between">
-            <p><strong>Project Price:</strong> <span id="project-price"  id="id_plot_price" ></span>{{ form.Plot_price }}</p>
+            <p><strong>Property Price:</strong><br> <span class="font-bold" id="property-price">Rs</span></p>
             <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>
         </div>
-
+        <script>
+            const properties = {{ properties|safe }};
+            console.log("Selected Property ID:", properties);  // This will print the selected ID in the console
+        
+            // Assuming form.project is a dropdown and its ID is 'project-select'
+            const projectSelect = document.getElementById('project-select');  // Replace with actual ID if different
+            const priceDisplay = document.getElementById('property-price');
+        
+        
+            // Listen for changes in the property selection
+            projectSelect.addEventListener('change', function() {
+                const selectedPropertyId = projectSelect.value;
+                console.log("Selected Property ID:", selectedPropertyId);  // This will print the selected ID in the console
+        
+        
+                // Find the property in the properties list by ID
+                const selectedProperty = properties.find(property => property.id == selectedPropertyId);
+                console.log("Selected Property ID:", selectedProperty);  // This will print the selected ID in the console
+        
+        
+                // Display the price if the property is found
+                if (selectedProperty) {
+                    priceDisplay.textContent = selectedProperty.price;
+                } else {
+                    priceDisplay.textContent = "N/A";
+                }
+            });
+        </script>
         <!-- EMI Options -->
         <div class="parent-div">
             <div id="emi-options" style="display:none;">
@@ -256,7 +287,6 @@
         </div>
     </form>
 </div>
-
 <!-- JavaScript to handle field visibility and EMI calculation -->
 <script>
     document.getElementById("id_gender").addEventListener("change", function () {

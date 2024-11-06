@@ -82,7 +82,7 @@ class Agent(models.Model):
     # New Addition Ends
     def __str__(self):
         
-        return f"{self.user.email} (Level {self.level})(Id {self.pk}) "
+        return f"{self.user.username} (Level {self.level})(Id {self.pk}) "
 
     # def save(self, *args, **kwargs):
     #     if not self.pk:
@@ -178,6 +178,7 @@ class  Project(models.Model):
     project_name = models.CharField(max_length=255)
     block = models.CharField(max_length=2)
     kisans = models.ManyToManyField('Kisan', related_name='projects_kisan')  # Link to Kisan model
+    dev_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     title = models.CharField(unique=True,max_length=255)
     lands = models.ManyToManyField('Kisan', related_name='projects_lands')
     type = models.CharField(max_length=255,null=True,blank=True)
@@ -233,6 +234,12 @@ class Property(models.Model):
     
     # Removed the redundant ForeignKey to Property itself
     related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.DO_NOTHING) 
+    PLOT_CHOICES = [
+        ('Normal', 'Normal'),
+        ('Corner', 'Corner'),
+        ('Special', 'Special'),
+    ]
+    plot_type = models.CharField(max_length=50, choices=PLOT_CHOICES,default='Normal')
 
     def if_sold(self):
         print(f"Checking if property {self.title} is sold")
@@ -295,6 +302,14 @@ class EmiPlan(models.Model):
 
 
 # DAYBOOK
+
+class Balance(models.Model):
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    carryover_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # Add this field
+
+    def __str__(self):
+        return f"Balance: {self.amount}"
+    
 class Daybook(models.Model):
     ACTIVITY_CHOICES = [
         ('pantry', 'Pantry'),
@@ -312,7 +327,7 @@ class Daybook(models.Model):
     custom_activity = models.CharField(max_length=100, blank=True, null=True)  # For "Others"
     amount = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     remark = models.TextField(blank=True, null=True)
-
+    
     def __str__(self):
         return f"{self.date} - {self.activity} - {self.amount}"
 
@@ -354,7 +369,7 @@ class PlotBooking(models.Model):
     project = models.OneToOneField(Property, on_delete=models.DO_NOTHING, related_name='project', unique=True,null=True, blank=True)
     associate_detail = models.BooleanField(default=False)
     agent = models.ForeignKey(Agent, on_delete=models.SET_NULL, null=True, blank=True, related_name='plot_bookings')  # Changed to lowercase
-    Plot_price = models.DecimalField(max_digits=10, decimal_places=2)
+    Plot_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     payment_type = models.CharField(max_length=50, choices=[('custom', 'Custom Payment'), ('installment', 'Installments')])
     booking_amount = models.DecimalField(max_digits=10, decimal_places=2)
     mode_of_payment = models.CharField(max_length=50, choices=[('cheque', 'Cheque'), ('rtgs', 'RTGS/NEFT'), ('cash', 'Cash')])
@@ -436,6 +451,7 @@ class Level(models.Model):
     
 
 class Kisan(models.Model):
+
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     contact_number = models.IntegerField()
@@ -444,7 +460,7 @@ class Kisan(models.Model):
     khasra_number = models.IntegerField(unique=True)
     area_in_beegha = models.DecimalField(max_digits=20, decimal_places=3)
     land_costing = models.DecimalField(max_digits=12, decimal_places=3)
-    development_costing = models.DecimalField(max_digits=12, decimal_places=3)
+    development_costing = models.DecimalField(max_digits=12, decimal_places=3,default=0,null=True,blank=True)
     # Make these fields optional
     kisan_payment = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True,default=0)
     land_address = models.TextField(max_length=50, null=True, blank=True)

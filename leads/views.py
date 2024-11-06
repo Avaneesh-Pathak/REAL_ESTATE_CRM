@@ -21,7 +21,7 @@ from django.views.generic import ListView, UpdateView, DeleteView
 
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot
 from agents.mixins import OrganisorAndLoginRequiredMixin
-from leads.models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,EMIPayment
+from leads.models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,EMIPayment,Balance
 from leads.forms import (
     LeadModelForm, 
     CustomUserCreationForm, 
@@ -36,6 +36,7 @@ from leads.forms import (
     PlotBookingForm,
     KisanForm,
     DaybookEntryForm,
+    BalanceUpdateForm,
 )
 
 
@@ -291,35 +292,33 @@ class LeadListView(LoginRequiredMixin,generic.ListView):
             queryset = Lead.objects.filter(
                 organisation=user.userprofile, 
                 agent__isnull=False
-            )
+            ).select_related('agent')
         else:
             # Check if the user has an associated agent
             if hasattr(user, 'agent'):
                 queryset = Lead.objects.filter(
                     organisation=user.agent.organisation, 
-                    agent__isnull=False
-                )
-                # Filter for the agent that is logged in
-                queryset = queryset.filter(agent__user=user)
+                    agent=user.agent
+                ).select_related('agent')
             else:
-                queryset = Lead.objects.none()  # Return an empty queryset if no agent exists
+                queryset = Lead.objects.none()
+                 # Return an empty queryset if no agent exists
 
         return queryset
+    
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = super(LeadListView, self).get_context_data(**kwargs)
         if user.is_organisor:
             queryset = Lead.objects.filter(organisation=user.userprofile,agent__isnull=True)
             
-            context.update ({
-                "unassigned_leads": queryset
-                })   
+            context["unassigned_leads"] = queryset  
            
         return context
     
 
 def lead_list(request):
-    leads = Lead.objects.all()
+    leads = Lead.objects.select_related('agent').all()
     context = {
         "leads":leads
     }
@@ -375,18 +374,16 @@ class LeadCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
         messages.success(self.request, "You have successfully created a lead")
         return super(LeadCreateView, self).form_valid(form)
 
-
+ 
 def lead_create(request):
-    form = LeadModelForm()
     if request.method == "POST":
-        form = LeadModelForm(request.POST)
+        form = LeadModelForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect("/leads")
-    context = {
-        "form": form
-    }
-    return render(request, "leads/lead_create.html", context)
+            return redirect('leads:lead-list')
+    else:
+        form = LeadModelForm()
+    return render(request, 'leads/lead_form.html', {'form': form})
 
 
 class LeadUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
@@ -821,6 +818,9 @@ class PropertyDetailView(generic.DetailView):
         cost_p_sqft = property.price
         # Fetch related PlotBooking for the specific property
         plot_booking = PlotBooking.objects.filter(project=property).first()
+        salarys = Salary.objects.filter(property = property)
+        print(salarys)
+        tot_sal = sum(salary.base_salary for salary in salarys)
 
         # Initialize variables for overall calculations
         total_area_in_beegha = 0
@@ -830,13 +830,14 @@ class PropertyDetailView(generic.DetailView):
 
         # Calculate overall land costs and development costs from Kisan data
         idr = property.project_id
+        print(idr)
         ids = idr.id
         projectused = Project.objects.get(id= ids) 
         lands = projectused.lands.all()
         print(lands)
         total_land_cost = sum( land.land_costing for land in lands)
         print(total_land_cost)
-        total_development_cost = sum( land.development_costing for land in lands)
+        total_development_cost = projectused.dev_cost*projectused.total_land_available_fr_plotting
 
         kisan_data = Kisan.objects.filter(is_assigned=True) # Only Used land taken
 
@@ -852,64 +853,9 @@ class PropertyDetailView(generic.DetailView):
         total_plot_price = sum(plotbooking.Plot_price for plotbooking in buyer_data)
         print(total_plot_price)
 
-        # Calculate total salary expenses
-        total_salary_paid = Salary.objects.aggregate(total=Sum('base_salary'))['total'] or 0
+        final_pr = property.totalprice - cost_for_land - tot_sal 
 
-        # Calculate profit per sqft for the whole
-        total_area_in_sqft = total_area_in_beegha * 27000  # Conversion factor
-        if total_area_in_sqft > 0:
-            profit_per_sqft = (total_plot_price - (total_land_cost + total_development_cost + total_salary_paid)) / total_area_in_sqft
-        else:
-            profit_per_sqft = 0
-
-        # Ensure length and breadth are not None before calculating the area
-        if property.length is not None and property.breadth is not None:
-            property_area = property.length * property.breadth
-        else:
-            property_area = 0 
-            # Calculate total profit per sqft using the calculated property_area
-        total_profit_per_sqft = Decimal(profit_per_sqft * property_area)
-
-        # --- New calculations based on specific land associated with the property ---
-        # Initialize specific land-related variables with None as default
-        specific_land_cost = None
-        specific_development_cost = None
-        specific_area_in_beegha = None
-        specific_profit_per_sqft = None
-        specific_total_profit = None
-
-        if property.land:
-            # Use the costs specific to the property's assigned land
-            specific_land_cost = property.land.land_costing
-            specific_development_cost = property.land.development_costing
-            specific_area_in_beegha = property.land.area_in_beegha
-
-            specific_total_area_in_sqft = specific_area_in_beegha * 27000  # Conversion factor for specific land
-            if specific_total_area_in_sqft > 0:
-                specific_profit_per_sqft = (total_plot_price_of_prop - (specific_land_cost + specific_development_cost + total_salary_paid)) / specific_total_area_in_sqft
-            else:
-                specific_profit_per_sqft = 0
-
-            specific_total_profit = Decimal(specific_profit_per_sqft * property_area)
-
-            # Update the context with specific land-related calculations
-            context.update({
-                'specific_land_cost': specific_land_cost,
-                'specific_development_cost': specific_development_cost,
-                'specific_area_in_beegha': specific_area_in_beegha,
-                'specific_profit_per_sqft': specific_profit_per_sqft,
-                'specific_total_profit': specific_total_profit,
-            })
-            print(specific_land_cost)
-            print(specific_development_cost)
-            print(specific_area_in_beegha)
-            print(specific_profit_per_sqft)
-            print(specific_total_profit)
-
-        # --- End of new code ---
-        
-
-        # Update context with all relevant details
+#Update context with all relevant details
         context.update({
             'property': property,
             'total_plot_price_of_prop': cost_for_land,
@@ -917,16 +863,12 @@ class PropertyDetailView(generic.DetailView):
             'plot_booking': plot_booking,
             'total_land_cost': total_land_cost,
             'total_development_cost': total_development_cost,
-            'total_salary_paid': total_salary_paid,
+            'agent': salarys,
+            'tot_sal': tot_sal,
+            'final_pr': final_pr,
             'profit_per_sqft': cost_p_sqft - cost_psqft ,
             'cost_per_sqft':cost_psqft ,
             'total_profit_per_sqft':property.totalprice - cost_for_land,
-            # New fields added for specific land calculations
-            'specific_land_cost':specific_land_cost,
-            'specific_development_cost':specific_development_cost,
-            'specific_area_in_beegha':specific_area_in_beegha,
-            'specific_profit_per_sqft':specific_profit_per_sqft,
-            'specific_total_profit':specific_total_profit,
         })
 
         return context
@@ -958,6 +900,7 @@ class ProjectCreateView(LoginRequiredMixin, View):
         # Get the number of properties to create and common attributes
         project_name = request.POST.get('project_name', )
         block = request.POST.get('block', '')
+        dev_cost = int(request.POST.get('dev_cost', ''))
         selected_land_ids = request.POST.getlist('lands')  # List of selected Kisan IDs
         projectTypeSelect = request.POST.get('projectTypeSelect')  # List of selected project type
 
@@ -986,6 +929,7 @@ class ProjectCreateView(LoginRequiredMixin, View):
             project=Project.objects.create(
                 project_name=project_name,
                 block=block,  # Example size, modify as needed
+                dev_cost=dev_cost,  # Example size, modify as needed
                 type =projectTypeSelect,
                 total_land_available_fr_plotting = tarea
             )
@@ -1016,11 +960,18 @@ class PropertyCreateView(LoginRequiredMixin, View):
         areas = Area.objects.all()
         types = Typeplot.objects.all()
         properties = Property.objects.all()
+        # Passing the choices to the template
+        plot_choices = Property.PLOT_CHOICES
 
         for project in projects:
             project.total_land_area = Property.objects.filter(project_id=project).aggregate(total_area=Sum('area'))['total_area'] or 0
             tla = project.total_land_area
             project.total_land_available = project.total_land_available_fr_plotting - tla
+            project.cost_per_sqft = project.dev_cost
+            kisan_lands = project.lands.all()
+            # total_area = sum(land.area_in_beegha*27200 for land in kisan_lands)
+            total_land_cost =  sum(land.land_costing for land in kisan_lands)
+            project.land_cost_per_sqft = total_land_cost/project.total_land_available + project.dev_cost
 
         # Pass available_land in context
         return render(request, self.template_name, {
@@ -1028,7 +979,8 @@ class PropertyCreateView(LoginRequiredMixin, View):
             'areas': areas,
             'types': types, # New addition
             'properties': properties, # New addition
-        })
+            "plot_choices": plot_choices,     
+            })
 
 
     def post(self, request):
@@ -1036,6 +988,7 @@ class PropertyCreateView(LoginRequiredMixin, View):
         num_properties = int(request.POST.get('num_properties', 1))
         price = int(request.POST.get('price', ''))
         type = request.POST.get('type', '')
+        ptype = request.POST.get('plot_type', '')
         dimension = request.POST.get('dimension', '')
         key = int(request.POST.get('project_id', ''))
         # Fetch the Project instance using `get_object_or_404`
@@ -1090,6 +1043,7 @@ class PropertyCreateView(LoginRequiredMixin, View):
                 project_id = project , # Example size, modify as needed
                 project_name = project_nam ,
                 block = blocks ,
+                plot_type = ptype ,
                 price=price , # Example price, modify as needed
                 type=type,  # Example price, modify as needed
                 area=area,  # Example price, modify as needed
@@ -1125,11 +1079,20 @@ def select_properties_view(request):
                 else:
                     x = 0
                     break
-
+        else:
+            # message to raise when no property selected
+            error_message = "Select at least one property to update."
+            print(error_message)
+            return render(request, 'property/select_properties.html', {'projects': projects,'properties': properties,
+                'error_message': error_message})
+    
         if x==0:
+            error_message = "You have selected multiple properties from Different Project"
+            print(error_message)
             return render(request, 'property/select_properties.html', {
             'projects': projects,
-            'properties': properties
+            'properties': properties,
+            'error_message':error_message
             })
         else:
             # Redirect to the update view with the selected IDs
@@ -1337,29 +1300,126 @@ def calculate_emi(request):
 
 # DAYBOOK
 
+# class DaybookListView(LoginRequiredMixin, View):
+#     template_name = 'Daybook/daybook_list.html'
+
+#     def get(self, request, *args, **kwargs):
+#         # Get today's date
+#         today = timezone.now().date()
+
+#         # Calculate today's expenses
+#         todays_expenses = Daybook.objects.filter(date=today)
+#         total_todays_expenses = sum(expense.amount for expense in todays_expenses)
+
+#         # Calculate total expenses till now
+#         total_expenses = Daybook.objects.aggregate(total_amount=models.Sum('amount'))['total_amount'] or 0
+
+#         # Get current balance (replace with your actual current balance logic)
+#         current_balance = 25000  # You can replace this with your actual logic for getting the current balance
+#         carryover_amount = current_balance - total_expenses
+
+#         if carryover_amount < 0:
+#             carryover_amount = abs(carryover_amount)
+#             current_balance = 0
+#         else:
+#             current_balance = current_balance - total_todays_expenses
+
+#         context = {
+#             'expenses': todays_expenses,
+#             'total_balance': current_balance,
+#             'carryover_amount': carryover_amount,
+#             'todays_expense': total_todays_expenses,
+#             'total_expenses': total_expenses,
+#         }
+#         return render(request, self.template_name, context)
+
+#     def post(self, request, *args, **kwargs):
+#         if 'reset_expenses' in request.POST:
+#             # Reset all expenses
+#             Daybook.objects.all().delete()
+#             return redirect('leads:daybook_list')  # Redirect to the daybook list after resetting
+
+# def daybook_create(request):
+#     today = timezone.now().date()  # Get today's date
+
+#     if request.method == 'POST':
+#         form = DaybookEntryForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('leads:daybook_list')  # Redirect to daybook list after saving
+#     else:
+#         form = DaybookEntryForm()  # Create a new form instance
+
+#     return render(request, 'Daybook/daybook_form.html', {
+#         'form': form,
+#         'today': today  # Pass today's date to the context
+#     })
+
+class DaybookCreateView(LoginRequiredMixin, View):
+    template_name = 'Daybook/daybook_form.html'
+
+    def get(self, request, *args, **kwargs):
+        form = DaybookEntryForm()
+        return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
+
+    def post(self, request, *args, **kwargs):
+        form = DaybookEntryForm(request.POST)
+        if form.is_valid():
+            expense = form.save(commit=False)
+            print("expenese is", expense)
+            balance = Balance.objects.first()
+            print("balance is", balance)
+            
+            # Check if balance is available
+            if balance:
+                if balance.amount >= expense.amount:
+                    # Deduct from balance as it's within the daily limit
+                    balance.amount -= expense.amount
+                else:
+                    # If expense exceeds the daily limit, return an error message
+                    messages.error(request, "Daily limit reached. Expense exceeds available balance.")
+                    return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
+            else:
+                # No balance record exists, create one with negative amount if overspending
+                Balance.objects.create(amount=-expense.amount)
+
+            # Save the expense and update balance
+            expense.save()
+            balance.save()
+
+            return redirect('leads:daybook_list')
+        return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
+
 class DaybookListView(LoginRequiredMixin, View):
     template_name = 'Daybook/daybook_list.html'
 
     def get(self, request, *args, **kwargs):
-        # Get today's date
         today = timezone.now().date()
-
-        # Calculate today's expenses
+        
+        # Fetch today's and total expenses
         todays_expenses = Daybook.objects.filter(date=today)
+        print("todays expense is ",todays_expenses)
         total_todays_expenses = sum(expense.amount for expense in todays_expenses)
-
-        # Calculate total expenses till now
+        print("total expens of today",total_todays_expenses)
         total_expenses = Daybook.objects.aggregate(total_amount=models.Sum('amount'))['total_amount'] or 0
+        print("total expense is",total_expenses)
+        # Retrieve current balance and carryover amount
+        current_balance_record = Balance.objects.first()
+        print("current balance record",current_balance_record)
+        current_balance = current_balance_record.amount if current_balance_record else 0
+        print("current balance",current_balance)
+        carryover_amount = current_balance_record.carryover_amount if current_balance_record else 0
+        print("carryover amount is ",carryover_amount)
 
-        # Get current balance (replace with your actual current balance logic)
-        current_balance = 25000  # You can replace this with your actual logic for getting the current balance
-        carryover_amount = current_balance - total_expenses
 
-        if carryover_amount < 0:
-            carryover_amount = abs(carryover_amount)
-            current_balance = 0
+        # Calculate carryover for next day
+        remaining_balance = current_balance - total_todays_expenses
+        if remaining_balance > 0:
+            carryover_amount += remaining_balance
+            print("remaining carryover is ",carryover_amount)
         else:
-            current_balance = current_balance - total_todays_expenses
+            carryover_amount = max(0, carryover_amount + remaining_balance)
+            print("remaining carryover 2 is ",carryover_amount)
 
         context = {
             'expenses': todays_expenses,
@@ -1372,25 +1432,40 @@ class DaybookListView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         if 'reset_expenses' in request.POST:
-            # Reset all expenses
             Daybook.objects.all().delete()
-            return redirect('leads:daybook_list')  # Redirect to the daybook list after resetting
+            Balance.objects.all().delete()
+            return redirect('leads:daybook_list')
 
-def daybook_create(request):
-    today = timezone.now().date()  # Get today's date
 
-    if request.method == 'POST':
-        form = DaybookEntryForm(request.POST)
+class BalanceUpdateView(LoginRequiredMixin, View):
+    template_name = 'Daybook/update_balance.html'
+
+    def get(self, request, *args, **kwargs):
+        form = BalanceUpdateForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = BalanceUpdateForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('leads:daybook_list')  # Redirect to daybook list after saving
-    else:
-        form = DaybookEntryForm()  # Create a new form instance
+            amount = form.cleaned_data['amount']
+            action = form.cleaned_data['action']
+            balance, created = Balance.objects.get_or_create(pk=1)
 
-    return render(request, 'Daybook/daybook_form.html', {
-        'form': form,
-        'today': today  # Pass today's date to the context
-    })
+            if action == 'add':
+                balance.amount += amount
+                print("Add",balance.amount)
+            elif action == 'deduct':
+                balance.amount = max(0, balance.amount - amount)
+                print("deduct",balance.amount)
+
+            balance.save()
+            return redirect('leads:daybook_list')
+        return render(request, self.template_name, {'form': form})
+
+
+
+
+
 
 
 # PROMOTER 
@@ -1439,21 +1514,36 @@ class PlotRegistrationView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form = PlotBookingForm()
         agents = Agent.objects.all()
+        properties = list(Property.objects.values('id', 'totalprice', 'project_name'))  # Fetch only necessary fields
+        print("get")
+        properties = [
+        {
+            'id': prop['id'],
+            'price': str(prop['totalprice']),  # Convert Decimal to string
+            'project_name': prop['project_name']
+        }
+        for prop in properties
+]
+
         
-        return render(request, self.template_name, {'form': form, 'agents': agents})
+        return render(request, self.template_name, {'form': form, 'agents': agents,'properties':properties})
 
     def post(self, request, *args, **kwargs):
         form = PlotBookingForm(request.POST)
         agents = Agent.objects.all()
+        print("post")
         
 
         if form.is_valid():
-            
+            print("help")
             # Retrieve EMI amount and tenure from the form
             emi_amount = form.cleaned_data.get('emi_amount')
-            Plot_price = form.cleaned_data.get('Plot_price')
             tenure = form.cleaned_data.get('emi_tenure')
             project = form.cleaned_data.get('project')
+            Property_inst = Property.objects.get(id = project.id)
+            Plot_price = Property_inst.totalprice
+            form.instance.Plot_price = Property_inst.totalprice  
+            form.save()
             agent = form.cleaned_data.get('agent')
             payment_type = form.cleaned_data.get('payment_type')  # Get the payment type
             print(agent)
@@ -1516,6 +1606,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
 
             return redirect('plot_registration/buyers_list')  # Ensure this matches your URL configuration
         else:
+            print(form.errors)
             messages.error(request, 'A buyer with this project already exists!')
 
             #return redirect('plot_registration/buyers_list.html')
@@ -1614,23 +1705,35 @@ def mark_as_paid(request, payment_id):
         payment.pay_emi(payment.emi_amount)  # Pay the full EMI amount
     return redirect('leads:buyer_detail', buyer_id=payment.plot_booking.id)
 
-
-def pay_emi(request, emi_id):
-    emi_payment = get_object_or_404(EMIPayment, id=emi_id)
-
+def pay_emi(request, payment_id):
     if request.method == 'POST':
-        amount_paid = Decimal(request.POST.get('amount_paid', 0))
+        payment = get_object_or_404(EMIPayment, id=payment_id)
 
-        # Attempt to pay the EMI
-        payment_result = emi_payment.pay_emi(amount_paid)
+        if payment.status == 'Pending':
+            payment.status = 'Paid'
+            payment.save()
+            plotbooking = payment.plot_booking
+            x = False 
+            p = EMIPayment.objects.filter(plot_booking = plotbooking)
+            for allemi in p:
+                if allemi.status == "Paid":
+                    x = True
+                else:
+                    x= False
+                    break
 
-        if payment_result['success']:
-            messages.success(request, payment_result['message'])  # Use messages framework to inform the user
-            return redirect('leads:buyers_list')  # Redirect after successful update
-        else:
-            messages.error(request, payment_result['message'])  # Inform user about the error
+            if x == True:
+                prop_paid = plotbooking.project
+                print(prop_paid.is_in_emi)
+                prop_paid.is_in_emi = False
+                prop_paid.save()
+                print(prop_paid.is_in_emi)
 
-    return render(request, 'plot_registration/pay_emi.html', {'emi_payment': emi_payment})
+                print(prop_paid)
+            
+            return JsonResponse({'status': 'success', 'message': 'Payment marked as paid.'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
+
 
 class GetProjectPriceView(View):
     def get(self, request):
@@ -1673,7 +1776,6 @@ def kisan_view(request, pk=None):
 
 
 # View for listing Kisan
-
 
 class KisanListView(LoginRequiredMixin, ListView):
     model = Kisan

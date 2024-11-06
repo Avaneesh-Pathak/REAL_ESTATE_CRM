@@ -79,6 +79,7 @@
             <a href="{% url 'leads:property-detail' property.pk %}">
                 <h2 class="font-bold text-xl mb-2">{{ property.title }}</h2>
             </a>
+            <p>{{ property.plot_type}}</p>
         </div>
         {% empty %}
         <div class="bg-red-100 p-4 rounded w-full">No properties available.</div>

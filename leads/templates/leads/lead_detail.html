@@ -5,7 +5,6 @@
     .fade-in {
         animation: fadeIn 1s ease-in-out forwards;
     }
-
     @keyframes fadeIn {
         from {
             opacity: 0;
@@ -17,17 +16,14 @@
             transform: translateY(0);
         }
     }
-
     .lead-section {
         background: linear-gradient(135deg, #1481af 0%, #fbfbfb 100%);
         border-radius: 1rem;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
-
     .nav-link {
         flex-grow: 1;
     }
-
     .nav-link:hover {
         border-color: #4f46e5;
         /* Indigo color on hover */
@@ -120,9 +116,10 @@
     .lead-detail {
         margin-bottom: 20px;
         /* Spacing between details */
+        
     }
+  
 </style>
-
 <section class="lead-section text-gray-600 body-font overflow-hidden">
     <div class="container px-5 py-24 mx-auto">
         <div class="lg:w-4/5 mx-auto flex flex-wrap section-container fade-in">
@@ -140,11 +137,10 @@
                     {% endif %}
                     {% endif %}
                 </div>
-                <p class="leading-relaxed mb-4">Fam locavore kickstarter distillery. Mixtape chillwave tumeric sriracha
-                    taximy chia microdosing tilde DIY. XOXO fam inxigo juiceramps cornhole raw denim forage brooklyn.
-                    Everyday carry +1 seitan poutine tumeric. Gastropub blue bottle austin listicle pour-over, neutra
-                    jean.</p>
-
+                <div class="flex flex-col border-t border-gray-200 py-2">
+                    <span class="text-gray-500 font-medium">Description</span>
+                    <span class="text-gray-900 whitespace-pre-line mt-1">{{ lead.description }}</span>
+                </div>
                 <div class="lead-detail">
                     <div class="flex border-t border-gray-200 py-2">
                         <span class="text-gray-500 font-medium">Age</span>
@@ -159,20 +155,15 @@
                         <span class="ml-auto text-gray-900">{{ lead.phone_number }}</span>
                     </div>
                 </div>
-
                 <div class="flex">
-
                     <a style="margin-left: 100px;" href="{% url 'leads:followup-list' lead.pk %}"
                         class="btn-primary w-5px mt-4">FollowUp List</a>
                 </div>
             </div>
-            <div style="align-items: center;" >
-                <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" onerror="this.onerror=null; this.src='{% static 'default.jpg' %}'" style="width: 150px; height: 150px;">
-
-
+            <div class="lead-profile">
+                <img src="{% if lead.profile_picture %}{{ lead.profile_picture.url }}{% else %}{% static 'default.jpg' %}{% endif %}"
+                    alt="Profile Picture" style="width: 250px; height: 250px; margin-left: 70%;">
             </div>
-
-
         </div>
     </div>
 </section>

@@ -36,20 +36,22 @@
             <th>Amount Paid</th>
             <th>Status</th>
             <th>Pending Amount</th>
-            <th>Action</th> <!-- Added Action Column -->
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
         {% for payment in emi_payments %}
-        <tr {% if payment.status == 'Paid' %}class="table-success"{% elif payment.status == 'Pending' %}class="table-warning"{% endif %}>
+        <tr id="payment-row-{{ payment.id }}" {% if payment.status == 'Paid' %}class="table-success"{% elif payment.status == 'Pending' %}class="table-warning"{% endif %}>
             <td>{{ payment.due_date }}</td>
             <td>{{ payment.emi_amount|floatformat:2 }}</td>
             <td>{{ payment.amount_paid|floatformat:2 }}</td>
-            <td>{{ payment.status }}</td>
+            <td class="status-text">{{ payment.status }}</td>
             <td>{{ payment.remaining_amount|floatformat:2 }}</td>
             <td>
                 {% if payment.status == 'Pending' %}
-                <a href="{% url 'leads:pay_emi' payment.id %}" class="btn btn-success">Pay EMI</a>
+                <button onclick="payEmi({{ payment.id }})" class="btn btn-success" id="pay-button-{{ payment.id }}">Pay EMI</button>
+                {% else %}
+                <span class="badge badge-success">Paid EMI</span>
                 {% endif %}
             </td>
         </tr>
@@ -61,6 +63,41 @@
     </tbody>
 </table>
 
+<!-- AJAX and JavaScript -->
+<script>
+    function payEmi(paymentId) {
+        const button = document.getElementById(`pay-button-${paymentId}`);
+        const row = document.getElementById(`payment-row-${paymentId}`);
+        const statusText = row.querySelector('.status-text');
+
+        fetch(`{% url 'leads:pay_emi' 0 %}`.replace(0, paymentId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',  // Include CSRF token for security
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update the button and row to indicate the payment was made
+                button.textContent = 'Paid EMI';
+                button.classList.remove('btn-success');
+                button.classList.add('btn-secondary', 'disabled');
+                button.disabled = true;
+                row.classList.remove('table-warning');
+                row.classList.add('table-success');
+                statusText.textContent = 'Paid';
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+</script>
 <!-- Bootstrap CSS and JS for better interaction -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

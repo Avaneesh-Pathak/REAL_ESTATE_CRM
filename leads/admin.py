@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (User, Lead, Agent, UserProfile, Category, FollowUp, Salary, Sale,Project,Area,Typeplot,PlotBooking,Kisan,
+from .models import (User, Lead, Agent, UserProfile, Category, FollowUp, Salary, Sale,Project,Area,Typeplot,PlotBooking,Kisan,EMIPayment,
                      Property, Bonus, EmiPlan, Daybook, Promoter)
 
 
@@ -65,6 +65,7 @@ admin.site.register(PlotBooking)
 admin.site.register(FollowUp)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(Area)
+admin.site.register(EMIPayment)
 admin.site.register(Kisan)
 admin.site.register(Property, PropertyAdmin)
 admin.site.register(Bonus, BonusAdmin)

@@ -4,7 +4,14 @@
 {% block content %}
 <div class="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
     <h1 class="text-2xl font-semibold mb-6 text-center">Select Properties to Edit</h1>
-
+    <!-- Display Error Message if Present -->
+    {% if error_message %}
+        <div class="mb-5">
+            <div class="text-red-500 bg-red-100 border border-red-200 rounded-md p-4">
+                {{ error_message }}
+            </div>
+        </div>
+    {% endif %}
     <!-- Project Selection Form -->
     <div class="mb-5">
         <div class="mb-4">

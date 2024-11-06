@@ -1,6 +1,9 @@
 from django.urls import path
 from django_distill import distill_path
-
+from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
+from django.urls import path, include
 from . import views
 from .views import (
     LeadListView, LeadDetailView, LeadCreateView, LeadUpdateView, LeadDeleteView,
@@ -8,8 +11,8 @@ from .views import (
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,ProjectCreateView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
-    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,DaybookListView,daybook_create,add_promoter,update_delete_promoter,
-    PromoterListView,load_properties,PlotRegistrationView,user_profile_view,
+    PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,DaybookListView,DaybookCreateView,add_promoter,update_delete_promoter,
+    PromoterListView,load_properties,PlotRegistrationView,user_profile_view,BalanceUpdateView,
     update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView,kisan_view,KisanListView,KisanUpdateView,KisanDeleteView
 )
 
@@ -56,7 +59,8 @@ urlpatterns = [
     path('calculate-emi/', calculate_emi, name='calculate_emi'), 
     #DAYBOOK
     path('daybook/', DaybookListView.as_view(), name='daybook_list'),  # URL for listing expenses
-    path('daybook/create/', daybook_create, name='daybook_create'),
+    path('daybook/create/', DaybookCreateView.as_view(), name='daybook_create'),
+    path('update-balance/', BalanceUpdateView.as_view(), name='update_balance'),
     
     #PROMOTER
     path('promoters/', PromoterListView.as_view(), name='promoter_list'),
@@ -69,7 +73,7 @@ urlpatterns = [
     path('buyer/<int:buyer_id>/print/', views.buyer_print_view, name='buyer_print'),
     path('buyer/<int:buyer_id>/', views.buyer_detail_view, name='buyer_detail'),
     path('buyer/update-delete/<int:id>/', update_delete_buyer, name='update_delete_buyer'),
-    path('emi/pay/<int:emi_id>/', pay_emi, name='pay_emi'),
+    path('emi/pay/<int:payment_id>/',  views.pay_emi, name='pay_emi'),
 
     path('property/get_price/', GetProjectPriceView.as_view(), name='get_project_price'),
     path('kisan/create/', kisan_view, name='kisan_create'),  # Create Kisan
@@ -80,3 +84,7 @@ urlpatterns = [
 
 
 ]   
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

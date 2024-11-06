@@ -124,8 +124,11 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 AUTH_USER_MODEL = 'leads.User'
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Media files configuration
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Authentication
 LOGIN_REDIRECT_URL = "/dashboard"
@@ -135,13 +138,14 @@ LOGOUT_REDIRECT_URL = "/"
 CRISPY_TEMPLATE_PACK = "tailwind"
 
 # Email settings
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
-# EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-# EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"
+# Use an actual email backend for production, such as:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
-# EMAIL_PORT = env.int("EMAIL_PORT")
-# DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+# EMAIL_HOST_USER = 'avaneeshpathak900@gmail.com'
+# EMAIL_HOST_PASSWORD = 'Anuj@03717P'
 
 # # Secure settings for production
 # if not DEBUG:

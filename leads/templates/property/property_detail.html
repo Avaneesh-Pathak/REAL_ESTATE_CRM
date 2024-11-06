@@ -104,22 +104,6 @@
         </div>
         {% endif %}
 
-        <!-- Individual Profit Information Card -->
-        {% if profit_per_sqft_individual %}
-        <div class="col-lg-6 col-md-6 col-sm-12 mb-4 fade-in">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <h2 class="card-title text-primary border-bottom pb-2">Individual Profit Information</h2>
-                    <p><strong>Individual Land Cost for Property:</strong> ₹{{ specific_land_cost|floatformat:2 }}</p>
-                    <p><strong>Individual Development Cost for Property:</strong> ₹{{ specific_development_cost|floatformat:2 }}</p>
-                    <p><strong>Individual Land Area for Property:</strong> ₹{{ specific_area_in_beegha|floatformat:2 }}</p>
-                    <p><strong>Individual Sale Price:</strong> ₹{{ individual_plot_price|floatformat:2 }}</p>
-                    <p><strong>Individual Profit per SqFt:</strong> ₹{{ specific_profit_per_sqft|floatformat:2 }}</p>
-                    <p><strong>Total Individual Profit:</strong> ₹{{ specific_total_profit|floatformat:2 }}</p>
-                </div>
-            </div>
-        </div>
-        {% endif %}
 
         <!-- Agent Information Card -->
         {% if agent %}
@@ -127,11 +111,16 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <h2 class="card-title text-primary border-bottom pb-2">Agent Information</h2>
-                    <p><strong>Agent Name:</strong> {{ plot_booking.agent }}</p>
-                    <p><strong>Commission:</strong> ₹{{ salary.agent.base_salary|floatformat:2 }}</p>
+                    {% for agentid in agent %}
+                    <p><strong>Agent Name:</strong> {{ agentid.agent }}</p>
+                    <p><strong>Commission:</strong> ₹{{ agentid.base_salary|floatformat:2 }}</p>
+                    {% endfor %}
+                    Distributing Commission : {{tot_sal}}-{{ total_profit_per_sqft|floatformat:2 }}<br>
+                    Total Profit After Distributing Commission : {{final_pr|floatformat:2 }}
                 </div>
             </div>
         </div>
+
         {% endif %}
     </div>
 

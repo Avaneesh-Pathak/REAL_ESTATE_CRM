@@ -43,32 +43,29 @@
 
     <form method="post" class="space-y-6">
         {% csrf_token %}
+        
+                <div>
+                    <label for="project_id" class="block text-gray-700 font-medium">Select Project:</label>
+                    <select id="project_id" name="project_id" required
+                        class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"  onchange="toggleCustomInputs()">
+                        <option value="">Choose a project</option>
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.title }} {{project.type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="propertyGrid" class=""  >
+                    {% for project in projects %}
+                    <div data-project="{{ project.id }}">
+                        Total land in : <b>{{ project.title}}:</b> {{ project.total_land_available_fr_plotting }} sqft
+                        <p>Total land Used: <b>{{ project.total_land_area }} sqft</b></p> 
+                        <p>Total land Available: <b>{{ project.total_land_available }} sqft</b></p> 
+                        <p>Cost per sqft: <b>{{ project.land_cost_per_sqft }} Rs</b></p> 
+                    </div>
+                    {% endfor %}
+                </div>
 
-        <div>
-            <label for="num_properties" class="block text-gray-700 font-medium">Number of Properties:</label>
-            <input type="number" name="num_properties" min="1" required
-                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
-        </div>
 
-        <div>
-            <label for="project_id" class="block text-gray-700 font-medium">Select Project:</label>
-            <select id="project_id" name="project_id" required
-                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"  onchange="toggleCustomInputs()">
-                <option value="">Choose a project</option>
-                {% for project in projects %}
-                <option value="{{ project.id }}">{{ project.title }} {{project.type }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div id="propertyGrid" class=""  >
-            {% for project in projects %}
-            <div data-project="{{ project.id }}">
-                Total land in : <b>{{ project.title}}:</b> {{ project.total_land_available_fr_plotting }} sq/ft
-                <p>Total land Used: <b>{{ project.total_land_area }} sq/ft</b></p> 
-                <p>Total land Available: <b>{{ project.total_land_available }} sq/ft</b></p> 
-            </div>
-            {% endfor %}
-        </div>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const projectDropdown = document.getElementById('project_id');
@@ -96,6 +93,18 @@
             });
         </script>
         
+        <div>
+            <label for="num_properties" class="block text-gray-700 font-medium">Number of Properties:</label>
+            <input type="number" name="num_properties" min="1" required
+                class="mt-1 w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        
+        <label for="plot_type">Select Plot Type:</label>
+        <select name="plot_type" id="plot_type" required>
+            {% for value, label in plot_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+        </select>
     
 
         <div>

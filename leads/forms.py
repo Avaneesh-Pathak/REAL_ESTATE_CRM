@@ -40,6 +40,9 @@ class LeadModelForm(forms.ModelForm):
             'email',
             'profile_picture'            
         )
+        widgets = {
+            'profile_picture': forms.ClearableFileInput(attrs={'accept': 'image/*'})
+        }
     def clean_first_name(self):
         data = self.cleaned_data["first_name"]
         return data
@@ -197,7 +200,7 @@ class DaybookEntryForm(forms.ModelForm):
     class Meta:
         model = Daybook
         fields = ['date', 'activity', 'custom_activity', 'amount', 'remark']
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['date'].initial = timezone.now().date()  # Set current date as the initial value
@@ -205,10 +208,21 @@ class DaybookEntryForm(forms.ModelForm):
     def clean_date(self):
         date = self.cleaned_data.get('date')
         today = timezone.now().date()
-        if date < today or date > today:
+        if date != today:
             raise forms.ValidationError("Please enter today's date.")
         return date
+
+class BalanceUpdateForm(forms.Form):
+    ACTION_CHOICES = [
+        ('add', 'Add'),
+        ('deduct', 'Deduct'),
+    ]
+
+    action = forms.ChoiceField(choices=ACTION_CHOICES, required=True)
+    amount = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
+
     
+      
 # PROMOTER FORM
 
 
@@ -259,12 +273,13 @@ class PlotBookingForm(forms.ModelForm):
         fields = [
             'booking_date', 'name', 'father_husband_name', 'gender', 'custom_gender', 'dob', 'mobile_no',
             'address', 'bank_name', 'account_no', 'email', 'nominee_name', 'corner_plot_10', 'corner_plot_5',
-            'full_pay_discount', 'location', 'project', 'associate_detail', 'agent', 'Plot_price',
+            'full_pay_discount', 'location', 'project', 'agent', 'Plot_price',
             'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark','emi_tenure', 'interest_rate'
         ]
         widgets = {
             'booking_date': forms.DateInput(attrs={'type': 'date'}),
             'dob': forms.DateInput(attrs={'type': 'date'}),
+            'project': forms.Select(attrs={'id': 'project-select'}),
             'payment_date':forms.DateInput(attrs={'type': 'date'}),
         }
 
@@ -341,12 +356,13 @@ class PlotBookingForm(forms.ModelForm):
     
 
 class KisanForm(forms.ModelForm):
+    
     class Meta:
         model = Kisan
         fields = [
             'first_name', 'last_name', 'contact_number', 'address',
-            'khasra_number', 'area_in_beegha', 'land_costing', 'development_costing',
-            'payment_to_kisan','land_address'
+            'khasra_number', 'area_in_beegha', 'land_costing',
+            'land_address'
         ]
     def __init__(self, *args, **kwargs):
         super(KisanForm, self).__init__(*args, **kwargs)
