@@ -15,8 +15,8 @@ class AgentListView(OrganisorAndLoginRequiredMixin, generic.ListView):
     template_name = "agents/agent_list.html"
     
     def get_queryset(self):
-        organisation = self.request.user.userprofile
-        return Agent.objects.filter(organisation=organisation)
+        # organisation = self.request.user.userprofile
+        return Agent.objects.all()
 
 
 
@@ -29,7 +29,7 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['organisation'] = self.request.user.userprofile  # Pass the organisation
+        # kwargs['organisation'] = self.request.user.userprofile  # Pass the organisation
         return kwargs
 
     def form_valid(self, form):
@@ -68,7 +68,6 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
         # # Create and save the Agent instance
         Agent.objects.create(
             user=user,
-            organisation=self.request.user.userprofile,
             parent_agent=parent_agent,
             # commission_percentage=commission_percentage,
             
@@ -83,8 +82,8 @@ class AgentDetailView(OrganisorAndLoginRequiredMixin, generic.DetailView):
     context_object_name = "agent"
 
     def get_queryset(self):
-        organisation = self.request.user.userprofile
-        return Agent.objects.filter(organisation=organisation)
+        # organisation = self.request.user.userprofile
+        return Agent.objects.all()
     
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)
@@ -115,12 +114,12 @@ class AgentUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # Pass the organisation to the form so the parent agent list is filtered correctly
-        kwargs['organisation'] = self.request.user.userprofile
+        # kwargs['organisation'] = self.request.user
         return kwargs
 
     def get_queryset(self):
-        organisation = self.request.user.userprofile
-        return Agent.objects.filter(organisation=organisation)
+        # organisation = self.request.user.userprofile
+        return Agent.objects.all()
 
     # Ensure the form is pre-filled with the agent's current details
     def get_initial(self):
@@ -142,8 +141,8 @@ class AgentDeleteView(OrganisorAndLoginRequiredMixin, generic.DeleteView):
         return reverse("agents:agent-list")
 
     def get_queryset(self):
-        organisation = self.request.user.userprofile
-        return Agent.objects.filter(organisation=organisation)
+        # organisation = self.request.user.userprofile
+        return Agent.objects.all()
 
 
 class AgentTreeView(generic.TemplateView):
@@ -153,8 +152,8 @@ class AgentTreeView(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         
         # Fetch all agents in the organization
-        organisation = self.request.user.userprofile
-        agents = Agent.objects.filter(organisation=organisation)
+        # organisation = self.request.user.userprofile
+        agents = Agent.objects.all()
 
         # Create a dictionary to hold agents by their ID
         agent_dict = {agent.id: agent for agent in agents}

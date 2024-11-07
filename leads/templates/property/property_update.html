@@ -27,6 +27,12 @@
                     
                     <label for="price_{{ property.id }}" class="form-label mt-3">Price</label>
                     <input type="number" class="form-control" id="price_{{ property.id }}" name="price" value="{{ property.price }}" required>
+                    <label for="plot_type">Select Plot Type:</label>
+                    <select name="plot_type" id="plot_type" required>
+                        {% for value, label in plot_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <hr class="my-4">
                 {% endwith %}

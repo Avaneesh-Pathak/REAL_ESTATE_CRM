@@ -193,7 +193,7 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         user = self.request.user
 
         # Total leads
-        total_lead_count = Lead.objects.filter(organisation=user.userprofile).count()
+        total_lead_count = Lead.objects.all().count()
 
         recent_buyers = PlotBooking.objects.order_by('-booking_date')[:5]  # Use the appropriate field for your criteria
         
@@ -249,13 +249,11 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         # Leads in last 30 days
         thirty_days_ago = timezone.now().date() - timedelta(days=30)
         total_in_past30 = Lead.objects.filter(
-            organisation=user.userprofile,
             date_added__gte=thirty_days_ago
         ).count()
 
         converted_category = Category.objects.filter(name="Converted").first()
         converted_in_past30 = Lead.objects.filter(
-            organisation=user.userprofile,
             category=converted_category,
             converted_date__gte=thirty_days_ago
         ).count()
@@ -279,6 +277,9 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         })
         return context
 
+import logging
+logger = logging.getLogger('app_errors')
+logger.info("This is an informational message.")
     
 class LeadListView(LoginRequiredMixin,generic.ListView):
     
@@ -286,19 +287,22 @@ class LeadListView(LoginRequiredMixin,generic.ListView):
     context_object_name = "leads"
 
     def get_queryset(self):
+        # Use logging in models or views
+
+
         user = self.request.user
         # initial queryset of leads for the entire organisation
         if user.is_organisor:
             queryset = Lead.objects.filter(
-                organisation=user.userprofile, 
+                # organisation=user.userprofile, 
                 agent__isnull=False
             ).select_related('agent')
         else:
             # Check if the user has an associated agent
             if hasattr(user, 'agent'):
                 queryset = Lead.objects.filter(
-                    organisation=user.agent.organisation, 
-                    agent=user.agent
+                    # organisation=user.agent.organisation, 
+                    # agent=user.agent
                 ).select_related('agent')
             else:
                 queryset = Lead.objects.none()
@@ -310,7 +314,7 @@ class LeadListView(LoginRequiredMixin,generic.ListView):
         user = self.request.user
         context = super(LeadListView, self).get_context_data(**kwargs)
         if user.is_organisor:
-            queryset = Lead.objects.filter(organisation=user.userprofile,agent__isnull=True)
+            queryset = Lead.objects.filter(agent__isnull=True)
             
             context["unassigned_leads"] = queryset  
            
@@ -1118,6 +1122,7 @@ class PropertyUpdateView(LoginRequiredMixin,View):
         # Split the comma-separated list of property IDs
         property_ids = ids.split(',')
         properties = Property.objects.filter(id__in=property_ids)
+        plot_choices = Property.PLOT_CHOICES
         if not properties.exists():
             return None, None  # Handle if no properties are found
         
@@ -1133,11 +1138,12 @@ class PropertyUpdateView(LoginRequiredMixin,View):
         return project, properties
 
     def get(self, request, ids):
+        plot_choices = Property.PLOT_CHOICES
         project, properties = self.get_project_and_properties(ids)
         if project is None or properties is None:
             return redirect('error_page')  # Redirect to an error page if data is missing
 
-        return render(request, self.template_name, {'properties': properties, 'project': project})
+        return render(request, self.template_name, {'properties': properties, 'project': project,'plot_choices':plot_choices})
 
     def post(self, request, ids):
         # Retrieve project and properties using helper method
@@ -1150,7 +1156,7 @@ class PropertyUpdateView(LoginRequiredMixin,View):
         length = int(request.POST.get('project_name', ''))
         price = request.POST.get('price', '')
         breadth = int(request.POST.get('block', ''))
-
+        update_type = request.POST.get('plot_type', '')
         # Calculate required area
         required_area = length * breadth * count
 
@@ -1164,6 +1170,7 @@ class PropertyUpdateView(LoginRequiredMixin,View):
             property_instance.price = float(price)
             property_instance.breadth = breadth
             property_instance.area = breadth*length
+            property_instance.plot_type = update_type
             property_instance.save()
 
         return redirect(self.get_success_url())
