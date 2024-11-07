@@ -165,7 +165,7 @@ def user_profile(request):
     return render(request, 'leads/profile.html', {'form': form})
 
 def update_profile(request):
-    user_profile = request.user.userprofile
+    user_profile = request.user
 
     if request.method == 'POST':
         form = UserProfileForm(request.POST, request.FILES, instance=user_profile)

@@ -6,7 +6,7 @@
         background-color: rgb(58, 32, 142);
     }
 </style>
-<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-8">
+<div  class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-8">
     <h2 class="text-3xl font-semibold mb-4">Daily Expenses</h2>
     <p class="text-lg text-gray-600 mb-6">
             Current Balance: 
@@ -21,7 +21,7 @@
         {% endif %}
     </p>
     <p class="text-lg text-gray-600 mb-6">Total Expenses Till Now: <span class="font-bold text-red-600">{{ total_expenses }}</span></p>
-    <p class="text-lg text-gray-600 mb-6">Carryover Amount: <span class="font-bold text-red-600">{{ carryover_amount}}</span></p>
+    {% comment %} <p class="text-lg text-gray-600 mb-6">Carryover Amount: <span class="font-bold text-red-600">{{ carryover_amount}}</span></p> {% endcomment %}
 
     <!-- Button to add a new expense -->
     <a href="{% url 'leads:daybook_create' %}"

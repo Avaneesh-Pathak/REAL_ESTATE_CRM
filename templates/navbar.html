@@ -1,0 +1,382 @@
+{% load static %}
+
+
+<style>
+    /* Header styling */
+    header {
+        background-color: #030648;
+        position: fixed;
+        top: 0;
+
+            {
+            % comment %
+        }
+
+        width: 100%;
+
+            {
+            % endcomment %
+        }
+
+        z-index: 1000;
+        height: 95px;
+    }
+
+    .logo img {
+        border-radius: 50%;
+    }
+
+    .profile-name::after {
+        content: "▼";
+        /* Down arrow */
+        font-size: 12px;
+        /* Adjust arrow size as needed */
+        margin-left: 5px;
+        color: #1a1a1a;
+        /* Match arrow color to text color */
+    }
+
+    .search-form {
+        margin-left: auto;
+    }
+
+    .search-input {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 200px;
+    }
+
+    .search-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        margin-left: 5px;
+    }
+
+    /* Sidebar styling */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 200px;
+        background-color: #030648;
+        padding-top: 1rem;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        padding: 1rem;
+        display: block;
+    }
+
+    .sidebar a:hover {
+        background-color: #1a1a1a;
+        color: #007bff;
+    }
+
+    .nested-menu {
+        display: none;
+    }
+
+    .nested-menu a {
+        padding-left: 2rem;
+    }
+
+    /* Profile Button */
+    .profile-button {
+        background: #126ccd;
+        border: none;
+        color: #2b5cbe;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+    .profile-button:hover {
+        background-color: #f2f2f2;
+    }
+
+    /* Profile Image */
+    .profile-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    /* Profile Icon (Fallback) */
+    .profile-icon {
+        font-size: 35px;
+        color: #114e94;
+    }
+
+    /* Profile Name */
+    .profile-name {
+        margin-left: 10px;
+        font-weight: bold;
+        color: #1a1a1a;
+    }
+
+    /* Dropdown Menu */
+    .profile-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: #2557ad;
+        color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        transform: translateY(10px);
+    }
+
+    .profile-dropdown.active {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+
+    /* Dropdown Item */
+    .dropdown-item {
+        display: block;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        background: none;
+        border: none;
+        transition: background-color 0.3s ease;
+        font-size: 14px;
+    }
+
+    .dropdown-item:hover {
+        background-color: #444;
+    }
+
+    /* Login Link */
+    .login-link {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .login-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 200px;
+        }
+
+        .search-input {
+            width: 150px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .search-form {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .search-input {
+            width: 100%;
+        }
+
+        .search-button {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 250px;
+        }
+    }
+
+    /* Hamburger icon */
+    .hamburger {
+        font-size: 40px;
+        color: #fff;
+        cursor: pointer;
+        margin-left: 15px;
+    }
+
+    /* Close button in sidebar */
+    .close-btn {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
+        align-items: center;
+    }
+</style>
+
+<header style="width: 100%;">
+    <div class="container flex items-center justify-between">
+        <!-- Hamburger Icon -->
+        <div class="hamburger cursor-pointer" id="hamburger">
+            &#9776;
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="close-btn">
+                <span class="text-white">PMA Software</span>
+                <button class="btn btn-danger btn-sm" id="close-button">X</button>
+            </div>
+            <nav>
+                <a href="{% url 'dashboard' %}">Home</a>
+
+                {% if request.user.is_organisor %}
+                <a href="{% url 'agents:agent-list' %}">Agents</a>
+                {% endif %}
+
+                <a href="#" id="toggle-leads-menu">Leads <i class="fas fa-chevron-down"></i></a>
+                <div class="nested-menu" id="leads-menu">
+                    <a href="{% url 'leads:lead-list' %}">Lead List</a>
+                    <a href="{% url 'leads:lead-create' %}">Create Lead</a>
+                    <a href="{% url 'leads:category-create' %}">Create Category</a>
+                </div>
+
+                {% comment %} <a href="#" id="toggle-sales-menu">Sales <i class="fas fa-chevron-down"></i></a>
+                <div class="nested-menu" id="sales-menu">
+                    <a href="{% url 'leads:sale_list' %}">Sales List</a>
+                    <a href="{% url 'leads:create_sale' %}">Add New Sale</a>
+                </div> {% endcomment %}
+
+                <a href="#" id="toggle-properties-menu">Properties <i class="fas fa-chevron-down"></i></a>
+                <div class="nested-menu" id="properties-menu">
+                    <a href="{% url 'leads:property_list' %}">Property List</a>
+                    <a href="{% url 'leads:plot_registration' %}">Register Plot</a>
+                    <a href="{% url 'leads:property-create' %}">Property Create</a>
+                </div>
+
+                <a href="{% url 'leads:salary_list' %}">Salary</a>
+                <a href="{% url 'leads:daybook_list' %}">Daybook</a>
+                <a href="{% url 'leads:buyers_list' %}">Buyers List</a>
+                <a href="{% url 'leads:plot_registration' %}">Register Plot</a>
+                <a href="{% url 'leads:kisan_list' %}">View Kisan List</a>
+                <a href="{% url 'leads:kisan_create' %}">Add Kisan</a>
+            </nav>
+        </div>
+
+        <!-- Brand and Title -->
+        <div style="margin-top: 15px; margin-right: 50%;" class="logo-container">
+            <a href="{% url 'dashboard' %}"
+                class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5 logo-container">
+                <img style="border-radius: 50px;" src="{% static 'images/Screenshot 2024-10-19 002628.png' %}"
+                    alt="Image" class="w-12 h-12 logo">
+                <span class="ml-3 text-xl py-0 text">PMA CRM</span>
+            </a>
+        </div>
+        <!-- Title Section -->
+
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <form action="{% url 'search' %}" method="GET" class="search-form">
+                <input type="text" name="q" class="search-input" placeholder="Search..." required>
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+
+        <!-- User Profile Dropdown -->
+        {% if request.user.is_authenticated %}
+        <div class="profile-dropdown-container" style="position: relative; display: inline-block;">
+            <button id="profile-menu-button" class="profile-button">
+                {% if request.user.userprofile.profile_picture %}
+                <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile Picture" class="profile-img">
+                {% else %}
+                <i class="fas fa-user-circle profile-icon"></i>
+                {% endif %}
+                <span class="profile-name">{{ request.user.username }}</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="profile-dropdown" class="profile-dropdown">
+                <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>
+                <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
+                <a href="{% url 'reset_password' %}" class="dropdown-item">Reset Password</a>
+            </div>
+        </div>
+        {% else %}
+        <a href="{% url 'login' %}" class="login-link">Login</a>
+        {% endif %}
+
+        <script>
+            // Toggle profile dropdown on button click
+            document.getElementById('profile-menu-button').addEventListener('click', function (event) {
+                event.stopPropagation();
+                const dropdown = document.getElementById('profile-dropdown');
+                dropdown.classList.toggle('active');
+            });
+
+            // Close the dropdown if clicked outside
+            document.addEventListener('click', function (event) {
+                const dropdown = document.getElementById('profile-dropdown');
+                if (!event.target.closest('#profile-menu-button')) {
+                    dropdown.classList.remove('active');
+                }
+            });
+
+            // Add hover effects to dropdown links
+            const dropdownLinks = document.querySelectorAll('.dropdown-item');
+            dropdownLinks.forEach(function (link) {
+                link.addEventListener('mouseover', function () {
+                    this.style.backgroundColor = '#444';
+                });
+                link.addEventListener('mouseout', function () {
+                    this.style.backgroundColor = 'transparent';
+                });
+            });
+        </script>
+
+
+    </div>
+</header>
+
+<!-- JavaScript for Sidebar and Dropdowns -->
+<script>
+    document.getElementById('hamburger').addEventListener('click', function () {
+        document.getElementById('sidebar').style.transform = 'translateX(0)';
+    });
+    document.getElementById('close-button').addEventListener('click', function () {
+        document.getElementById('sidebar').style.transform = 'translateX(-100%)';
+    });
+
+    document.getElementById('toggle-leads-menu').addEventListener('click', function () {
+        document.getElementById('leads-menu').classList.toggle('hidden');
+    });
+
+    document.getElementById('toggle-sales-menu').addEventListener('click', function () {
+        document.getElementById('sales-menu').classList.toggle('hidden');
+    });
+
+    document.getElementById('toggle-properties-menu').addEventListener('click', function () {
+        document.getElementById('properties-menu').classList.toggle('hidden');
+    });
+
+    document.getElementById('profile-menu-button').addEventListener('click', function (event) {
+        event.stopPropagation();
+        document.getElementById('profile-dropdown').classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', function () {
+        document.getElementById('profile-dropdown').classList.add('hidden');
+    });
+</script>

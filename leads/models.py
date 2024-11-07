@@ -471,8 +471,9 @@ class EMIPayment(models.Model):
 
     def remaining_amount(self):
         """Calculate the remaining amount to be paid."""
-        logger.debug(f"Remaining amount for EMI: {remaining}")
-        return self.emi_amount - self.amount_paid
+        remaining = self.emi_amount - self.amount_paid  # Calculate the remaining amount
+        logger.debug(f"Remaining amount for EMI: {remaining}")  # Log the remaining amount
+        return remaining
 
     def pay_emi(self, amount):
         """Pay the EMI with the specified amount."""
