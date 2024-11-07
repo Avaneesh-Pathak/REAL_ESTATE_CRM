@@ -9,7 +9,7 @@
         font-family: 'Open Sans', sans-serif;
         /* Clean and modern font */
         margin-top: 0%;
-        padding: 0;
+        padding: 10;
     }
 
     .container {
@@ -143,7 +143,7 @@
 </style>
 
 
-<div class="container mt-5 mb-5 p-4">
+<div class="container p-20 mt-0 mb-0">
     <h1 style="text-align: center; color: #000000; font-size: var(--h1-font-size, 32px);">
         PLOT REGISTRATION
     </h1>
@@ -214,7 +214,7 @@
                 </select></p>
         </div>
         <div class="d-flex justify-content-between">
-            <p><strong>Property Price:</strong><br> <span class="font-bold" id="property-price">Rs</span></p>
+            <p><strong>Property Price:</strong><br> <span style="font-size: 30px; color: rgb(93, 97, 218);" class="font-bold" id="property-price">Rs</span></p>
             <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>
         </div>
         <script>
@@ -294,19 +294,26 @@
         customGenderField.style.display = this.value === "other" ? "block" : "none";
     });
 
-    document.getElementById("id_associate_detail").addEventListener("change", function () {
-        const agentField = document.getElementById("agent-field");
-        agentField.style.display = this.checked ? "block" : "none";
-    });
+    // document.getElementById("id_associate_detail").addEventListener("change", function () {
+    //     const agentField = document.getElementById("agent-field");
+    //     agentField.style.display = this.checked ? "block" : "none";
+    // });
 
     document.getElementById("id_payment_type").addEventListener("change", function () {
         const emiOptions = document.getElementById("emi-options");
+        console.log(document.getElementById("id_payment_type"))
         emiOptions.style.display = this.value === "installment" ? "block" : "none";
     });
 
     function calculateEMI() {
-        const plotPrice = parseFloat(document.getElementById("id_Plot_price").value) || 0;
+        // const plotPrice =document.getElementById("property-price").value || 0;
+       
+        // Parse property price from the text content of the span
+        const plotPriceText = document.getElementById("property-price").textContent;
+        const plotPrice = parseFloat(plotPriceText.replace(/\D/g, '')) || 0;
+        console.log(plotPrice)
         const downPayment = parseFloat(document.getElementById("id_booking_amount").value) || 0;
+        console.log(downPayment)
         const emiTenure = parseInt(document.getElementById("id_emi_tenure").value) || 0;
         const interestRate = parseFloat(document.getElementById("id_interest_rate").value) || 0;
 
@@ -338,22 +345,22 @@
                 success: function (response) {
                     if (response.price) {
                         // Update the price input field with the fetched price
-                        $('#id_Plot_price').val(response.price);
+                        $('#id_property-price').val(response.price);
                     } else if (response.error) {
                         console.log(response.error);
-                        $('#id_Plot_price').val('');  // Clear if there's an error
+                        $('#id_property-price').val('');  // Clear if there's an error
                     }
                 }
             });
         } else {
             // Clear the price field if no project is selected
-            $('#id_Plot_price').val('');
+            $('#id_property-price').val('');
         }
     });
 
     // FInal Price 
     function calculateFinalPrice() {
-        const plotPrice = parseFloat(document.getElementById("id_plot_price").value) || 0;
+        const plotPrice = parseFloat(document.getElementById("id_property-price").value) || 0;
         const bookingAmount = parseFloat(document.getElementById("id_booking_amount").value) || 0;
 
         const finalPrice = plotPrice - bookingAmount;
@@ -361,7 +368,7 @@
     }
 
     document.getElementById("id_booking_amount").addEventListener("input", calculateFinalPrice);
-    document.getElementById("id_plot_price").addEventListener("input", calculateFinalPrice);
+    document.getElementById("id_property-price").addEventListener("input", calculateFinalPrice);
 
 
 </script>

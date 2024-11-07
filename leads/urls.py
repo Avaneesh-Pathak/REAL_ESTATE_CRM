@@ -80,6 +80,10 @@ urlpatterns = [
     path('kisans/', KisanListView.as_view(), name='kisan_list'),
     path('kisan/edit/<int:pk>/', KisanUpdateView.as_view(), name='kisan_edit'),
     path('kisan/delete/<int:pk>/', KisanDeleteView.as_view(), name='kisan_delete'),
+    path('export/properties/', views.export_properties_to_csv, name='export_properties_to_csv'),
+    path('export/buyers/', views.export_buyers_to_csv, name='export_buyers_to_csv'),
+    path('export/salaries/', views.export_salaries_to_csv, name='export_salaries_to_csv'),
+    path('export/kisans/', views.export_kisans_to_csv, name='export_kisans_to_csv'),
   
 
 

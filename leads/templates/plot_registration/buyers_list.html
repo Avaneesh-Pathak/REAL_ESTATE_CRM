@@ -34,9 +34,13 @@
         </div>
         {% if request.user.is_organisor %}
         <div>
-            <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:plot_registration' %}">
+            <a class="mr-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:plot_registration' %}">
                 Register New Plot
             </a>
+            <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:export_buyers_to_csv' %}">
+                Download Buyer List CSV
+            </a>
+            
         </div>
         {% endif %}
     </div>

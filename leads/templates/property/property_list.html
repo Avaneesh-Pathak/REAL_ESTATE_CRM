@@ -59,9 +59,13 @@
                 href="{% url 'leads:property-create' %}">
                 Create a new property
             </a>
-            <a class="mr-40 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+            <a class="mr-10 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
                 href="{% url 'leads:select_properties' %}">
                 Update
+            </a>
+            <a class="mr-10 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" 
+                href="{% url 'leads:export_properties_to_csv' %}">
+                Download CSV
             </a>
         </div>
         {% endif %}
@@ -70,7 +74,7 @@
     <!-- Grid layout for properties with 8 columns -->
     <div id="propertyGrid" class="grid grid-cols-8 gap-7">
         {% for property in properties %}
-        <div data-project="{{ property.project_id.id }}" style="border-radius:10%; 
+        <div data-project="{{ property.project_id.id }}" style="text-align: center; border-radius:10%; 
         background-color: 
         {% if property.is_in_emi %} rgba(255, 255, 0, 0.4); /* Yellow for in EMI */
         {% elif property.is_sold %} rgba(255, 0, 0, 0.4); /* Red for sold */
@@ -79,7 +83,7 @@
             <a href="{% url 'leads:property-detail' property.pk %}">
                 <h2 class="font-bold text-xl mb-2">{{ property.title }}</h2>
             </a>
-            <p>{{ property.plot_type}}</p>
+            <p style="text-align: center; font-weight: bold;" >{{ property.plot_type}}</p>
         </div>
         {% empty %}
         <div class="bg-red-100 p-4 rounded w-full">No properties available.</div>

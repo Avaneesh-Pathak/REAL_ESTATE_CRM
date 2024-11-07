@@ -15,10 +15,14 @@
         </div>
         {% if request.user.is_organisor %}
         <div>
-            <a style="margin-right: 8px;" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+            {% comment %} <a style="margin-right: 8px;" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
                 href="{% url 'leads:create_salary' %}">
                 Add Salary Data
+            </a> {% endcomment %}
+            <a style="margin-right: 8px;" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" href="{% url 'leads:export_salaries_to_csv' %}">
+                Download Salary List CSV
             </a>
+            
         </div>
         {% endif %}
     </div>
@@ -36,7 +40,7 @@
             <tr>
                 <th class="text-center">Agent</th>
                 <th class="text-center">Last Sale Commission</th>
-                <th class="text-center">Salary</th>
+                {% comment %} <th class="text-center">Salary</th> {% endcomment %}
                 <th class="text-center">Property Sold</th>
                 <!-- <th class="text-center">Total Commission</th> -->
                 <th class="text-center">Total Payout</th>
@@ -49,7 +53,7 @@
             <tr class="bg-gray-100 text-center">
                 <td style="font-size:large; font-weight: bold;">{{ salary.agent.username }}</td>
                 <td class="text-center">₹{{ salary.base_salary|floatformat:3 }}</td>
-                <td class="text-center">₹{{ salary.bonus }}</td>
+                {% comment %} <td class="text-center">₹{{ salary.bonus }}</td> {% endcomment %}
                 <td class="text-center">{{ salary.property.title }}</td>
                 <!-- <td class="text-center">₹{{ salary.agent.total_profit }}</td> Total Commission -->
                 <td class="text-center">₹{{ salary.total_compensation|floatformat:3 }}</td>

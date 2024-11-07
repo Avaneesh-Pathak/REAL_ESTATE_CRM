@@ -120,7 +120,7 @@ class FollowUpModelForm(forms.ModelForm):
 class SalaryForm(forms.ModelForm):
     class Meta:
         model = Salary
-        fields = ['agent', 'base_salary', 'bonus', 'payment_date']
+        fields = ['payment_date']
         widgets = {
             'payment_date': forms.DateInput(attrs={
                 'type': 'date',  # Use HTML5 date input
@@ -280,6 +280,7 @@ class PlotBookingForm(forms.ModelForm):
             'booking_date': forms.DateInput(attrs={'type': 'date'}),
             'dob': forms.DateInput(attrs={'type': 'date'}),
             'project': forms.Select(attrs={'id': 'project-select'}),
+            'payment_type': forms.Select(attrs={'id': 'id_payment_type'}),
             'payment_date':forms.DateInput(attrs={'type': 'date'}),
         }
 

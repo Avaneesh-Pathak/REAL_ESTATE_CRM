@@ -1299,62 +1299,6 @@ def calculate_emi(request):
     return render(request, 'EMI/emi_calculation.html', {'emi': emi, 'error_message': error_message})
 
 # DAYBOOK
-
-# class DaybookListView(LoginRequiredMixin, View):
-#     template_name = 'Daybook/daybook_list.html'
-
-#     def get(self, request, *args, **kwargs):
-#         # Get today's date
-#         today = timezone.now().date()
-
-#         # Calculate today's expenses
-#         todays_expenses = Daybook.objects.filter(date=today)
-#         total_todays_expenses = sum(expense.amount for expense in todays_expenses)
-
-#         # Calculate total expenses till now
-#         total_expenses = Daybook.objects.aggregate(total_amount=models.Sum('amount'))['total_amount'] or 0
-
-#         # Get current balance (replace with your actual current balance logic)
-#         current_balance = 25000  # You can replace this with your actual logic for getting the current balance
-#         carryover_amount = current_balance - total_expenses
-
-#         if carryover_amount < 0:
-#             carryover_amount = abs(carryover_amount)
-#             current_balance = 0
-#         else:
-#             current_balance = current_balance - total_todays_expenses
-
-#         context = {
-#             'expenses': todays_expenses,
-#             'total_balance': current_balance,
-#             'carryover_amount': carryover_amount,
-#             'todays_expense': total_todays_expenses,
-#             'total_expenses': total_expenses,
-#         }
-#         return render(request, self.template_name, context)
-
-#     def post(self, request, *args, **kwargs):
-#         if 'reset_expenses' in request.POST:
-#             # Reset all expenses
-#             Daybook.objects.all().delete()
-#             return redirect('leads:daybook_list')  # Redirect to the daybook list after resetting
-
-# def daybook_create(request):
-#     today = timezone.now().date()  # Get today's date
-
-#     if request.method == 'POST':
-#         form = DaybookEntryForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('leads:daybook_list')  # Redirect to daybook list after saving
-#     else:
-#         form = DaybookEntryForm()  # Create a new form instance
-
-#     return render(request, 'Daybook/daybook_form.html', {
-#         'form': form,
-#         'today': today  # Pass today's date to the context
-#     })
-
 class DaybookCreateView(LoginRequiredMixin, View):
     template_name = 'Daybook/daybook_form.html'
 
@@ -1461,12 +1405,6 @@ class BalanceUpdateView(LoginRequiredMixin, View):
             balance.save()
             return redirect('leads:daybook_list')
         return render(request, self.template_name, {'form': form})
-
-
-
-
-
-
 
 # PROMOTER 
 
@@ -1846,8 +1784,112 @@ class KisanDeleteView(DeleteView):
     template_name = 'kisan/kisan_confirm_delete.html'
     success_url = reverse_lazy('leads:kisan_list')
 
+import csv
+from django.http import HttpResponse
+from .models import Property  # or any model you want to export
+
+def export_properties_to_csv(request):
+    # Define the HTTP response as a CSV file
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="properties.csv"'
+    
+    # Create a CSV writer
+    writer = csv.writer(response)
+    
+    # Write the header row for the CSV file
+    writer.writerow(['Title', 'Project Name', 'Block', 'Price per Sq Ft', 'Area', 'Plot Price', 'Type', 'Status'])
+    
+    # Fetch data from the model
+    properties = Property.objects.all()  # Adjust your queryset as needed
+    
+    # Write data rows
+    for property in properties:
+        writer.writerow([
+            property.title,
+            property.project_name,
+            property.block,
+            property.price,
+            property.area,
+            property.totalprice,  # Assuming this is the plot price field
+            property.type,
+            'Sold' if property.is_sold else 'Available' if not property.is_in_emi else 'In Emi'
+        ])
+    
+    return response
+
+def export_buyers_to_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="buyers.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Name', 'Mobile','Email','Property',  'Address', 'Booking Date', 'Agent Name'])  # Adjust columns as needed
+    
+    buyers = PlotBooking.objects.all()  # Adjust your queryset as needed
+
+    for buyer in buyers:
+        writer.writerow([
+            buyer.id,
+            buyer.name,
+            buyer.mobile_no,
+            buyer.email,
+            buyer.project,
+            buyer.address,
+            buyer.booking_date,
+            buyer.agent,
+           
+            # buyer.plot_id,  # Adjust field name based on your Buyer model
+            # buyer.agent if buyer.agent else 'N/A'
+        ])
+    
+    return response
+
+from .models import Salary  # Replace with your Salary model
+
+def export_salaries_to_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="salaries.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Agent Name', 'Commision', 'Payment Date', 'Property ID'])  # Adjust columns as needed
+    
+    salaries = Salary.objects.all()  # Adjust your queryset as needed
+
+    for salary in salaries:
+        writer.writerow([
+            salary.agent,  # Assuming agent has a user relation with username
+            salary.base_salary,
+            # salary.bonus,
+            salary.payment_date,
+            salary.property.title if salary.property else 'N/A'
+        ])
+    
+    return response
 
 
+
+from .models import Kisan  # Replace with your Kisan model
+
+def export_kisans_to_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="kisans.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'First Name','Last Name', 'Contact','Khasra Number', 'Area in Beegha','Land Cost'])  # Adjust columns as needed
+    
+    kisans = Kisan.objects.all()  # Adjust your queryset as needed
+
+    for kisan in kisans:
+        writer.writerow([
+            kisan.id,
+            kisan.first_name,
+            kisan.last_name,
+            kisan.contact_number,
+            kisan.khasra_number,
+            kisan.area_in_beegha,
+            kisan.land_costing
+        ])
+    
+    return response
 
 
 

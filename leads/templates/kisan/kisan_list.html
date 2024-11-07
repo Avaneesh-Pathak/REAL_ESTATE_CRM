@@ -32,9 +32,13 @@
         </div>
     {% if request.user.is_organisor %}
         <div>
-            <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:kisan_create' %}">
+            <a class=" mr-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:kisan_create' %}">
                 Add New Kisan
             </a>
+            <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:export_kisans_to_csv' %}">
+                Download Kisan List CSV
+            </a>
+            
         </div>
         {% endif %}
     </div>
