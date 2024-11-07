@@ -2,9 +2,9 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+{% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> {% endcomment %}
 
-<div style="margin-top: 5%;" class="container my-5">
+<div style="margin-top: 4%; width: 60%;" class="container">
     <!-- Back Button -->
     <div class="mb-4">
         <a href="{% url 'leads:property_list' %}" class="text-decoration-none">

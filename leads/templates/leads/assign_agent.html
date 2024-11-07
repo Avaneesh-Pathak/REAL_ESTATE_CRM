@@ -4,13 +4,13 @@
 {% block content %}
 <style>
     /* Simple styles for the form */
-    .container {
+    {% comment %} .container {
         padding: 20px;
         
         max-width: 600px;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+    } {% endcomment %}
 
     h1 {
         text-align: center;
@@ -78,7 +78,7 @@
     }
 </style>
 
-<div class="container">
+<div style="width: fit-content;" class="container mt-5">
     <a href="{% url 'leads:lead-list' %}" class="back-link mb-3 btn btn-primary">← Go Back to Leads</a>
 
     <h1 style="font-size: large; font-weight: 500; ;" >Assign an Agent to This Lead</h1>

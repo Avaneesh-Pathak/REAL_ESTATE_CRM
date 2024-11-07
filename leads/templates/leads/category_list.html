@@ -98,7 +98,7 @@
                                 {{ category.name }}
                             </a>
                         </td>
-                        <td class="px-4 py-3">TODO</td>
+                        <td class="px-4 py-3">{{ category.lead_count }}</td>
                         <td class="px-4 py-3">
                             <a href="{% url 'leads:category-delete' category.pk %}" 
                                class="delete-btn bg-red-500 text-white py-1 px-3 rounded-full hover:bg-red-600 shadow-sm">

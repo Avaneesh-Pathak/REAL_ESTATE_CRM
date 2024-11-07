@@ -496,6 +496,7 @@ class CategoryListView(LoginRequiredMixin, generic.ListView):
             queryset = Category.objects.filter(
                 organisation=user.agent.organisation
             )
+        queryset = queryset.annotate(lead_count=Count('leads'))
         return queryset
 
 

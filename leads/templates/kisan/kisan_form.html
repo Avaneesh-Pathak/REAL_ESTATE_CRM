@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <style>
-  .container {
-    max-width: 700px;
-    margin: auto;
-    padding: 20px;
-  }
   .form-container {
-    background-color: #0b0456; /* Change this to the desired background color for the form */
-    padding: 20px; /* Add padding for the form */
-    border-radius: 4px; /* Rounded corners for the form */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: add shadow to the form */
+    background-color: #07033b;
+    /* Change this to the desired background color for the form */
+    padding: 20px;
+    /* Add padding for the form */
+    border-radius: 4px;
+    /* Rounded corners for the form */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Optional: add shadow to the form */
   }
 
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     width: 100%;
     padding: 10px;
     margin: 4px 0;
@@ -22,10 +22,14 @@
     border-radius: 4px;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0);
   }
+
   label {
-    color: white; /* Change label color to white */
-    font-weight: bold; /* Make labels bold */
+    color: white;
+    /* Change label color to white */
+    font-weight: bold;
+    /* Make labels bold */
   }
+
   .error-message {
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
@@ -68,76 +72,77 @@
 <div class="mx-20 mt-5">
   <h2 class="text-2xl font-semibold mb-4">Create Kisan</h2>
   <a href="{% url 'leads:kisan_list' %}" class="back-button">Back to Kisan List</a>
-  
+
   <form method="POST" class="form-container">
     {% csrf_token %}
-    
+
     {% if form.errors %}
-      <div class="error-message" role="alert">
-        <strong class="font-bold">There were some errors:</strong>
-        <ul>
-          {% for field in form %}
-            {% for error in field.errors %}
-              <li>{{ field.label }}: {{ error }}</li>
-            {% endfor %}
-          {% endfor %}
-          {% for error in form.non_field_errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-      </div>
+    <div class="error-message" role="alert">
+      <strong class="font-bold">There were some errors:</strong>
+      <ul>
+        {% for field in form %}
+        {% for error in field.errors %}
+        <li>{{ field.label }}: {{ error }}</li>
+        {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
     {% endif %}
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
       <div>
         <label for="{{ form.first_name.id_for_label }}" class="block mb-1">{{ form.first_name.label }}</label>
-        <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" 
-               value="{{ form.first_name.value|default:'' }}" placeholder="First Name">
+        <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}"
+          value="{{ form.first_name.value|default:'' }}" placeholder="First Name">
       </div>
 
       <div>
         <label for="{{ form.last_name.id_for_label }}" class="block mb-1">{{ form.last_name.label }}</label>
-        <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" 
-               value="{{ form.last_name.value|default:'' }}" placeholder="Last Name">
+        <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}"
+          value="{{ form.last_name.value|default:'' }}" placeholder="Last Name">
       </div>
 
       <div>
         <label for="{{ form.contact_number.id_for_label }}" class="block mb-1">{{ form.contact_number.label }}</label>
-        <input type="number" name="{{ form.contact_number.name }}" id="{{ form.contact_number.id_for_label }}" 
-               value="{{ form.contact_number.value|default:'' }}" placeholder="Contact Number">
+        <input type="number" name="{{ form.contact_number.name }}" id="{{ form.contact_number.id_for_label }}"
+          value="{{ form.contact_number.value|default:'' }}" placeholder="Contact Number">
       </div>
 
       <div>
         <label for="{{ form.address.id_for_label }}" class="block mb-1">Kisan {{ form.address.label }}</label>
-        <textarea name="{{ form.address.name }}" id="{{ form.address.id_for_label }}" 
-                  placeholder="Address">{{ form.address.value|default:'' }}</textarea>
+        <textarea name="{{ form.address.name }}" id="{{ form.address.id_for_label }}"
+          placeholder="Address">{{ form.address.value|default:'' }}</textarea>
       </div>
 
       <div>
         <label for="{{ form.khasra_number.id_for_label }}" class="block mb-1">{{ form.khasra_number.label }}</label>
-        <input type="number" name="{{ form.khasra_number.name }}" id="{{ form.khasra_number.id_for_label }}" 
-               value="{{ form.khasra_number.value|default:'' }}" placeholder="Khasra Number">
+        <input type="number" name="{{ form.khasra_number.name }}" id="{{ form.khasra_number.id_for_label }}"
+          value="{{ form.khasra_number.value|default:'' }}" placeholder="Khasra Number">
       </div>
 
       <div>
         <label for="{{ form.area_in_beegha.id_for_label }}" class="block mb-1">{{ form.area_in_beegha.label }}</label>
-        <input type="number" step="0.001" name="{{ form.area_in_beegha.name }}" id="{{ form.area_in_beegha.id_for_label }}" 
-               value="{{ form.area_in_beegha.value|default:'' }}" placeholder="Area in Beegha">
+        <input type="number" step="0.001" name="{{ form.area_in_beegha.name }}"
+          id="{{ form.area_in_beegha.id_for_label }}" value="{{ form.area_in_beegha.value|default:'' }}"
+          placeholder="Area in Beegha">
       </div>
 
       <div>
         <label for="{{ form.land_costing.id_for_label }}" class="block mb-1">Total {{ form.land_costing.label }}</label>
-        <input type="number" step="0.01" name="{{ form.land_costing.name }}" id="{{ form.land_costing.id_for_label }}" 
-               value="{{ form.land_costing.value|default:'' }}" placeholder="Land Costing">
+        <input type="number" step="0.01" name="{{ form.land_costing.name }}" id="{{ form.land_costing.id_for_label }}"
+          value="{{ form.land_costing.value|default:'' }}" placeholder="Land Costing">
       </div>
 
       <div>
         <label for="{{ form.land_address.id_for_label }}" class="block mb-1">{{ form.land_address.label }}</label>
-        <input type="text" name="{{ form.land_address.name }}" id="{{ form.land_address.id_for_label }}" 
-               value="{{ form.land_address.value|default:'' }}" placeholder="Land Address">
+        <input type="text" name="{{ form.land_address.name }}" id="{{ form.land_address.id_for_label }}"
+          value="{{ form.land_address.value|default:'' }}" placeholder="Land Address">
       </div>
 
-<!-- 
+      <!-- 
       <div>
         <label for="{{ form.basic_sales_price.id_for_label }}" class="block mb-1">{{ form.basic_sales_price.label }}</label>
         <input type="number" step="0.01" name="{{ form.basic_sales_price.name }}" id="{{ form.basic_sales_price.id_for_label }}" 
@@ -156,6 +161,6 @@
 
     <button type="submit">Save Kisan</button>
   </form>
-  
+
 </div>
 {% endblock %}
