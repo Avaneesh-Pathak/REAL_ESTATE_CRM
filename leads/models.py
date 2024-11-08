@@ -203,31 +203,52 @@ class Agent(models.Model):
     commission_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)  # Percentage of profit shared
     total_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Total profit earned
     level = models.IntegerField(default=1)
-    
+
     def __str__(self):
         return f"{self.user.email} (Level {self.level})(Id {self.pk}) "
 
     def save(self, *args, **kwargs):
+        # Get the parent agent
+        parent_agent = self.parent_agent
+        print(f"Parent agent: {parent_agent}")
+
+        # Check if the parent agent exists and if commission percentage is valid
+        if parent_agent:
+            # Check if the parent agent's level is at maximum
+            if parent_agent.level >= 5:
+                print("Exceeding maximum level of agent.")  # You can add an error here if needed
+                # You can raise an exception or handle it as per your business logic
+                return  # Optionally, raise an exception or return
+
+            # Set the new level based on the parent agent’s level
+            self.level = parent_agent.level + 1
+        else:
+            self.level = 1  # Top-level agent if no parent agent is provided
+
+        # Ensure that parent_agent is correctly assigned
+        self.parent_agent = parent_agent
+        print(f"Updated parent agent: {self.parent_agent}")
+        print(f"Updated level: {self.level}")
+
         # Check if it's a new instance or an update
         is_new_instance = self.pk is None
 
         # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)
 
-        # Determine the action
+        # Log the instance data (excluding internal attributes)
         action = "created" if is_new_instance else "updated"
-
-        # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
+        logger.info(f'Agent instance {self.pk} was {action}. Data: {data}')
 
-@receiver(post_delete, sender=Agent)
-def log_userprofile_deletion(sender, instance, **kwargs):
+
+# @receiver(post_delete, sender=Agent)
+# def log_userprofile_deletion(sender, instance, **kwargs):
         # Collect the instance data before deletion
-    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+    # data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
         
         # Log the deletion action with instance data in dictionary format
-    logger.info(f'Agent instance  was Deleted. Data: {data}')
+    # logger.info(f'Agent instance  was Deleted. Data: {data}')
 
 class Category(models.Model):
     name = models.CharField(max_length=30)  # New, Contacted, Converted, Unconverted
@@ -377,10 +398,18 @@ class Project(models.Model):
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
         logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
 
-@receiver(post_delete, sender=Project)
+@receiver(pre_delete, sender=Project)
 def log_userprofile_deletion(sender, instance, **kwargs):
         # Collect the instance data before deletion
+    
     data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+    print("hello")
+
+        # Reset land_assigned status for all related lands (Kisan)
+    for land in instance.lands.all():
+        print(land)
+        land.is_assigned = False
+        land.save()
         
         # Log the deletion action with instance data in dictionary format
     logger.info(f'Project instance  was Deleted. Data: {data}')

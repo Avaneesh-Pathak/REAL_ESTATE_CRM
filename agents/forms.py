@@ -78,25 +78,25 @@ class AgentCreateForm(forms.ModelForm):
 
 class AgentUpdateForm(forms.ModelForm):
     parent_agent = forms.ModelChoiceField(
-        queryset=Agent.objects.none(),
+        queryset=Agent.objects.all(),
         required=False,
         label="Parent Agent",
         help_text="Select a parent agent if applicable."
     )
-    commission_percentage = forms.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        required=True,
-        help_text="Commission percentage to share with parent agent."
-    )
-    level = forms.IntegerField(
-        required=True,
-        help_text="Enter the agent level."
-    )
+    # commission_percentage = forms.DecimalField(
+    #     max_digits=5,
+    #     decimal_places=2,
+    #     required=True,
+    #     help_text="Commission percentage to share with parent agent."
+    # )
+    # level = forms.IntegerField(
+    #     required=True,
+    #     help_text="Enter the agent level."
+    # )
 
     class Meta:
         model = Agent
-        fields = ['user', 'parent_agent', 'commission_percentage', 'level']
+        fields = ['parent_agent']
 
     def __init__(self, *args, **kwargs):
         organisation = kwargs.pop('organisation', None)

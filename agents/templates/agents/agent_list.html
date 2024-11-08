@@ -44,7 +44,7 @@
                                     </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xm font-medium text-white uppercase tracking-wider">
-                                        Edit
+                                        Parent Agent
                                     </th>
                                     
                                     
@@ -65,12 +65,10 @@
                                     <td class="px-6 py-4  text-align-center whitespace-nowrap text-sl text-black-900">
                                         {{ agent.level }}
                                     </td>
-                                    <td class="px-6 py-4  text-align-center whitespace-nowrap text-align-center text-sl font-medium">
-                                        <a href="{% url 'agents:agent-update' agent.pk %}"
-                                            class="text-indigo-600 hover:text-indigo-900">
-                                            Edit
-                                        </a>
+                                    <td class="px-6 py-4  text-align-center whitespace-nowrap text-sl text-black-900">
+                                        {{ agent.parent_agent.user }}
                                     </td>
+                                    
                                 </tr>
                                 {% empty %}
 

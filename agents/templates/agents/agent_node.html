@@ -2,7 +2,6 @@
     <div class="agent-info">
         <strong>{{ agent.user.username }}</strong>
         <p>Level: {{ agent.level }}</p>
-        <a href="{% url 'agents:agent-update' agent.id %}" class="btn">Update Agent</a>
     </div>
     {% if agent.sub_agents_list %}
         <div class="children">

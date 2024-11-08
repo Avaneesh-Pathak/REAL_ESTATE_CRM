@@ -5,10 +5,11 @@ from django.utils import timezone
 from django.core.mail import send_mail
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import reverse
+from django.shortcuts import reverse,get_object_or_404
 from leads.models import Agent,Salary
 from .forms import AgentModelForm,AgentCreateForm,AgentUpdateForm
 from .mixins import OrganisorAndLoginRequiredMixin
+
 
 
 class AgentListView(OrganisorAndLoginRequiredMixin, generic.ListView):
@@ -39,7 +40,7 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
 
         # Get the cleaned data from the form
         parent_agent = form.cleaned_data.get('parent_agent')
-        commission_percentage = form.cleaned_data.get('commission_percentage')
+        # commission_percentage = form.cleaned_data.get('commission_percentage')
 
         # Check if the parent agent exists and if commission percentage is valid
         if parent_agent:
@@ -104,34 +105,62 @@ class AgentDetailView(OrganisorAndLoginRequiredMixin, generic.DetailView):
     #     return context
 
 
+# cfrom django.shortcuts import get_object_or_404
+# from django.urls import reverse
+# from django.views import generic
+# from .models import Agent
+# from .forms import AgentUpdateForm
+
 class AgentUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
     template_name = "agents/agent_update.html"
     form_class = AgentUpdateForm
+
+    def get_object(self, queryset=None):
+        # Access the primary key from URL kwargs and get the object
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Agent, pk=pk)
 
     def get_success_url(self):
         return reverse("agents:agent-list")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        # Pass the organisation to the form so the parent agent list is filtered correctly
+        # Pass additional context if needed (e.g., current organisation)
         # kwargs['organisation'] = self.request.user
         return kwargs
 
     def get_queryset(self):
-        # organisation = self.request.user.userprofile
+        # Adjust this query as needed to filter agents by organization, if applicable
         return Agent.objects.all()
 
-    # Ensure the form is pre-filled with the agent's current details
-    def get_initial(self):
-        initial = super().get_initial()
-        agent = self.get_object()
+    # def form_valid(self, form):
+    #     # Get the instance of Agent being updated
+    #     agent = self.get_object()
+        
+    #     # Get the cleaned data from the form
+    #     parent_agent = form.cleaned_data.get('parent_agent')
 
-        # Pre-fill the form with the current details of the agent
-        initial['parent_agent'] = agent.parent_agent
-        initial['commission_percentage'] = agent.commission_percentage
-        initial['level'] = agent.level
+    #     # Check if the parent agent exists and if commission percentage is valid
+    #     if parent_agent:
+    #         # Check if the parent agent's level is at maximum
+    #         if parent_agent.level >= 5:
+    #             form.add_error(None, "Exceeding maximum level of agent.")  # Non-field error
+    #             return self.form_invalid(form)
+            
+    #         # Set the new level based on the parent agent’s level
+    #         agent.level = parent_agent.level + 1
+    #         print(agent.level)
+    #     else:
+    #         agent.level = 1  # Top-level agent if no parent agent is provided
+        
+    #     # Update the agent fields
+    #     agent.parent_agent = parent_agent
 
-        return initial
+    #     # agent.level = 
+    #     # agent.save()  # Save changes to the database
+    #     print(agent.level)
+
+    #     # return super().form_valid(form)
 
 class AgentDeleteView(OrganisorAndLoginRequiredMixin, generic.DeleteView):
     template_name = "agents/agent_delete.html"
