@@ -25,8 +25,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEBUG = True
 
 # Allowed hosts (adjust for production)
-ALLOWED_HOSTS =['2113-2409-40e3-5b-c458-f5dd-7044-a4e3-f39f.ngrok-free.app','127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://2113-2409-40e3-5b-c458-f5dd-7044-a4e3-f39f.ngrok-free.app']
+ALLOWED_HOSTS =[]
+# CSRF_TRUSTED_ORIGINS = ['https://2113-2409-40e3-5b-c458-f5dd-7044-a4e3-f39f.ngrok-free.app']
 
 
 # Installed apps
@@ -116,6 +116,9 @@ TIME_ZONE = 'Asia/Kolkata'  # or your local timezone
 USE_TZ = True
 USE_I18N = True
 USE_L10N = True
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 
 # Static files
