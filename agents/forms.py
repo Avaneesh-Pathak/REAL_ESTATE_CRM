@@ -36,7 +36,7 @@ class AgentModelForm(forms.ModelForm):
 
 class AgentCreateForm(forms.ModelForm):
     parent_agent = forms.ModelChoiceField(
-        queryset=Agent.objects.none(),  # Start with no agents
+        queryset=Agent.objects.all(),  # Start with no agents
         required=False,
         label="Parent Agent",
         help_text="Select a parent agent if applicable."

@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User 
 from django.db.models.signals import post_save, pre_delete 
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.dispatch import receiver
@@ -17,18 +19,30 @@ logger.addHandler(handler)
 
 
 class User(AbstractUser):
-    is_organisor = models.BooleanField(default=True)
+    is_organisor = models.BooleanField(default=False)
     is_agent = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        # Check if it's a new instance or an update
+        is_new_instance = self.pk is None
 
-# Signal to log changes to the User model
-@receiver(post_save, sender=User)
-def log_user_activity(sender, instance, created, **kwargs):
-    if created:
-        logger.info(f"New user created: {instance.username}, is_organisor={instance.is_organisor}, is_agent={instance.is_agent}")
-    else:
-        logger.info(f"User updated: {instance.username}, is_organisor={instance.is_organisor}, is_agent={instance.is_agent}")
+        # Call the parent save method to save the instance to the database
+        super().save(*args, **kwargs)
 
+        # Determine the action
+        action = "created" if is_new_instance else "updated"
 
+        # Log the instance data in dictionary format (excluding internal attributes)
+        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        logger.info(f'User instance {self.pk} was {action}. Data: {data}')
+
+    def delete(self, *args, **kwargs):
+        # Collect the instance data before deletion
+        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        logger.info(f'User instance {self.pk} was deleted. Data: {data}')
+        
+        # Call the parent delete method to actually delete the instance
+        super().delete(*args, **kwargs)
 
 # Create your models here.
 
@@ -42,18 +56,55 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
-# Signal to log changes to the UserProfile model
-@receiver(post_save, sender=UserProfile)
-def log_user_profile_activity(sender, instance, created, **kwargs):
-    if created:
-        logger.info(f"New UserProfile created: {instance.user.username}, Full Name: {instance.full_name}, Contact: {instance.contact_number}, Email: {instance.email}")
-    else:
-        logger.info(f"UserProfile updated: {instance.user.username}, Full Name: {instance.full_name}, Contact: {instance.contact_number}, Email: {instance.email}")
-   
+    def save(self, *args, **kwargs):
+        # Check if it's a new instance or an update
+        is_new_instance = self.pk is None
+
+        # Call the parent save method to save the instance to the database
+        super().save(*args, **kwargs)
+
+        # Determine the action
+        action = "created" if is_new_instance else "updated"
+
+        # Log the instance data in dictionary format (excluding internal attributes)
+        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
+
+@receiver(post_delete, sender=UserProfile)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Userprofile instance  was Deleted. Data: {data}')
+
+
+
 #New Addition
 class LeadManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset()
+    def save(self, *args, **kwargs):
+        # Check if it's a new instance or an update
+        is_new_instance = self.pk is None
+
+        # Call the parent save method to save the instance to the database
+        super().save(*args, **kwargs)
+
+        # Determine the action
+        action = "created" if is_new_instance else "updated"
+
+        # Log the instance data in dictionary format (excluding internal attributes)
+        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
+
+@receiver(post_delete, sender=LeadManager)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Userprofile instance  was Deleted. Data: {data}')
 # New Addition Ended
 
 class Lead(models.Model):
@@ -81,29 +132,20 @@ class Lead(models.Model):
         # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)
 
-        # Directly log to check if logging works
-        logger.info("Testing if logging works.")
+        # Determine the action
+        action = "created" if is_new_instance else "updated"
 
-        # Log the action (whether it is a creation or an update)
-        if is_new_instance:
-            action = "created"
-        else:
-            action = "updated"
-
-        # Log the instance data (exclude internal attributes)
+        # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
         logger.info(f'Lead instance {self.pk} was {action}. Data: {data}')
 
-    def delete(self, *args, **kwargs):
-        # Log the deletion action with instance data before deleting
-        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Lead instance {self.pk} is about to be deleted. Data: {data}')
+@receiver(post_delete, sender=Lead)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
         
-        # Call the parent delete method to actually delete the instance
-        super().delete(*args, **kwargs)
-
-        # Log after deletion
-        logger.info(f'Lead instance {self.pk} was deleted. Data: {data}')
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Lead instance  was Deleted. Data: {data}')
 
 
 
@@ -133,29 +175,26 @@ class FollowUp(models.Model):
         return f"{self.lead.first_name} {self.lead.last_name}"
 
     def save(self, *args, **kwargs):
-            # Check if it's a new instance or an update
-            is_new_instance = self.pk is None
+        # Check if it's a new instance or an update
+        is_new_instance = self.pk is None
 
-            # Call the parent save method to save the instance to the database
-            super().save(*args, **kwargs)
+        # Call the parent save method to save the instance to the database
+        super().save(*args, **kwargs)
 
-            # Log the action (whether it's creation or update)
-            action = "created" if is_new_instance else "updated"
-            
-            # Log the instance data, excluding internal attributes
-            data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-            logger.info(f'FollowUp instance {self.pk} was {action}. Data: {data}')
+        # Determine the action
+        action = "created" if is_new_instance else "updated"
 
-    def delete(self, *args, **kwargs):
-        # Log the deletion action with instance data before deleting
+        # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'FollowUp instance {self.pk} is about to be deleted. Data: {data}')
-            
-        # Call the parent delete method to actually delete the instance
-        super().delete(*args, **kwargs)
+        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
 
-            # Log after deletion
-        logger.info(f'FollowUp instance {self.pk} was deleted. Data: {data}')
+@receiver(post_delete, sender=FollowUp)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'FollowUp instance  was Deleted. Data: {data}')
 
 class Agent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -164,39 +203,31 @@ class Agent(models.Model):
     commission_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)  # Percentage of profit shared
     total_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Total profit earned
     level = models.IntegerField(default=1)
+    
+    def __str__(self):
+        return f"{self.user.email} (Level {self.level})(Id {self.pk}) "
 
     def save(self, *args, **kwargs):
-        # Check if this is a new instance or an update
+        # Check if it's a new instance or an update
         is_new_instance = self.pk is None
 
         # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)
 
-        # Log creation or update action
+        # Determine the action
         action = "created" if is_new_instance else "updated"
+
+        # Log the instance data in dictionary format (excluding internal attributes)
+        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
+
+@receiver(post_delete, sender=Agent)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
         
-        # Log the instance data, excluding internal attributes
-        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Agent instance {self.pk} was {action}. Data: {data}')
-
-    def delete(self, *args, **kwargs):
-        # Log the deletion action before deletion
-        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Agent instance {self.pk} is about to be deleted. Data: {data}')
-
-        # Manually delete the associated UserProfile and User before deleting the Agent
-        if self.organisation:
-            self.organisation.delete()  # Delete associated UserProfile
-            logger.info(f'Associated UserProfile for Agent {self.pk} was deleted.')
-        if self.user:
-            self.user.delete()  # Delete associated User
-            logger.info(f'Associated User for Agent {self.pk} was deleted.')
-
-        # Call the parent delete method to actually delete the Agent instance
-        super().delete(*args, **kwargs)
-
-        # Log after deletion
-        logger.info(f'Agent instance {self.pk} was deleted.')
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Agent instance  was Deleted. Data: {data}')
 
 class Category(models.Model):
     name = models.CharField(max_length=30)  # New, Contacted, Converted, Unconverted
@@ -208,35 +239,35 @@ class Category(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        # Check if the instance is new (creation) or existing (update)
+        # Check if it's a new instance or an update
         is_new_instance = self.pk is None
 
-        # Save the instance
+        # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)
 
-        # Log creation or update action
+        # Determine the action
         action = "created" if is_new_instance else "updated"
+
+        # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Category instance {self.pk} was {action}. Data: {data}')
+        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
 
-    def delete(self, *args, **kwargs):
-        # Log the deletion action before the instance is deleted
-        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Category instance {self.pk} is about to be deleted. Data: {data}')
-
-        # Delete the instance
-        super().delete(*args, **kwargs)
-
-        # Log after deletion
-        logger.info(f'Category instance {self.pk} was deleted.')
-
-# Signal handler for UserProfile creation
-def post_user_created_signal(sender, instance, created, **kwargs):
-    if created:
-        logger.info(f"UserProfile created for user: {instance.username}")
-        UserProfile.objects.create(user=instance)
+@receiver(post_delete, sender=Category)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
         
-post_save.connect(post_user_created_signal, sender=User)
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Category instance  was Deleted. Data: {data}')
+
+
+# # Signal handler for UserProfile creation
+# def post_user_created_signal(sender, instance, created, **kwargs):
+#     if created:
+#         logger.info(f"UserProfile created for user: {instance.username}")
+#         UserProfile.objects.create(user=instance)
+        
+# post_save.connect(post_user_created_signal, sender=User)
 
 class Salary(models.Model):
     agent = models.ForeignKey(User, on_delete=models.DO_NOTHING)  # Or your Agent model
@@ -258,27 +289,26 @@ class Salary(models.Model):
         return f"Salary for {self.agent.username} on {self.payment_date}"
 
     def save(self, *args, **kwargs):
-        # Determine if the instance is new or being updated
+        # Check if it's a new instance or an update
         is_new_instance = self.pk is None
 
-        # Save the instance
+        # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)
 
-        # Log creation or update
+        # Determine the action
         action = "created" if is_new_instance else "updated"
+
+        # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Salary instance {self.pk} was {action}. Data: {data}')
+        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
 
-    def delete(self, *args, **kwargs):
-        # Log before deletion
-        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Salary instance {self.pk} is about to be deleted. Data: {data}')
-
-        # Delete the instance
-        super().delete(*args, **kwargs)
-
-        # Log after deletion
-        logger.info(f'Salary instance {self.pk} was deleted.')
+@receiver(post_delete, sender=Salary)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Salary instance  was Deleted. Data: {data}')
 
 class Sale(models.Model):
     property = models.ForeignKey('Property', on_delete=models.DO_NOTHING)
@@ -288,32 +318,26 @@ class Sale(models.Model):
     organisation = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.DO_NOTHING)
 
     def save(self, *args, **kwargs):
-        # Determine if the instance is new or being updated
+        # Check if it's a new instance or an update
         is_new_instance = self.pk is None
 
-        # Save the instance
+        # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)
 
-        # Mark the property as sold after the sale is saved
-        if self.property:
-            self.property.is_sold = True
-            self.property.save()
-
-        # Log creation or update
+        # Determine the action
         action = "created" if is_new_instance else "updated"
+
+        # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Sale instance {self.pk} was {action}. Data: {data}')
+        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
 
-    def delete(self, *args, **kwargs):
-        # Log before deletion
-        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Sale instance {self.pk} is about to be deleted. Data: {data}')
-
-        # Delete the instance
-        super().delete(*args, **kwargs)
-
-        # Log after deletion
-        logger.info(f'Sale instance {self.pk} was deleted.')
+@receiver(post_delete, sender=Sale)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Sale instance  was Deleted. Data: {data}')
 
     def __str__(self):
         # Log when the Sale instance is accessed
@@ -340,33 +364,26 @@ class Project(models.Model):
         return composite_key
 
     def save(self, *args, **kwargs):
-        # Check if it's a new instance
+        # Check if it's a new instance or an update
         is_new_instance = self.pk is None
 
-        # Generate and set the title before saving
-        self.title = self.create_composite_key()
-        
-        # Save the instance
+        # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)
 
-        # Update the title field directly in the database after saving
-        self.__class__.objects.filter(pk=self.pk).update(title=self.title)
-
-        # Log creation or update
+        # Determine the action
         action = "created" if is_new_instance else "updated"
+
+        # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Project instance {self.pk} was {action}. Data: {data}')
+        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
 
-    def delete(self, *args, **kwargs):
-        # Log before deletion
-        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Project instance {self.pk} is about to be deleted. Data: {data}')
-
-        # Perform the deletion
-        super().delete(*args, **kwargs)
-
-        # Log after deletion
-        logger.info(f'Project instance {self.pk} was deleted.')
+@receiver(post_delete, sender=Project)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Project instance  was Deleted. Data: {data}')
 
     def __str__(self):
         # Log access to the Project instance
@@ -418,37 +435,28 @@ class Property(models.Model):
         letters = "PRP"  # Ensure uppercase
         formatted_number = f"{self.id:03}"  # Pads with zeros if necessary
         composite_key = f"{letters}-{formatted_number}"
-        
         return composite_key
 
     def save(self, *args, **kwargs):
-        
-        super().save(*args, **kwargs)
-        if not self.title:
-            self.title = self.create_composite_key()
-            
-            self.__class__.objects.filter(pk=self.pk).update(title=self.title)
-
-    def save(self, *args, **kwargs):
         is_new_instance = self.pk is None
+        super().save(*args, **kwargs)  # Save first to get the ID
 
-        if not self.title:
+        # Generate and update title only if it's a new instance and title is empty
+        if is_new_instance and not self.title:
             self.title = self.create_composite_key()
-
-        super().save(*args, **kwargs)
-        self.__class__.objects.filter(pk=self.pk).update(title=self.title)
+            self.__class__.objects.filter(pk=self.pk).update(title=self.title)
 
         action = "created" if is_new_instance else "updated"
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
         logger.info(f'Property instance {self.pk} was {action}. Data: {data}')
 
-    def delete(self, *args, **kwargs):
-        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Property instance {self.pk} is about to be deleted. Data: {data}')
-
-        super().delete(*args, **kwargs)
-
-        logger.info(f'Property instance {self.pk} was deleted.')
+@receiver(post_delete, sender=Property)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Property instance  was Deleted. Data: {data}')
 
 class Bonus(models.Model):
     agent = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -464,6 +472,14 @@ class Bonus(models.Model):
         action = "created" if self.pk is None else "updated"
         super().save(*args, **kwargs)
         logger.info(f"Bonus for agent {self.agent.username} was {action} with amount {self.bonus_amount} on {self.date_awarded}")
+@receiver(post_delete, sender=Bonus)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Bonus instance  was Deleted. Data: {data}')
+
 
 # Area
 class Area(models.Model):
@@ -483,6 +499,13 @@ class Area(models.Model):
         self.area = self.length * self.breadth
         super().save(*args, **kwargs)
         logger.info(f"Area instance created with length {self.length}, breadth {self.breadth}, and calculated area {self.area}")
+@receiver(post_delete, sender=Area)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Area instance  was Deleted. Data: {data}')
 
     def __str__(self):
         # Log whenever __str__ is called
@@ -507,6 +530,14 @@ class EmiPlan(models.Model):
         action = "created" if self.pk is None else "updated"
         super().save(*args, **kwargs)
         logger.info(f"EMI Plan '{self.name}' was {action} with interest rate {self.interest_rate}% and tenure {self.tenure_months} months")
+@receiver(post_delete, sender=EmiPlan)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'EmiPlan instance  was Deleted. Data: {data}')
+
 
 # DAYBOOK
 class Balance(models.Model):
@@ -523,6 +554,13 @@ class Balance(models.Model):
         super().save(*args, **kwargs)
         logger.info(f"Balance {action} with amount: {self.amount} and carryover amount: {self.carryover_amount}")
 
+@receiver(post_delete, sender=Balance)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Balance instance  was Deleted. Data: {data}')
     
 class Daybook(models.Model):
     ACTIVITY_CHOICES = [
@@ -557,6 +595,13 @@ class Daybook(models.Model):
             action = "created" if self.pk is None else "updated"
             super().save(*args, **kwargs)
             logger.info(f"Daybook entry {action} with date: {self.date}, activity: {activity_display}, amount: {self.amount}")
+@receiver(post_delete, sender=Daybook)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Daybook instance  was Deleted. Data: {data}')
 
 # PROMOTER MODEL
 class Promoter(models.Model):
@@ -574,6 +619,7 @@ class Promoter(models.Model):
     def __str__(self):
         logger.info(f"Promoter created: {self.name}, Email: {self.email}")
         return self.name
+
 
 # PLOT BOOKING
 class PlotBooking(models.Model):
@@ -629,7 +675,15 @@ class PlotBooking(models.Model):
         action = "created" if self.pk is None else "updated"
         super().save(*args, **kwargs)
         logger.info(f"PlotBooking {action}: {self.name} - {self.booking_date}")
-    
+@receiver(post_delete, sender=PlotBooking)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'PlotBooking instance  was Deleted. Data: {data}')
+
+
 class EMIPayment(models.Model):
     plot_booking = models.ForeignKey('PlotBooking', on_delete=models.DO_NOTHING, related_name='emi_payments')
     due_date = models.DateField()
@@ -678,9 +732,32 @@ class EMIPayment(models.Model):
     def __str__(self):
         logger.info(f"EMI Payment for Plot Booking: {self.plot_booking} - Due: {self.due_date}")
         return f"EMI Payment for {self.plot_booking} - Due: {self.due_date} - Status: {self.status}"
+    def save(self, *args, **kwargs):
+        # Check if it's a new instance or an update
+        is_new_instance = self.pk is None
+
+        # Call the parent save method to save the instance to the database
+        super().save(*args, **kwargs)
+
+        # Determine the action
+        action = "created" if is_new_instance else "updated"
+
+        # Log the instance data in dictionary format (excluding internal attributes)
+        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        logger.info(f'EMi Payment instance {self.pk} was {action}. Data: {data}')
 
     class Meta:
         ordering = ['due_date']  # Order EMI payments by due date
+
+
+
+@receiver(post_delete, sender=EMIPayment)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'EMIPayment instance  was Deleted. Data: {data}')
 
 
 class Level(models.Model):
@@ -709,13 +786,7 @@ class Kisan(models.Model):
     basic_sales_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True) 
     is_sold = models.BooleanField(default=False)
     usable_land_total = models.FloatField(null=True, blank=True)
-    LAND_TYPE_CHOICES = [
-        ('plot', 'Plot'),
-        ('rowhouse', 'Rowhouse'),
-        ('flat', 'Flat'),
-    ]
     
-    land_type = models.CharField(max_length=50, choices=LAND_TYPE_CHOICES,default=False)
 
     def area_in_sqft(self):
         """Convert area from beegha to square feet."""
@@ -725,6 +796,24 @@ class Kisan(models.Model):
         return sqft
     
     def __str__(self) -> str:
-        logger.info(f"Kisan created: {self.first_name} {self.last_name} with khasra number {self.khasra_number}")
         return f"Kisan: {self.first_name} {self.last_name}"
     
+    def save(self, *args, **kwargs):
+        # Check if it's a new instance or an update
+        is_new_instance = self.pk is None
+        # Call the parent save method to save the instance to the database
+        super().save(*args, **kwargs)
+        # Determine the action
+        action = "created" if is_new_instance else "updated"
+        # Log the instance data in dictionary format (excluding internal attributes)
+        data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        logger.info(f'Kisan Profile instance {self.pk} was {action}. Data: {data}')
+
+
+@receiver(post_delete, sender=Kisan)
+def log_userprofile_deletion(sender, instance, **kwargs):
+        # Collect the instance data before deletion
+    data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+        
+        # Log the deletion action with instance data in dictionary format
+    logger.info(f'Kisan instance  was Deleted. Data: {data}')  

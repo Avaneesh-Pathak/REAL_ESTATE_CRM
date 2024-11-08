@@ -277,9 +277,9 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         })
         return context
 
-import logging
-logger = logging.getLogger('app_errors')
-logger.info("This is an informational message.")
+# import logging
+# logger = logging.getLogger('app_errors')
+# logger.info("This is an informational message.")
     
 class LeadListView(LoginRequiredMixin,generic.ListView):
     
@@ -1748,29 +1748,29 @@ class KisanListView(LoginRequiredMixin, ListView):
         for kisan in Kisan.objects.filter(is_sold=False):
             area_in_beegha = kisan.area_in_beegha  # Get the area in beegha
             area_in_sqft = area_in_beegha * 27200  # Convert beegha to sqft
-            land_type = kisan.land_type.lower()  # Ensure it is in lowercase for comparison
+            # land_type = kisan.land_type.lower()  # Ensure it is in lowercase for comparison
 
             # Determine development percentage based on land type
-            if land_type in ['plot', 'rowhouse']:
-                development_percentage = Decimal('0.30')  # 30% for plot or rowhouse
-            elif land_type == 'flat':
-                development_percentage = Decimal('0.40')  # 40% for flat
-            else:
-                development_percentage = Decimal('0')  # No development if land type is different
+            # if land_type in ['plot', 'rowhouse']:
+            #     development_percentage = Decimal('0.30')  # 30% for plot or rowhouse
+            # elif land_type == 'flat':
+            #     development_percentage = Decimal('0.40')  # 40% for flat
+            # else:
+            #     development_percentage = Decimal('0')  # No development if land type is different
 
             # Calculate usable land
-            usable_land = area_in_sqft * (1 - development_percentage)
-            print(usable_land)
-            usable_land_total += usable_land
-            print(usable_land_total)
-            print(f"Area in sqft: {area_in_sqft}, Development Percentage: {development_percentage}")
-            print(f"Processing record ID: {kisan.id}")
+            # usable_land = area_in_sqft * (1 - development_percentage)
+            # print(usable_land)
+            # usable_land_total += usable_land
+            # print(usable_land_total)
+            # print(f"Area in sqft: {area_in_sqft}, Development Percentage: {development_percentage}")
+            # print(f"Processing record ID: {kisan.id}")
 
-            kisan.usable_land_total = usable_land
-            kisan.save() 
+            # kisan.usable_land_total = usable_land
+            # kisan.save() 
 
 
-        context['usable_land_total'] = usable_land_total
+        # context['usable_land_total'] = usable_land_total
 
         return context
 
@@ -1780,7 +1780,7 @@ class KisanUpdateView(UpdateView):
     fields = [
         'first_name', 'last_name', 'contact_number', 'address',
         'khasra_number', 'area_in_beegha', 'land_costing', 'development_costing',
-        'kisan_payment', 'land_address', 'payment_to_kisan', 'basic_sales_price','land_type'
+        'kisan_payment', 'land_address', 'payment_to_kisan', 'basic_sales_price',
     ]
     template_name = 'kisan/kisan_update.html'  # Updated template name
     success_url = reverse_lazy('leads:kisan_list')
