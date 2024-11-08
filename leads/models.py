@@ -408,7 +408,6 @@ class Property(models.Model):
     plot_type = models.CharField(max_length=50, choices=PLOT_CHOICES,default='Normal')
 
     def if_sold(self):
-        logger.info(f"Checking if property {self.title} is sold")
         print(f"Checking if property {self.title} is sold")
         return self.is_sold  # Ensure this references the correct model
     
@@ -419,8 +418,16 @@ class Property(models.Model):
         letters = "PRP"  # Ensure uppercase
         formatted_number = f"{self.id:03}"  # Pads with zeros if necessary
         composite_key = f"{letters}-{formatted_number}"
-        logger.info(f"Composite key generated for property: {composite_key}")
+        
         return composite_key
+
+    def save(self, *args, **kwargs):
+        
+        super().save(*args, **kwargs)
+        if not self.title:
+            self.title = self.create_composite_key()
+            
+            self.__class__.objects.filter(pk=self.pk).update(title=self.title)
 
     def save(self, *args, **kwargs):
         is_new_instance = self.pk is None
