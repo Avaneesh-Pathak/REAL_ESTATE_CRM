@@ -270,7 +270,6 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
             'total_sales': total_sales,
             'total_cost': total_cost,
             'total_profit': total_profit,
-            
             'salary_distribution': salary_distribution,
             'salaryDistribution_labels': salaryDistribution_labels,
             

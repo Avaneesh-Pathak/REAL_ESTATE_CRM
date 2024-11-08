@@ -25,7 +25,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEBUG = True
 
 # Allowed hosts (adjust for production)
-ALLOWED_HOSTS =[]
+ALLOWED_HOSTS =['2113-2409-40e3-5b-c458-f5dd-7044-a4e3-f39f.ngrok-free.app','127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://2113-2409-40e3-5b-c458-f5dd-7044-a4e3-f39f.ngrok-free.app']
+
 
 # Installed apps
 INSTALLED_APPS = [

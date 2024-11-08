@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from . import views
 from .views import (
-    LeadListView, LeadDetailView, LeadCreateView, LeadUpdateView, LeadDeleteView,
+    LeadListView, LeadDetailView, LeadCreateView, LeadUpdateView, LeadDeleteView,DashboardView,
     AssignAgentView, CategoryListView, CategoryDetailView, LeadCategoryUpdateView,
     CategoryCreateView, CategoryUpdateView, CategoryDeleteView,LeadJsonView,ProjectCreateView,
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
@@ -21,6 +21,7 @@ app_name = "leads"
 
 
 urlpatterns = [
+    path('dashboard/',DashboardView.as_view(), name='dashboard'),
 
     path('sales/', SaleListView.as_view(), name='sale_list'),
     path('profile/<int:user_id>/', user_profile_view, name='user-profile'),

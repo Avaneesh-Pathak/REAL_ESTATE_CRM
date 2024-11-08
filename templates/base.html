@@ -487,15 +487,16 @@
             </div>
 
             <!-- Brand and Title -->
-            <div class="logo-container">
-                <!-- Logo Section -->
+            <div style="margin-top: 12px;">
                 <a href="{% url 'dashboard' %}"
-                    class="mt-1 align-left flex w-100 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5">
+                    class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5 logo-container">
                     <img style="border-radius: 50px;" src="{% static 'images/Screenshot 2024-10-19 002628.png' %}"
-                        alt="Logo" class="w-12 h-12 logo">
-                    <span class="ml-3 text-xl">PMA CRM</span>
+                        alt="Image" class="w-12 h-12 logo">
+                    <span class="ml-3 text-xl py-2 text">PMA Software</span>
                 </a>
             </div>
+
+           
 
             <!-- User Profile Dropdown -->
             {% if request.user.is_authenticated %}
