@@ -1319,7 +1319,8 @@ class DaybookCreateView(LoginRequiredMixin, View):
         if form.is_valid():
             expense = form.save(commit=False)
             print("expenese is", expense)
-            balance = Balance.objects.first()
+            # balance = Balance.objects.first()
+            balance, created = Balance.objects.get_or_create(defaults={'amount': 0})  # Set an initial amount if created
             print("balance is", balance)
             
             # Check if balance is available

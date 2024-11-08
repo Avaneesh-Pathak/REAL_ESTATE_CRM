@@ -25,7 +25,7 @@
         /* Header styling */
         header {
             background-color: #030648;
-            position: fixed;
+            position: absolute;
             top: 0;
             width: 100%;
             z-index: 1000;
@@ -34,16 +34,6 @@
 
         .logo img {
             border-radius: 50%;
-        }
-
-        .profile-name::after {
-            content: "▼";
-            /* Down arrow */
-            font-size: 12px;
-            /* Adjust arrow size as needed */
-            margin-left: 5px;
-            color: #1a1a1a;
-            /* Match arrow color to text color */
         }
 
         .search-form {
@@ -80,7 +70,6 @@
             transition: transform 0.3s ease-in-out;
         }
 
-        
         .sidebar a {
             color: white;
             text-decoration: none;
@@ -103,13 +92,137 @@
 
         /* Profile Button */
         .profile-button {
-            background: #126ccd;
+            background-color: transparent;
+            position: relative;
+            border: none;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .profile-button:hover {
+            background-color: #2f4a6d;
+            border-radius: 5px;
+        }
+
+        .profile-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .profile-icon {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .dropdown-arrow {
+            margin-left: 5px;
+            font-size: 14px;
+        }
+
+        /* Dropdown Menu */
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: #dfe2e6;
+            color: rgb(246, 234, 234);
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            width: 160px;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .profile-dropdown.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #041739;
+        }
+
+        .dropdown-item i {
+            margin-right: 8px;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: left;
+            padding: 10px;
+        }
+
+        /* Additional styling for logo and text */
+        .logo img {
+            border-radius: 50%;
+            width: 48px;
+            /* Set a specific width for the logo */
+            height: 48px;
+        }
+
+        .logo-container span {
+            margin-left: 12px;
+            /* Space between logo and text */
+            font-size: 1.25rem;
+            /* Adjust the size of the text */
+            font-weight: 500;
+            /* Adjust font weight for PMA CRM */
+        }
+
+        .text-section h3,
+        .text-section h4 {
+            margin: 0;
+            padding: 0;
+        }
+
+        .text-section h3 {
+            font-size: 24px;
+        }
+
+        .text-section h4 {
+            font-size: 18px;
+        }
+
+        /* Ensure the logo image has a circular border and the text is aligned */
+        /* .logo {
+            border-radius: 5%;
+        } */
+
+        .text-xl {
+            font-size: 1.25rem;
+            /* Adjust size as needed */
+        }
+
+        .ml-5 {
+            margin-left: 20px;
+        }
+
+        /* Profile Button */
+        .profile-button {
+            background: #f7f7f7;
             border: none;
             color: #2b5cbe;
             cursor: pointer;
             display: flex;
             align-items: center;
-            /* padding: 10px 10px; */
             border-radius: 8px;
             transition: background-color 0.3s ease;
         }
@@ -120,7 +233,7 @@
 
         /* Profile Image */
         .profile-img {
-            width:205%;
+            width: 205%;
             height: 40px;
             object-fit: cover;
             border-radius: 50%;
@@ -129,14 +242,13 @@
         /* Profile Icon (Fallback) */
         .profile-icon {
             font-size: 35px;
-            color: #114e94;
+            color: #111194;
         }
 
         /* Profile Name */
         .profile-name {
-            /* margin-left: 10px; */
             font-weight: bold;
-            color: #fdfdfd;
+            color: #090b41;
         }
 
         /* Dropdown Menu */
@@ -144,8 +256,8 @@
             display: none;
             position: absolute;
             right: 0;
-            background-color: #2557ad;
-            color: rgb(176, 21, 21);
+            background-color: #031638;
+            color: rgb(255, 255, 255);
             border-radius: 5px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             opacity: 0;
@@ -164,7 +276,7 @@
         /* Dropdown Item */
         .dropdown-item {
             display: block;
-            color: white;
+            color: rgb(255, 255, 255);
             padding: 10px 15px;
             text-decoration: none;
             background: none;
@@ -174,7 +286,7 @@
         }
 
         .dropdown-item:hover {
-            background-color: #444;
+            background-color: #110247;
         }
 
         /* Login Link */
@@ -235,15 +347,94 @@
             padding: 1rem;
             align-items: center;
         }
+
+        /* Large screens (desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            .profile-dropdown-container {
+                font-size: 16px;
+            }
+        }
+
+        /* Medium screens (tablets, 768px to 1199px) */
+        @media (max-width: 1199px) {
+            .profile-button {
+                font-size: 15px;
+                padding: 6px;
+            }
+
+            .profile-img {
+                width: 28px;
+                height: 28px;
+            }
+
+            .dropdown-item {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+        }
+
+        /* Small screens (mobile devices, 576px to 767px) */
+        @media (max-width: 767px) {
+            .profile-button {
+                font-size: 14px;
+                padding: 5px;
+            }
+
+            .profile-img {
+                width: 26px;
+                height: 26px;
+            }
+
+            .profile-dropdown {
+                width: 140px;
+            }
+
+            .dropdown-item {
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+
+        /* Extra small screens (phones, 575px and below) */
+        @media (max-width: 575px) {
+            .profile-button {
+                font-size: 13px;
+                padding: 4px;
+            }
+
+            .profile-img {
+                width: 24px;
+                height: 24px;
+            }
+
+            .profile-name {
+                display: none;
+                /* Hide the username on very small screens */
+            }
+
+            .dropdown-arrow {
+                display: none;
+            }
+
+            .profile-dropdown {
+                width: 120px;
+                top: 110%;
+            }
+
+            .dropdown-item {
+                padding: 6px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 
 <body style="background-color: #E3FEF7">
-    
+
     <header>
-        <div class="container flex items-center justify-between">
+        <div class="container flex justify-content-between items-center">
             <!-- Hamburger Icon -->
-            <div class="hamburger cursor-pointer" id="hamburger">
+            <div class="hamburger cursor-pointer padding-5" id="hamburger">
                 &#9776;
             </div>
 
@@ -294,45 +485,38 @@
                     <a href="{% url 'leads:kisan_create' %}"><i class="fas fa-plus-circle"></i> Add Kisan</a>
                 </nav>
             </div>
-            <!-- <button id="toggle-sidebar-btn" class="sidebar-toggle-btn"><i class="fas fa-arrow-left"></i></button> -->
 
             <!-- Brand and Title -->
-            <div style="margin-top: 15px; margin-right: 80%;" class="logo-container">
+            <div class="logo-container">
+                <!-- Logo Section -->
                 <a href="{% url 'dashboard' %}"
-                    class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5 logo-container">
+                    class="mt-1 align-left flex w-100 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5">
                     <img style="border-radius: 50px;" src="{% static 'images/Screenshot 2024-10-19 002628.png' %}"
-                        alt="Image" class="w-20 h-12 logo">
-                    <span class="text-right ml-3 text-xl py-0 text">PMA CRM</span>
+                        alt="Logo" class="w-12 h-12 logo">
+                    <span class="ml-3 text-xl">PMA CRM</span>
                 </a>
             </div>
-            <!-- Title Section -->
-
-
-            <!-- Search Box -->
-            {% comment %} <div class="search-container">
-                <form action="{% url 'search' %}" method="GET" class="search-form">
-                    <input type="text" name="q" class="search-input" placeholder="Search..." required>
-                    <button type="submit" class="search-button">Search</button>
-                </form>
-            </div> {% endcomment %}
 
             <!-- User Profile Dropdown -->
             {% if request.user.is_authenticated %}
-            <div class="profile-dropdown-container" style="margin-right: 10%;">
-                <button style="padding-right: 50%; padding-left: 10%; margin-right: auto; padding-top: 5%; padding-bottom: 5%;" id="profile-menu-button" class="profile-button">
+            <div class="profile-dropdown-container">
+                <button id="profile-menu-button" class="profile-button">
                     {% if request.user.userprofile.profile_picture %}
                     <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile Picture"
                         class="profile-img">
                     {% else %}
                     <i class="fas fa-user-circle profile-icon"></i>
                     {% endif %}
-                    <span class="profile-name ml-2">{{ request.user.username }}</span>
+                    <span class="profile-name">{{ request.user.username }}</span>
+                    <i class="fas fa-caret-down dropdown-arrow"></i>
                 </button>
 
                 <!-- Dropdown Menu -->
                 <div id="profile-dropdown" class="profile-dropdown">
-                    <a href="{% url 'profile' %}" class="dropdown-item"><i class="fas fa-user-circle"></i> Profile</a>
-                    <a href="{% url 'logout' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <a href="{% url 'profile' %}" class="dropdown-item"><i class="fas fa-user-circle"></i>
+                        Profile</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>
+                        Logout</a>
                     <a href="{% url 'reset_password' %}" class="dropdown-item"><i class="fas fa-key"></i> Reset
                         Password</a>
                 </div>
@@ -341,6 +525,8 @@
             <a href="{% url 'login' %}" class="login-link">Login</a>
             {% endif %}
 
+
+            <!-- Script for Toggle & Close -->
             <script>
                 // Toggle profile dropdown on button click
                 document.getElementById('profile-menu-button').addEventListener('click', function (event) {
@@ -352,22 +538,12 @@
                 // Close the dropdown if clicked outside
                 document.addEventListener('click', function (event) {
                     const dropdown = document.getElementById('profile-dropdown');
-                    if (!event.target.closest('#profile-menu-button')) {
+                    if (!event.target.closest('#profile-menu-button') && !event.target.closest('#profile-dropdown')) {
                         dropdown.classList.remove('active');
                     }
                 });
-
-                // Add hover effects to dropdown links
-                const dropdownLinks = document.querySelectorAll('.dropdown-item');
-                dropdownLinks.forEach(function (link) {
-                    link.addEventListener('mouseover', function () {
-                        this.style.backgroundColor = '#444';
-                    });
-                    link.addEventListener('mouseout', function () {
-                        this.style.backgroundColor = 'transparent';
-                    });
-                });
             </script>
+
 
 
         </div>
@@ -470,10 +646,6 @@
             e.preventDefault(); // Prevent default link behavior
             $('#leads-menu').slideToggle(); // Use slideToggle for animation
         });
-
-
-        
-
     </script>
 </body>
 
