@@ -120,7 +120,7 @@
 
         /* Profile Image */
         .profile-img {
-            width: 40px;
+            width:205%;
             height: 40px;
             object-fit: cover;
             border-radius: 50%;
@@ -301,7 +301,7 @@
                 <a href="{% url 'dashboard' %}"
                     class="flex w-280 h-100 title-font font-medium items-center text-white mb-4 md:mb-0 ml-5 logo-container">
                     <img style="border-radius: 50px;" src="{% static 'images/Screenshot 2024-10-19 002628.png' %}"
-                        alt="Image" class="w-12 h-12 logo">
+                        alt="Image" class="w-20 h-12 logo">
                     <span class="text-right ml-3 text-xl py-0 text">PMA CRM</span>
                 </a>
             </div>
@@ -326,7 +326,7 @@
                     {% else %}
                     <i class="fas fa-user-circle profile-icon"></i>
                     {% endif %}
-                    <span class="profile-name">{{ request.user.username }}</span>
+                    <span class="profile-name ml-2">{{ request.user.username }}</span>
                 </button>
 
                 <!-- Dropdown Menu -->
