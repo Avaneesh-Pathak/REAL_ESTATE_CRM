@@ -628,13 +628,7 @@
                 }
             });
 
-            // On page load, check for saved theme preference
-            const currentTheme = localStorage.getItem('theme');
-            if (currentTheme === 'night') {
-                themeStyle.setAttribute('href', "{% static 'CSS/night_mode.css' %}");
-                $('body').addClass('night-mode'); // Set body class to night mode
-                themeIcon.innerHTML = '&#9729;'; // Set icon to Moon
-            }
+            
         });
         // Toggle nested menu for Sales
         $('#toggle-properties-menu').on('click', function (e) {

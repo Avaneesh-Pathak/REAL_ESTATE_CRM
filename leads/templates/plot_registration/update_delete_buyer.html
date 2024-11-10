@@ -191,21 +191,18 @@
     <h4 class="section-subheading">Booking Details</h4>
     <div class="d-flex justify-content-between">
         <p><strong>{{ form.location.label }}</strong>{{ form.location }}</p>
-        <p><strong>{{ form.project.label }}</strong>{{ form.project }}</p>
+        <p><strong>Select Property</strong><input type="text" class="form-control" value="{{ form.instance.project }}" readonly disabled>
+        </p>
     </div>
     <div class="d-flex justify-content-between">
-        <p><strong>{{ form.associate_detail.label }}</strong>{{ form.associate_detail }}</p>
-        <p id="agent-field" style="display:none;"><strong>Agent</strong><select id="agent-dropdown" name="agent"
-                class="form-control">
-                <option value="">Select an Agent</option>
-                {% for agent in agents %}
-                <option value="{{ agent.id }}">{{ agent.user.username }}</option>
-                {% endfor %}
-            </select></p>
+        <p><strong>Agent</strong>
+            <input type="text" class="form-control" value="{{ form.instance.agent }}" readonly disabled>
+        </p>
     </div>
     <div class="d-flex justify-content-between">
-        <p><strong>Project Price:</strong> <span id="project-price"></span>{{ form.Plot_price }}</p>
-        <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>
+        <p><strong>Property Price:</strong> <span id="project-price"></span>    <input type="text" class="form-control" value="{{ form.instance.Plot_price }}" readonly disabled></p>
+        <p><strong>{{ form.payment_type.label }}</strong>    <input type="text" class="form-control" value="{{ form.instance.payment_type }}" readonly disabled>
+        </p>
     </div>
 
     <!-- EMI Options -->
@@ -230,7 +227,8 @@
     <!-- Payment Information Section -->
     <h4 class="section-subheading">Payment Information</h4>
     <div class="d-flex justify-content-between">
-        <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p>
+        <p><strong>{{ form.booking_amount.label }}</strong><input type="text" class="form-control" value="{{ form.instance.booking_amount }}" readonly disabled>
+        </p>
         <p><strong>{{ form.mode_of_payment.label }}</strong>{{ form.mode_of_payment }}</p>
     </div>
     <div class="d-flex justify-content-between">
@@ -241,7 +239,7 @@
     <!-- Action Buttons -->
     <div class="form-group text-center mt-4">
         <button type="submit" name="update" class="btn btn-success">Update</button>
-        <button type="submit" name="delete" class="btn btn-danger">Delete</button>
+        {% comment %} <button type="submit" name="delete" class="btn btn-danger">Delete</button> {% endcomment %}
     </div>
 </form>
 </div>
@@ -257,10 +255,10 @@
     });
 
     // Show promoter field if 'Associate Detail' is checked
-    document.getElementById("id_associate_detail").addEventListener("change", function () {
+    {% comment %} document.getElementById("id_associate_detail").addEventListener("change", function () {
         const agentField = document.getElementById("agent-field");
         agentField.style.display = this.checked ? "block" : "none";
-    });
+    }); {% endcomment %}
 
     // Show EMI options if 'Installment' is selected for payment type
     document.getElementById("id_payment_type").addEventListener("change", function () {

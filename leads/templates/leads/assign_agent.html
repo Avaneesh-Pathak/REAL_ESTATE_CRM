@@ -6,7 +6,6 @@
     /* Simple styles for the form */
     {% comment %} .container {
         padding: 20px;
-        
         max-width: 600px;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -62,28 +61,14 @@
         background-color: #0056b3; /* Darker blue */
         transform: scale(1.05);
     }
-
-    .alert {
-        display: none; /* Initially hidden */
-        margin-top: 15px;
-        padding: 10px;
-        background-color: #d4edda; /* Green background */
-        color: #155724; /* Dark green text */
-        border: 1px solid #c3e6cb; /* Border color */
-        border-radius: 5px;
-    }
-
-    .alert.show {
-        display: block; /* Show the alert */
-    }
 </style>
 
 <div style="width: fit-content;" class="container mt-5">
     <a href="{% url 'leads:lead-list' %}" class="back-link mb-3 btn btn-primary">← Go Back to Leads</a>
 
-    <h1 style="font-size: large; font-weight: 500; ;" >Assign an Agent to This Lead</h1>
+    <h1 style="font-size: large; font-weight: 500;" >Assign an Agent to This Lead</h1>
 
-    <form method="post" action="." >
+    <form method="post" action=".">
         {% csrf_token %}
         <div class="form-group">
             <label for="{{ form.agent.id_for_label }}" class="form-label">{{ form.agent.label }}</label>
@@ -99,29 +84,5 @@
 
         <button type="submit" class="btn" id="submit-button">Assign Agent</button>
     </form>
-
-    <div id="success-message" class="alert" role="alert">
-        Agent has been successfully assigned!
-    </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector('form');
-        const successMessage = document.getElementById('success-message');
-
-        form.addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent the default form submission
-
-            // Simulate a successful submission
-            successMessage.classList.add('show');
-
-            // Reset the form after a delay
-            setTimeout(function () {
-                successMessage.classList.remove('show');
-                form.reset();
-            }, 3000); // Show success message for 3 seconds
-        });
-    });
-</script>
 {% endblock content %}

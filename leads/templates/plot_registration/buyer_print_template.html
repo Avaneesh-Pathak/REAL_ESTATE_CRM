@@ -41,6 +41,9 @@
         }
         .receipt-info {
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
         .receipt-info p {
             margin: 0;
@@ -111,6 +114,9 @@
             h2, h4 {
                 font-size: 18px;
             }
+            .gst-input, .other-charges-input {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -124,99 +130,144 @@
         </div>
 
         <div class="receipt-info">
-            <p><strong>Date:</strong> {% now "Y-m-d" %}</p> <!-- Automatically fetches current date -->
-            <p><strong>Receipt No:</strong> {{ receipt_number }}</p> 
-
-            <p style="font-style: italic; font-weight: bolder; font-size: larger; text-align: right;" ><strong>Buyer Name:</strong> {{ buyer.name }}</p>
+            <div>
+                <p><strong>Date:</strong> {% now "Y-m-d" %}</p>
+                <p><strong>Receipt No:</strong> {{ receipt_number }}</p>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-style: italic; font-weight: bolder; font-size: larger;"><strong>Buyer Name:</strong> {{ buyer.name }}</p>
+            </div>
         </div>
 
         <h4>Buyer Details</h4>
-        <table class="details-table">
-            <tr>
-                <th>Father/Husband Name</th>
-                <td>{{ buyer.father_husband_name }}</td>
-            </tr>
-            <tr>
-                <th>Gender</th>
-                <td>{{ buyer.gender }}</td>
-            </tr>
-            <tr>
-                <th>Date of Birth</th>
-                <td>{{ buyer.dob }}</td>
-            </tr>
-            <tr>
-                <th>Mobile No.</th>
-                <td>+91 {{ buyer.mobile_no }}</td>
-            </tr>
-            <tr>
-                <th>Address</th>
-                <td>{{ buyer.address }}</td>
-            </tr>
-            <tr>
-                <th>Bank Name</th>
-                <td>{{ buyer.bank_name }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ buyer.email }}</td>
-            </tr>
-            <tr>
-                <th>Nominee Name</th>
-                <td>{{ buyer.nominee_name }}</td>
-            </tr>
-        </table>
+        <div style="display: flex; justify-content: space-between;">
+            <table class="details-table">
+                <tr>
+                    <th>Father/Husband Name</th>
+                    <td>{{ buyer.father_husband_name }}</td>
+                </tr>
+                <tr>
+                    <th>Gender</th>
+                    <td>{{ buyer.gender }}</td>
+                </tr>
+                <tr>
+                    <th>Date of Birth</th>
+                    <td>{{ buyer.dob }}</td>
+                </tr>
+                <tr>
+                    <th>Mobile No.</th>
+                    <td>+91 {{ buyer.mobile_no }}</td>
+                </tr>
+                <tr>
+                    <th>Address</th>
+                    <td>{{ buyer.address }}</td>
+                </tr>
+                <tr>
+                    <th>Bank Name</th>
+                    <td>{{ buyer.bank_name }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{ buyer.email }}</td>
+                </tr>
+                <tr>
+                    <th>Nominee Name</th>
+                    <td>{{ buyer.nominee_name }}</td>
+                </tr>
+            </table>
+        </div>
 
         <h4>Property Details</h4>
-        <table class="details-table">
-            <tr>
-                <th>Location Applied For</th>
-                <td>{{ buyer.location }}</td>
-            </tr>
-            <tr>
-                <th>Property Name</th>
-                <td>{{ buyer.project.title }}</td>
-            </tr>
-            <tr>
-                <th>Agent Name</th>
-                <td>{{ buyer.agent.user.username }}</td>
-            </tr>
-        </table>
+        <div style="display: flex; justify-content: space-between;">
+            <table class="details-table">
+                <tr>
+                    <th>Location Applied For</th>
+                    <td>{{ buyer.location }}</td>
+                </tr>
+                <tr>
+                    <th>Property Name</th>
+                    <td>{{ buyer.project.title }}</td>
+                </tr>
+                <tr>
+                    <th>Agent Name</th>
+                    <td>{{ buyer.agent.user.username }}</td>
+                </tr>
+            </table>
+        </div>
 
         <h4>Payment Details</h4>
+        <div style="display: flex; justify-content: space-between;">
+            <table class="details-table">
+                <tr>
+                    <th>Plot Price</th>
+                    <td>{{ buyer.Plot_price }}</td>
+                </tr>
+                <tr>        
+                    <th>Payment Type</th>
+                    <td>{{ buyer.payment_type }}</td>
+                </tr>
+                <tr>
+                    <th>Booking Amount</th>
+                    <td>{{ buyer.booking_amount }}</td>
+                </tr>
+                <tr>
+                    <th>Mode of Payment</th>
+                    <td>{{ buyer.mode_of_payment }}</td>
+                </tr>
+                <tr>
+                    <th>Payment Date</th>
+                    <td>{{ buyer.payment_date }}</td>
+                </tr>
+                <tr>
+                    <th>Remarks</th>
+                    <td>{{ buyer.remark }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Hide this section in the print view -->
+        <div class="gst-input">
+            <form method="POST" action="">
+                {% csrf_token %}
+                <label for="gst_amount">GST Amount (in %):</label>
+                <input type="number" name="gst_amount" id="gst_amount" step="1" min="0" required value="{{ gst_amount }}" placeholder="Enter GST Percentage (e.g., 18)">
+
+                <label for="other_charges">Other Charges:</label>
+                <input type="number" name="other_charges" id="other_charges" step="0.01" required value="{{ other_charges }}">
+
+                <button type="submit">Add</button>
+            </form>
+        </div>
+
+        <!-- Display the Receipt Summary with Total Amount -->
+        <h4>Receipt Summary</h4>
         <table class="details-table">
-            <tr>
-                <th>Plot Price</th>
-                <td>{{ buyer.Plot_price }}</td>
-            </tr>
-            <tr>        
-                <th>Payment Type</th>
-                <td>{{ buyer.payment_type }}</td>
-            </tr>
-            <tr>
-                <th>Booking Amount</th>
-                <td>{{ buyer.booking_amount }}</td>
-            </tr>
-            <tr>
-                <th>Mode of Payment</th>
-                <td>{{ buyer.mode_of_payment }}</td>
-            </tr>
-            <tr>
-                <th>Payment Date</th>
-                <td>{{ buyer.payment_date }}</td>
-            </tr>
-            <tr>
-                <th>Remarks</th>
-                <td>{{ buyer.remark }}</td>
-            </tr>
+            <tr><td>Plot Price:</td><td>₹{{ buyer.Plot_price|floatformat:2 }}</td></tr>
+            <tr><td id="gst_label">GST @ {{ gst_amount }}%:</td><td id="gst_amount_value">₹{{ gst_amount|floatformat:2 }}</td></tr>
+            <tr><td>Other Charges:</td><td>₹{{ other_charges|floatformat:2 }}</td></tr>
+            <tr><th>Total Amount:</th><th>₹{{ total_amount|floatformat:2 }}</th></tr>
         </table>
 
-        <button class="print-button" onclick="window.print()">Print</button>
+        <button class="print-button" onclick="window.print()">Print Receipt</button>
 
         <div class="footer">
             <p>Thank you for your registration.</p>
             <p>If you have any questions, contact us at (123) 000-0000 or support@company.com</p>
-            <p>Company Address: Lucknow, UP,INDIA</p>
+            <p>Company Address: Lucknow, UP, INDIA</p>
         </div>
     </div>
+
+    <script>
+        // Handle the calculation and display of GST dynamically
+        document.getElementById("gstForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let gstAmount = document.getElementById("gstAmountInput").value;
+            let gstLabel = document.getElementById("gst_label");
+            let gstAmountValue = document.getElementById("gst_amount_value");
+
+            gstLabel.textContent = `GST @ ${gstAmount}%:`;
+            gstAmountValue.textContent = `₹${(gstAmount / 100) * {{ buyer.Plot_price }} | floatformat:2 }}`;
+        });
+    </script>
 </body>
 </html>

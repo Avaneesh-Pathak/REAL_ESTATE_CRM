@@ -74,9 +74,9 @@
                     <!-- <td class="py-2 px-4 border-b">{{ kisan.usable_land_total }}</td> Display usable land -->
                     <!-- <td class="py-2 px-4 border-b">{{ kisan.land_type }}</td> Display land type -->
                     <td class="py-2 px-4 border-b">{{ kisan.land_costing }}</td>
-                    <td class="py-2 px-4 border-b">
+                    <td class="py-2 px-4 border-b"> {% if kisan.is_assigned %}Assigned {% else %}
                         <a href="{% url 'leads:kisan_edit' kisan.id %}" class="hover:bg-Blue text-lightblue font-bold">Edit</a>
-                        <a href="{% url 'leads:kisan_delete' kisan.id %}" class="bg-red text-red-600 hover:text-red-800 ml-4">Delete</a>
+                        <a href="{% url 'leads:kisan_delete' kisan.id %}" class="bg-red text-red-600 hover:text-red-800 ml-4">Delete</a>{% endif %}
                     </td>
                 </tr>
                 {% empty %}

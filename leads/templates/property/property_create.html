@@ -58,7 +58,7 @@
                     {% for project in projects %}
                     <div style="border-radius: 20px; padding: 10px;" class="bg-blue-200 text-Black-800" data-project="{{ project.id }}">
                         Total land in : <b>{{ project.title}}:</b> {{ project.total_land_available_fr_plotting }} sqft
-                        <p>Total land Used: <b>{{ project.total_land_area }} sqft</b></p> 
+                        <p>Total land Used: <b>{{ project.total_land_area_used }} sqft</b></p> 
                         <p>Total land Available: <b>{{ project.total_land_available }} sqft</b></p> 
                         <p style="color: rgb(255, 0, 0);" >Cost per sqft: <b>{{ project.land_cost_per_sqft| floatformat:2 }} Rs</b></p> 
                     </div>

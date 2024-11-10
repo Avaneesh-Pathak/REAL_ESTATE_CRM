@@ -15,7 +15,10 @@
         <form method="POST">
             {% csrf_token %}
             <!-- Assuming 'properties' is passed and you want the first property -->
-             
+            {% if error_message %}
+            <div class="alert alert-danger">{{ error_message }}</div>
+            {% endif %}
+        
             {% if properties %}
                 {% with property=properties.0 %}
                 <div class="form-group mb-3">

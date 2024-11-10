@@ -77,11 +77,13 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class AssignAgentForm(forms.Form):
-    agent = forms.ModelChoiceField(queryset=Agent.objects.none())
+    agent = forms.ModelChoiceField(queryset=Agent.objects.all())
+    print(agent)
 
     def __init__(self, *args, **kwargs):
         request = kwargs.pop("request")
-        agents = Agent.objects.filter(organisation=request.user.userprofile)
+        agents = Agent.objects.all()
+        print(agents)
         super(AssignAgentForm, self).__init__(*args, **kwargs)
         self.fields["agent"].queryset = agents
         self.fields['agent'].widget.attrs.update({'class': 'form-control'})
@@ -280,12 +282,27 @@ class PlotBookingForm(forms.ModelForm):
             'booking_date': forms.DateInput(attrs={'type': 'date'}),
             'dob': forms.DateInput(attrs={'type': 'date'}),
             'project': forms.Select(attrs={'id': 'project-select'}),
+            # 'booking_amount': forms.IntegerField(attrs={'id': 'id_booking_amount'}),
             'payment_type': forms.Select(attrs={'id': 'id_payment_type'}),
             'payment_date':forms.DateInput(attrs={'type': 'date'}),
         }
 
     def __init__(self, *args,project=None, **kwargs):
         super().__init__(*args, **kwargs)
+        if self.instance.pk:  # If updating an existing instance
+            # Set the fields to be read-only during updates
+            self.fields['project'].widget.attrs['readonly'] = True
+            self.fields['Plot_price'].widget.attrs['readonly'] = True
+            self.fields['booking_amount'].widget.attrs['readonly'] = True
+            self.fields['payment_type'].widget.attrs['readonly'] = True
+            self.fields['agent'].widget.attrs['readonly'] = True
+            
+            # Optionally, add 'disabled' to prevent submission of these fields
+            self.fields['project'].disabled = True
+            self.fields['Plot_price'].disabled = True
+            self.fields['booking_amount'].disabled = True
+            self.fields['payment_type'].disabled = True
+            self.fields['agent'].disabled = True
         self.fields['project'].required = True  # Set the field as required
         self.fields['booking_date'].initial = date.today()
 

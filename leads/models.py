@@ -7,6 +7,9 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.dispatch import receiver
 from decimal import Decimal
+from django.contrib import messages
+from twilio.rest import Client
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 import logging
@@ -16,6 +19,20 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+
+def send_sms(to, message):
+    try:
+        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        message_sent = client.messages.create(
+            body=message,
+            from_=settings.TWILIO_PHONE_NUMBER,
+            to='+918052513208'  # Use the `to` argument passed into the function
+        )
+        print(f"Message sent successfully with SID: {message_sent.sid}")
+    except Exception as e:
+        print(f"Error sending message: {e}")
+
 
 
 class User(AbstractUser):
@@ -111,7 +128,7 @@ class Lead(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     age = models.IntegerField(default=0)
-    organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING,null=True,blank=True)
     agent = models.ForeignKey("Agent", null=True, blank=True, on_delete=models.SET_NULL)
     category = models.ForeignKey("Category",related_name="leads" ,null=True, blank=True, on_delete=models.SET_NULL)
     description = models.TextField()
@@ -241,18 +258,9 @@ class Agent(models.Model):
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
         logger.info(f'Agent instance {self.pk} was {action}. Data: {data}')
 
-
-# @receiver(post_delete, sender=Agent)
-# def log_userprofile_deletion(sender, instance, **kwargs):
-        # Collect the instance data before deletion
-    # data = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
-        
-        # Log the deletion action with instance data in dictionary format
-    # logger.info(f'Agent instance  was Deleted. Data: {data}')
-
 class Category(models.Model):
     name = models.CharField(max_length=30)  # New, Contacted, Converted, Unconverted
-    organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING)
+    organisation = models.ForeignKey(UserProfile, on_delete=models.DO_NOTHING,null=True,blank=True)
 
     def __str__(self):
         # Log whenever a Category instance is accessed
@@ -282,13 +290,6 @@ def log_userprofile_deletion(sender, instance, **kwargs):
     logger.info(f'Category instance  was Deleted. Data: {data}')
 
 
-# # Signal handler for UserProfile creation
-# def post_user_created_signal(sender, instance, created, **kwargs):
-#     if created:
-#         logger.info(f"UserProfile created for user: {instance.username}")
-#         UserProfile.objects.create(user=instance)
-        
-# post_save.connect(post_user_created_signal, sender=User)
 
 class Salary(models.Model):
     agent = models.ForeignKey(User, on_delete=models.DO_NOTHING)  # Or your Agent model
@@ -385,6 +386,7 @@ class Project(models.Model):
         return composite_key
 
     def save(self, *args, **kwargs):
+        self.title = self.create_composite_key()
         # Check if it's a new instance or an update
         is_new_instance = self.pk is None
 
@@ -396,7 +398,7 @@ class Project(models.Model):
 
         # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        logger.info(f'Userprofile instance {self.pk} was {action}. Data: {data}')
+        logger.info(f'Project instance {self.pk} was {action}. Data: {data}')
 
 @receiver(pre_delete, sender=Project)
 def log_userprofile_deletion(sender, instance, **kwargs):
@@ -559,6 +561,7 @@ class EmiPlan(models.Model):
         action = "created" if self.pk is None else "updated"
         super().save(*args, **kwargs)
         logger.info(f"EMI Plan '{self.name}' was {action} with interest rate {self.interest_rate}% and tenure {self.tenure_months} months")
+
 @receiver(post_delete, sender=EmiPlan)
 def log_userprofile_deletion(sender, instance, **kwargs):
         # Collect the instance data before deletion
@@ -608,6 +611,8 @@ class Daybook(models.Model):
     custom_activity = models.CharField(max_length=100, blank=True, null=True)  # For "Others"
     amount = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     remark = models.TextField(blank=True, null=True)
+    # Balance field to keep track of remaining balance
+    current_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     
     def __str__(self):
         # Log whenever __str__ is called (representing the Daybook entry)
@@ -616,14 +621,21 @@ class Daybook(models.Model):
         return f"{self.date} - {activity_display} - {self.amount}"
 
     def save(self, *args, **kwargs):
-        # Handle custom activity logging if the activity is 'Others'
-        if self.activity == 'others' and not self.custom_activity:
-            logger.warning("Custom activity is required when activity is set to 'Others'.")
-        else:
-            activity_display = self.custom_activity if self.activity == 'others' else self.activity
-            action = "created" if self.pk is None else "updated"
-            super().save(*args, **kwargs)
-            logger.info(f"Daybook entry {action} with date: {self.date}, activity: {activity_display}, amount: {self.amount}")
+        # Calculate the new balance after the transaction
+        previous_balance = self.__class__.objects.filter(id=self.id).first().current_balance if self.pk else 0
+        if self.amount:  # If there's an amount for the transaction, update the balance
+            self.current_balance = previous_balance + self.amount
+        
+        activity_display = self.custom_activity if self.activity == 'others' else self.activity
+        action = "created" if self.pk is None else "updated"
+        
+        super().save(*args, **kwargs)
+        
+        # Log and send SMS after save
+        logger.info(f"Daybook entry {action} with date: {self.date}, activity: {activity_display}, amount: {self.amount}, remaining balance: {self.current_balance}")
+
+
+
 @receiver(post_delete, sender=Daybook)
 def log_userprofile_deletion(sender, instance, **kwargs):
         # Collect the instance data before deletion
@@ -631,6 +643,14 @@ def log_userprofile_deletion(sender, instance, **kwargs):
         
         # Log the deletion action with instance data in dictionary format
     logger.info(f'Daybook instance  was Deleted. Data: {data}')
+    # Prepare the deletion message
+    message = f"Daybook Entry Deleted:\nDate: {instance.date}\nActivity: {instance.activity}\nAmount: {instance.amount}"
+    if instance.remark:
+        message += f"\nRemark: {instance.remark}"
+    
+    # Send SMS for deletion (replace with your actual phone number)
+    my_number = '+918052513208'  # Replace with your actual phone number
+    send_sms(to=my_number, message=message)
 
 # PROMOTER MODEL
 class Promoter(models.Model):
@@ -682,6 +702,8 @@ class PlotBooking(models.Model):
     emi_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=True)  # Calculated EMI amount
     remark = models.TextField(blank=True, null=True)
     
+
+    
     def update_property_status_if_paid(self):
         # Check if there are any pending EMI payments
         pending_emis = self.emi_payments.filter(status='Pending').count()
@@ -692,6 +714,8 @@ class PlotBooking(models.Model):
             property_obj.is_sold = True
             property_obj.save()
             logger.info(f"Property status updated to sold: {property_obj.title}")
+            # Send SMS when property status changes to sold
+            # self.send_property_sold_sms(property_obj)
         else:
             logger.info(f"Property not yet fully paid; {pending_emis} EMI payments pending.")
 
@@ -704,6 +728,9 @@ class PlotBooking(models.Model):
         action = "created" if self.pk is None else "updated"
         super().save(*args, **kwargs)
         logger.info(f"PlotBooking {action}: {self.name} - {self.booking_date}")
+
+
+
 @receiver(post_delete, sender=PlotBooking)
 def log_userprofile_deletion(sender, instance, **kwargs):
         # Collect the instance data before deletion
@@ -711,6 +738,10 @@ def log_userprofile_deletion(sender, instance, **kwargs):
         
         # Log the deletion action with instance data in dictionary format
     logger.info(f'PlotBooking instance  was Deleted. Data: {data}')
+    # # Send SMS when a plot booking is deleted
+    message = f"Plot booking was deleted:\nName: {instance.name}\nBooking Date: {instance.booking_date}"
+    my_number = '+918052513208'  # Replace with the recipient's phone number
+    send_sms(to=my_number, message=message)
 
 
 class EMIPayment(models.Model):
@@ -846,3 +877,8 @@ def log_userprofile_deletion(sender, instance, **kwargs):
         
         # Log the deletion action with instance data in dictionary format
     logger.info(f'Kisan instance  was Deleted. Data: {data}')  
+
+
+# Billing
+
+

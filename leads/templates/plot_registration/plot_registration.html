@@ -178,13 +178,7 @@
 
         <!-- Business Information Section -->
         <h3 class="section-heading">BUSINESS INFORMATION</h3>
-        <!-- <h4 class="section-subheading">PLC Charges</h4>
-        <div class="d-flex justify-content-between align-items-center"
-            style="padding: 10px; background-color: #f0f0f0; border-radius: 8px; border: 1px solid #ddd;">
-            <div class="d-flex justify-content-between form-group">
-                {{ form.plc_charge }} Render the radio buttons here 
-            </div>
-        </div> -->
+        
 
         <!-- Booking Details -->
         <h4 class="section-subheading">Booking Details</h4>
@@ -247,15 +241,15 @@
             <div id="emi-options" style="display:none;">
                 <h4 class="section-subheading">EMI Details</h4>
                 <div class="form-group">
-                    <label>{{ form.emi_tenure.label }}</label>
+                    <label>EMI Tenure in Months</label>
                     {{ form.emi_tenure }}
                 </div>
                 <div class="form-group">
-                    <label>{{ form.interest_rate.label }}</label>
+                    <label>Interest Rate (in %)</label>
                     {{ form.interest_rate }}
                 </div>
                 <div class="form-group">
-                    <label>Calculated EMI:</label>
+                    <label>Calculated EMI:(Per Months)</label>
                     <input type="text" id="calculated-emi" readonly class="form-control">
                 </div>
             </div>
@@ -307,7 +301,12 @@
        
         // Parse property price from the text content of the span
         const plotPriceText = document.getElementById("property-price").textContent;
-        const plotPrice = parseFloat(plotPriceText.replace(/\D/g, '')) || 0;
+        const PlotPrice = parseFloat(plotPriceText.replace(/\D/g, '')) || 0;
+        
+        const plotPrice = (PlotPrice/100)|| 0;
+
+
+        console.log(PlotPrice)
         console.log(plotPrice)
         const downPayment = parseFloat(document.getElementById("id_booking_amount").value) || 0;
         console.log(downPayment)
@@ -317,8 +316,10 @@
         const remainingAmount = plotPrice - downPayment;
 
         if (emiTenure > 0 && interestRate > 0) {
-            const r = interestRate / 12 / 100;
-            const emi = remainingAmount * r * Math.pow(1 + r, emiTenure) / (Math.pow(1 + r, emiTenure) - 1);
+            const r = (interestRate / 1200 );
+            
+            const emi = (remainingAmount * r * Math.pow(1 + r, emiTenure)) / (Math.pow(1 + r, emiTenure) - 1);
+            // Display EMI with two decimal places
             document.getElementById("calculated-emi").value = emi.toFixed(2);
         } else {
             document.getElementById("calculated-emi").value = "0.00";

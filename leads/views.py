@@ -3,8 +3,8 @@ import datetime
 from leads.models import models
 from datetime import timedelta , date
 from decimal import Decimal, InvalidOperation
-from django import forms
 from django.contrib import messages
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
@@ -19,7 +19,7 @@ from django.utils import timezone
 from django.views import View, generic
 from django.views.generic import ListView, UpdateView, DeleteView
 
-from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot
+from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot,send_sms
 from agents.mixins import OrganisorAndLoginRequiredMixin
 from leads.models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,EMIPayment,Balance
 from leads.forms import (
@@ -185,7 +185,7 @@ def update_profile(request):
     }
     return render(request, 'leads/profile.html', context)
 
-class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
+class DashboardView(LoginRequiredMixin, generic.TemplateView):
     template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
@@ -276,9 +276,7 @@ class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
         })
         return context
 
-# import logging
-# logger = logging.getLogger('app_errors')
-# logger.info("This is an informational message.")
+
     
 class LeadListView(LoginRequiredMixin,generic.ListView):
     
@@ -341,7 +339,7 @@ class LeadDetailView(LoginRequiredMixin, generic.DetailView):
         user = self.request.user
         # initial queryset of leads for the entire organisation
         if user.is_organisor:
-            queryset = Lead.objects.filter(organisation=user.userprofile)
+            queryset = Lead.objects.all()
         else:
             queryset = Lead.objects.filter(organisation=user.agent.organisation)
             # filter for the agent that is logged in
@@ -366,8 +364,8 @@ class LeadCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
 
     def form_valid(self, form):
         lead = form.save(commit=False)
-        lead.organisation = self.request.user.userprofile
-        lead.save()
+        # lead.organisation = self.request.user
+        # lead.save()
         # send_mail(
         #     subject="A lead has been created",
         #     message="Go to the site to see the new lead",
@@ -396,7 +394,7 @@ class LeadUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
     def get_queryset(self):
         user = self.request.user
         # initial queryset of leads for the entire organisation
-        return Lead.objects.filter(organisation=user.userprofile)
+        return Lead.objects.all()
 
     def get_success_url(self):
         return reverse("leads:lead-list")
@@ -440,29 +438,33 @@ def lead_delete(request, pk):
     return redirect("/leads")
 
 
-class AssignAgentView(OrganisorAndLoginRequiredMixin, generic.FormView):
+class AssignAgentView(generic.FormView):  # Temporarily remove mixin
     template_name = "leads/assign_agent.html"
     form_class = AssignAgentForm
 
     def get_form_kwargs(self, **kwargs):
-        kwargs = super(AssignAgentView, self).get_form_kwargs(**kwargs)
-        kwargs.update({
-            "request": self.request
-        })
+        kwargs = super().get_form_kwargs(**kwargs)
+        kwargs.update({"request": self.request})
+        print("Form kwargs:", kwargs)  # Debugging
         return kwargs
-        
+
     def get_success_url(self):
-        return reverse("leads:lead-list")
+        print("Redirecting to lead list")  # Debugging
+        return "/leads/"  # Temporarily hard-coded
 
     def form_valid(self, form):
         agent = form.cleaned_data["agent"]
         lead = Lead.objects.get(id=self.kwargs["pk"])
+        print("Assigning agent:", agent)
+        print("Lead:", lead)
         lead.agent = agent
         lead.save()
-        return super(AssignAgentView, self).form_valid(form)
+        messages.info(self.request, "You have successfully Assigned the agent")
+
+        return super().form_valid(form)
 
 
-class CategoryListView(LoginRequiredMixin, generic.ListView):
+class CategoryListView(OrganisorAndLoginRequiredMixin, generic.ListView):
     template_name = "leads/category_list.html"
     context_object_name = "category_list"
 
@@ -471,13 +473,9 @@ class CategoryListView(LoginRequiredMixin, generic.ListView):
         user = self.request.user
 
         if user.is_organisor:
-            queryset = Lead.objects.filter(
-                organisation=user.userprofile
-            )
+            queryset = Lead.objects.all()
         else:
-            queryset = Lead.objects.filter(
-                organisation=user.agent.organisation
-            )
+            queryset = Lead.objects.all()
 
         context.update({
             "unassigned_lead_count": queryset.filter(category__isnull=True).count()
@@ -488,13 +486,9 @@ class CategoryListView(LoginRequiredMixin, generic.ListView):
         user = self.request.user
         # initial queryset of leads for the entire organisation
         if user.is_organisor:
-            queryset = Category.objects.filter(
-                organisation=user.userprofile
-            )
+            queryset = Category.objects.all()
         else:
-            queryset = Category.objects.filter(
-                organisation=user.agent.organisation
-            )
+            queryset = Category.objects.all()
         queryset = queryset.annotate(lead_count=Count('leads'))
         return queryset
 
@@ -507,13 +501,9 @@ class CategoryDetailView(LoginRequiredMixin, generic.DetailView):
         user = self.request.user
         # initial queryset of leads for the entire organisation
         if user.is_organisor:
-            queryset = Category.objects.filter(
-                organisation=user.userprofile
-            )
+            queryset = Category.objects.all()            
         else:
-            queryset = Category.objects.filter(
-                organisation=user.agent.organisation
-            )
+            queryset = Category.objects.all()
         return queryset
  
 
@@ -526,8 +516,8 @@ class CategoryCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
 
     def form_valid(self, form):
         category = form.save(commit=False)
-        category.organisation = self.request.user.userprofile
-        category.save()
+        # category.organisation = self.request.user.userprofile
+        # category.save()
         return super(CategoryCreateView, self).form_valid(form)
 
 
@@ -562,13 +552,9 @@ class CategoryDeleteView(OrganisorAndLoginRequiredMixin, generic.DeleteView):
         user = self.request.user
         # initial queryset of leads for the entire organisation
         if user.is_organisor:
-            queryset = Category.objects.filter(
-                organisation=user.userprofile
-            )
+            queryset = Category.objects.all()
         else:
-            queryset = Category.objects.filter(
-                organisation=user.agent.organisation
-            )
+            queryset = Category.objects.all()
         return queryset
 
 
@@ -580,9 +566,9 @@ class LeadCategoryUpdateView(LoginRequiredMixin, generic.UpdateView):
         user = self.request.user
         # initial queryset of leads for the entire organisation
         if user.is_organisor:
-            queryset = Lead.objects.filter(organisation=user.userprofile)
+            queryset = Lead.objects.all()
         else:
-            queryset = Lead.objects.filter(organisation=user.agent.organisation)
+            queryset = Lead.objects.all()
             # filter for the agent that is logged in
             queryset = queryset.filter(agent__user=user)
         return queryset
@@ -634,12 +620,9 @@ class FollowupList(LoginRequiredMixin,generic.ListView):
         user = self.request.user
         # Define the initial queryset based on user type
         if user.is_organisor:
-            return FollowUp.objects.filter(lead__organisation=user.userprofile)
+            return FollowUp.objects.all()
         else:
-            return FollowUp.objects.filter(
-                lead__organisation=user.agent.organisation,
-                lead__agent__user=user
-            )
+            return FollowUp.objects.all()
     
 
 def followup_list(request,lead_id):
@@ -658,9 +641,9 @@ class FollowUpUpdateView(LoginRequiredMixin, generic.UpdateView):
         user = self.request.user
         # initial queryset of leads for the entire organisation
         if user.is_organisor:
-            queryset = FollowUp.objects.filter(lead__organisation=user.userprofile)
+            queryset = FollowUp.objects.all()
         else:
-            queryset = FollowUp.objects.filter(lead__organisation=user.agent.organisation)
+            queryset = FollowUp.objects.all()
             # filter for the agent that is logged in
             queryset = queryset.filter(lead__agent__user=user)
         return queryset
@@ -968,14 +951,15 @@ class PropertyCreateView(LoginRequiredMixin, View):
         plot_choices = Property.PLOT_CHOICES
 
         for project in projects:
-            project.total_land_area = Property.objects.filter(project_id=project).aggregate(total_area=Sum('area'))['total_area'] or 0
-            tla = project.total_land_area
+            project.total_land_area_used = Property.objects.filter(project_id=project).aggregate(total_area=Sum('area'))['total_area'] or 0
+            tla = project.total_land_area_used
             project.total_land_available = project.total_land_available_fr_plotting - tla
             project.cost_per_sqft = project.dev_cost
             kisan_lands = project.lands.all()
             # total_area = sum(land.area_in_beegha*27200 for land in kisan_lands)
             total_land_cost =  sum(land.land_costing for land in kisan_lands)
-            project.land_cost_per_sqft = total_land_cost/project.total_land_available + project.dev_cost
+            print(project.dev_cost)
+            project.land_cost_per_sqft = (total_land_cost/project.total_land_available_fr_plotting) + project.dev_cost
 
         # Pass available_land in context
         return render(request, self.template_name, {
@@ -1064,7 +1048,7 @@ class PropertyCreateView(LoginRequiredMixin, View):
 
 def select_properties_view(request):
     projects = Project.objects.all()
-    properties = Property.objects.all()
+    properties = Property.objects.filter(is_sold = False,is_in_emi = False)
 
     if request.method == 'POST':
         selected_ids = request.POST.getlist('properties')  # Get list of selected IDs
@@ -1136,6 +1120,14 @@ class PropertyUpdateView(LoginRequiredMixin,View):
         project.available_land = project.total_land_available_fr_plotting - project.total_land_area + area_in_selected_properties
 
         return project, properties
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Include extra context if it exists
+        if hasattr(self, 'extra_context'):
+            context.update(self.extra_context)
+        return context
+
 
     def get(self, request, ids):
         plot_choices = Property.PLOT_CHOICES
@@ -1154,16 +1146,21 @@ class PropertyUpdateView(LoginRequiredMixin,View):
         # Get form values
         count = len(properties)
         length = int(request.POST.get('project_name', ''))
-        price = request.POST.get('price', '')
+        price = float(request.POST.get('price', ''))
         breadth = int(request.POST.get('block', ''))
         update_type = request.POST.get('plot_type', '')
         # Calculate required area
+        tp = length*breadth*price
         required_area = length * breadth * count
 
         # Check if available land is sufficient
         if required_area > project.available_land:
-            return self.get(request, ids)  # Re-render `get` view if there's not enough land
-
+            error_message = f"Only {project.available_land} sqft of land is available. Cannot create {required_area} sqft of property."
+            print(error_message)
+        
+        # Set the extra context to pass the error message
+            self.extra_context = {'error_message': error_message}
+            return self.get(request, ids)  # Call `get` without passing `error_message` as an argument
         # Update properties if sufficient land is available
         for property_instance in properties:
             property_instance.length = length
@@ -1171,6 +1168,8 @@ class PropertyUpdateView(LoginRequiredMixin,View):
             property_instance.breadth = breadth
             property_instance.area = breadth*length
             property_instance.plot_type = update_type
+            property_instance.totalprice=tp  # Example price, modify as needed
+
             property_instance.save()
 
         return redirect(self.get_success_url())
@@ -1321,12 +1320,14 @@ class DaybookCreateView(LoginRequiredMixin, View):
             # balance = Balance.objects.first()
             balance, created = Balance.objects.get_or_create(defaults={'amount': 0})  # Set an initial amount if created
             print("balance is", balance)
+            balance, created = Balance.objects.get_or_create(defaults={'amount': 0})  # Create Balance if not existing
             
             # Check if balance is available
             if balance:
                 if balance.amount >= expense.amount:
                     # Deduct from balance as it's within the daily limit
                     balance.amount -= expense.amount
+                    action_message = "added"
                 else:
                     # If expense exceeds the daily limit, return an error message
                     messages.error(request, "Daily limit reached. Expense exceeds available balance.")
@@ -1334,10 +1335,24 @@ class DaybookCreateView(LoginRequiredMixin, View):
             else:
                 # No balance record exists, create one with negative amount if overspending
                 Balance.objects.create(amount=-expense.amount)
+                action_message = "added"
 
             # Save the expense and update balance
             expense.save()
             balance.save()
+            # Create the message for SMS
+            remaining_balance = balance.amount  # Get the remaining balance after expense is deducted
+            message = f"Daybook Entry {action_message}:\nDate: {expense.date}\nActivity: {expense.activity}\nAmount: {expense.amount}\nRemaining Balance: {remaining_balance}"
+
+            if expense.remark:
+                message += f"\nRemark: {expense.remark}"
+
+            # Send SMS (replace with your actual phone number)
+            my_number = '+918052513208'  # Replace with your actual phone number
+            send_sms(to=my_number, message=message)
+
+            # Success message for adding the expense
+            messages.success(request, f"Expense of {expense.amount} has been successfully added.")
 
             return redirect('leads:daybook_list')
         return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
@@ -1405,12 +1420,20 @@ class BalanceUpdateView(LoginRequiredMixin, View):
 
             if action == 'add':
                 balance.amount += amount
+                action_message = "added"
                 print("Add",balance.amount)
             elif action == 'deduct':
                 balance.amount = max(0, balance.amount - amount)
+                action_message = "deducted"
                 print("deduct",balance.amount)
 
             balance.save()
+            # Create the message content with remaining balance
+            message = f"Balance has been {action_message} by {amount}. Current balance: {balance.amount}"
+
+            # Send SMS to the specified phone number (replace with the actual number)
+            my_number = '+918052513208'  # Replace with your actual phone number
+            send_sms(to=my_number, message=message)
             return redirect('leads:daybook_list')
         return render(request, self.template_name, {'form': form})
 
@@ -1451,9 +1474,18 @@ def add_promoter(request):
     return render(request, 'promoter/add_promoter.html', {'form': form})
 
 
+def calculate_emi(plot_price, interest_rate, tenure):
+    if interest_rate is not None and tenure > 0:
+        monthly_interest_rate = interest_rate / (12 * 100)  # Convert annual interest rate to monthly
+        emi = (plot_price * monthly_interest_rate * (1 + monthly_interest_rate)**tenure) / ((1 + monthly_interest_rate)**tenure - 1)
+        print("EMI IS :",emi)
+        return emi
+    else:
+        # If no interest, EMI is simply the plot price divided by tenure
+        return plot_price / tenure
+    
 
 # PLOT REGISTRATION
-
 class PlotRegistrationView(LoginRequiredMixin, View):
     template_name = 'plot_registration/plot_registration.html'
 
@@ -1470,8 +1502,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
         }
         for prop in properties
 ]
-
-        
+   
         return render(request, self.template_name, {'form': form, 'agents': agents,'properties':properties})
 
     def post(self, request, *args, **kwargs):
@@ -1484,12 +1515,23 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             print("help")
             # Retrieve EMI amount and tenure from the form
             emi_amount = form.cleaned_data.get('emi_amount')
+            print(emi_amount)
             tenure = form.cleaned_data.get('emi_tenure')
+            print(tenure)
             project = form.cleaned_data.get('project')
+            interest_rate = form.cleaned_data.get('interest_rate')
             Property_inst = Property.objects.get(id = project.id)
             Plot_price = Property_inst.totalprice
             form.instance.Plot_price = Property_inst.totalprice  
             form.save()
+            # Calculate EMI with interest rate if applicable
+            interest_rate = form.cleaned_data.get('interest_rate')  # Interest rate from form
+            if emi_amount is None and tenure and Plot_price:
+                emi_amount = calculate_emi(Plot_price, interest_rate, tenure)
+            
+            # Save EMI details
+            if emi_amount is not None:
+                form.instance.emi_amount = emi_amount  # Save EMI amount
             agent = form.cleaned_data.get('agent')
             payment_type = form.cleaned_data.get('payment_type')  # Get the payment type
             print(agent)
@@ -1521,22 +1563,23 @@ class PlotRegistrationView(LoginRequiredMixin, View):
 
 
             prop =  Property.objects.get(title=project)
-            print(prop)
-            print(prop.is_sold)
             prop.is_sold=True
             # Check if the payment type is "installment" and set is_in_emi accordingly
             if payment_type == 'installment':
-                print(payment_type)
                 prop.is_in_emi = True
             else:
                 prop.is_in_emi = False
             prop.save()  # Save the updated property
-            
-            print(prop.is_sold)
             plot_booking = form.save()
+
             # Ensure emi_amount is a Decimal and tenure is an integer
-            if emi_amount is not None and tenure is not None and tenure > 0:
-                monthly_emi = emi_amount / tenure  # EMI per month
+            # if emi_amount is not None and tenure is not None and tenure > 0:
+            if tenure and emi_amount:
+                monthly_emi = emi_amount
+                print("monthy emi is",monthly_emi)
+                # print(tenure)
+                # monthly_emi = emi_amount / tenure  # EMI per month
+                # print(monthly_emi)
                 
                 # Generate EMI payment records
                 for month in range(tenure):
@@ -1550,6 +1593,73 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                 # Handle missing or invalid EMI amount or tenure
                 form.add_error(None, 'Invalid EMI amount or tenure.')
 
+
+            # Prepare the message content
+            agent = form.cleaned_data.get('agent')
+            emi_start_date = plot_booking.payment_date  # Use the payment date or define as needed
+            emi_start_date_formatted = emi_start_date.strftime('%Y-%m-%d')
+            if agent is not None:
+                
+                # Now you can safely access agent.user.username
+                message = f"""
+                Plot Booking Details:
+
+                Buyer Name: {plot_booking.name}
+                Mobile No: {plot_booking.mobile_no}
+                Email: {plot_booking.email}
+
+                Plot Details:
+                Project Title: {plot_booking.project.title if plot_booking.project else 'N/A'}
+                Plot Price: {plot_booking.Plot_price} INR
+
+                Payment Details:
+                Payment Type: {plot_booking.payment_type}
+                Booking Amount: {plot_booking.booking_amount} INR
+                Mode of Payment: {plot_booking.mode_of_payment}
+                EMI Tenure: {plot_booking.emi_tenure} months (if applicable)
+                Interest Rate: {plot_booking.interest_rate}%
+                {'EMI Amount: ' + str(monthly_emi) + ' INR' if monthly_emi else 'EMI Amount: N/A'}
+                EMI Start Date: {emi_start_date_formatted}
+
+                Agent Details:
+                Agent Name: {agent.user.username}
+                Agent Commission: ₹{base_salary} (Commission for this booking)
+
+                Thank you for your booking. Our team will contact you soon to complete the process.
+                """
+            else:
+                # Handle the case where no agent is selected
+                message = f"""
+                Plot Booking Details:
+
+                Buyer Name: {plot_booking.name}
+                Mobile No: {plot_booking.mobile_no}
+                Email: {plot_booking.email}
+
+                Plot Details:
+                Project Title: {plot_booking.project.title if plot_booking.project else 'N/A'}
+                Plot Price: {plot_booking.Plot_price} INR
+
+                Payment Details:
+                Payment Type: {plot_booking.payment_type}
+                Booking Amount: {plot_booking.booking_amount} INR
+                Mode of Payment: {plot_booking.mode_of_payment}
+                EMI Tenure: {plot_booking.emi_tenure} months (if applicable)
+                Interest Rate: {plot_booking.interest_rate}%
+                {'EMI Amount: ' + str(monthly_emi) + ' INR' if monthly_emi else 'EMI Amount: N/A'}
+                EMI Start Date: {emi_start_date_formatted}
+
+
+                Agent Details:
+                No agent selected.
+
+                Thank you for your booking. Our team will contact you soon to complete the process.
+                """
+
+
+#             # Send SMS to your number (replace with your actual number)
+            # my_number = '+918052513208'  # Replace with your actual phone number
+            # send_sms(to=my_number, message=message)
             return redirect('plot_registration/buyers_list')  # Ensure this matches your URL configuration
         else:
             print(form.errors)
@@ -1571,12 +1681,20 @@ class BuyersListView(LoginRequiredMixin, View):
         return render(request, self.template_name, {'buyers': buyers})
 
 
+import datetime
+import random
+import string
 def generate_receipt_number():
- 
     # Generate a unique receipt number using the current date and time
-    current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-  
-    return f"REC-{current_time}"  # Receipt number with prefix 'REC-'
+    # current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+
+    # Generate a random alphanumeric string of length 10
+    random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+
+    # Combine both parts to create the final receipt number
+    receipt_number = f"REC-{random_string}"
+
+    return receipt_number
 
 
 def buyer_print_view(request, buyer_id):
@@ -1585,12 +1703,31 @@ def buyer_print_view(request, buyer_id):
    
     # Generate a unique receipt number
     receipt_number = generate_receipt_number()
-    
+
+    # Initialize gst_amount and other_charges
+    gst_amount = 0
+    other_charges = 0
+    total_amount = buyer.Plot_price  # Start with the plot price
+
+    # Check if the form is submitted
+    if request.method == 'POST':
+        # Fetch gst_amount and other_charges from form data
+        gst_amount = Decimal(request.POST.get('gst_amount', 0))
+        other_charges = Decimal(request.POST.get('other_charges', 0))
+        plot_price = buyer.Plot_price
+        gst_amount = (plot_price * gst_amount) / 100
+        
+        # Calculate the total amount
+        total_amount = plot_price + gst_amount + other_charges
+
     # Prepare the context for rendering the template
     context = {
         'buyer': buyer,
-        'receipt_date': timezone.now(),  # Get the current date and time
-        'receipt_number': receipt_number,  # Add the generated receipt number to the context
+        'receipt_date': timezone.now(),          # Get the current date and time
+        'receipt_number': receipt_number,        # Add the generated receipt number
+        'gst_amount': gst_amount,                # Pass GST amount to template
+        'other_charges': other_charges,          # Pass other charges to template
+        'total_amount': total_amount,            # Pass calculated total amount to template
     }
     
     # Render the template with the context
@@ -1599,27 +1736,33 @@ def buyer_print_view(request, buyer_id):
 @login_required
 def update_delete_buyer(request, id):
     plot_booking = get_object_or_404(PlotBooking, id=id)
-    print(plot_booking.project)
+    # print(plot_booking.project)
     pdid = plot_booking.project
     pd =  Property.objects.get(title=pdid)
+    
 
 
     if request.method == 'POST':
         if 'update' in request.POST:
             form = PlotBookingForm(request.POST, instance=plot_booking)
             if form.is_valid():
-                print(form.is_valid())
                 form.save()
                 pd.is_sold=False
                 pd.save()
                 project = form.cleaned_data.get('project')
-                agent = form.cleaned_data.get('agent')
-                print(agent)
-                prop =  Property.objects.get(title=project)
-                print(prop.is_sold)
+                agent = form.cleaned_data.get('agent')               
+                prop =  Property.objects.get(title=project)               
                 prop.is_sold=True
-                prop.save()
-                print(prop.is_sold)
+                prop.save()                
+                # Check for upcoming EMI payment dates and send reminders
+                today = timezone.now()
+                upcoming_emi = EMIPayment.objects.filter(plot_booking=plot_booking, status='Pending', due_date__lte=today + timedelta(days=5))
+                if upcoming_emi.exists():
+                    for emi in upcoming_emi:
+                        # Send reminder SMS for EMI due in the next 5 days
+                        message = f"Reminder: EMI payment for plot booking {plot_booking.project.title} is due on {emi.due_date}. Please make the payment."
+                        my_number = '+918052513208'
+                        send_sms(to=my_number, message=message)
                 return redirect('leads:buyers_list')  # Redirect after updating
             else:
                 messages.error(request, 'A buyer with this project already exists!')
@@ -1676,6 +1819,10 @@ def pay_emi(request, payment_id):
                 print(prop_paid.is_in_emi)
 
                 print(prop_paid)
+                # Send SMS notification when all EMI is paid
+                message = f"EMI for plot booking {plotbooking.project.title} is fully paid. Thank you for completing the payment!"
+                my_number = '+918052513208'
+                send_sms(to=my_number, message=message)
             
             return JsonResponse({'status': 'success', 'message': 'Payment marked as paid.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
@@ -1898,6 +2045,15 @@ def export_kisans_to_csv(request):
         ])
     
     return response
+
+
+
+
+
+
+
+
+
 
 
 
