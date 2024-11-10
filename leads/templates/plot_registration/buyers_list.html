@@ -80,6 +80,12 @@
                     <td>
                         <a href="{% url 'leads:buyer_print' buyer.id %}" class="hover:bg-red text-lightblue font-bold">Print</a>
                     </td>
+                    {% if receipt_file %}
+                    <td>
+                        <a href="{{ receipt_file.url }}" download class="btn btn-success font-bold">Download Receipt</a>
+                    </td>
+                    {% endif %}
+                                    
                   
                 </tr>
                 {% empty %}

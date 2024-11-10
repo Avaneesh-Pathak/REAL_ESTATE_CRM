@@ -2,6 +2,8 @@ import logging
 import datetime
 from leads.models import models
 from datetime import timedelta , date
+from django.core.files import File
+
 from decimal import Decimal, InvalidOperation
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -1348,7 +1350,7 @@ class DaybookCreateView(LoginRequiredMixin, View):
                 message += f"\nRemark: {expense.remark}"
 
             # Send SMS (replace with your actual phone number)
-            my_number = '+918052513208'  # Replace with your actual phone number
+            my_number = '+919548582538'  # Replace with your actual phone number
             send_sms(to=my_number, message=message)
 
             # Success message for adding the expense
@@ -1432,7 +1434,7 @@ class BalanceUpdateView(LoginRequiredMixin, View):
             message = f"Balance has been {action_message} by {amount}. Current balance: {balance.amount}"
 
             # Send SMS to the specified phone number (replace with the actual number)
-            my_number = '+918052513208'  # Replace with your actual phone number
+            my_number = '+919548582538'  # Replace with your actual phone number
             send_sms(to=my_number, message=message)
             return redirect('leads:daybook_list')
         return render(request, self.template_name, {'form': form})
@@ -1618,8 +1620,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                 Mode of Payment: {plot_booking.mode_of_payment}
                 EMI Tenure: {plot_booking.emi_tenure} months (if applicable)
                 Interest Rate: {plot_booking.interest_rate}%
-                {'EMI Amount: ' + str(monthly_emi) + ' INR' if monthly_emi else 'EMI Amount: N/A'}
-                EMI Start Date: {emi_start_date_formatted}
+                
 
                 Agent Details:
                 Agent Name: {agent.user.username}
@@ -1658,8 +1659,8 @@ class PlotRegistrationView(LoginRequiredMixin, View):
 
 
 #             # Send SMS to your number (replace with your actual number)
-            # my_number = '+918052513208'  # Replace with your actual phone number
-            # send_sms(to=my_number, message=message)
+            my_number = '+919548582538'  # Replace with your actual phone number
+            send_sms(to=my_number, message=message)
             return redirect('plot_registration/buyers_list')  # Ensure this matches your URL configuration
         else:
             print(form.errors)
@@ -1697,6 +1698,52 @@ def generate_receipt_number():
     return receipt_number
 
 
+# Function to generate and save receipt PDF
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.core.files.storage import FileSystemStorage
+
+# Function to generate and save receipt PDF
+def generate_receipt_pdf(booking, receipt_number, gst_amount, other_charges, total_amount):
+    # Generate a unique receipt number if not passed
+    if not receipt_number:
+        receipt_number = generate_receipt_number()
+
+    # Calculate GST and total amount if not passed
+    if not gst_amount:
+        gst_value = (booking.gst_amount / 100) * booking.Plot_price
+    if not total_amount:
+        total_amount = booking.Plot_price + gst_value + booking.other_charges
+
+    # Create a file buffer for the PDF
+    buffer = BytesIO()
+
+    # Set up the PDF canvas
+    c = canvas.Canvas(buffer, pagesize=letter)
+    c.drawString(100, 750, f"Registration Receipt - {receipt_number}")
+    c.drawString(100, 730, f"Date: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    c.drawString(100, 710, f"Buyer: {booking.name}")
+    c.drawString(100, 690, f"Property: {booking.project.title}")
+    c.drawString(100, 670, f"Plot Price: ₹{booking.Plot_price}")
+    c.drawString(100, 610, f"Total Amount: ₹{total_amount:.2f}")
+    
+    c.save()
+
+    # Move the buffer cursor to the beginning
+    buffer.seek(0)
+
+    # Save PDF file to 'receipts' directory and attach it to booking's receipt field
+    file_name = f"receipt_{booking.id}.pdf"
+    booking.receipt.save(file_name, File(buffer), save=True)
+
+    # Close the buffer
+    buffer.close()
+    
+    return file_name
+
+
+
 def buyer_print_view(request, buyer_id):
     # Fetch the buyer instance or return a 404 error if not found
     buyer = get_object_or_404(PlotBooking, id=buyer_id)
@@ -1719,6 +1766,12 @@ def buyer_print_view(request, buyer_id):
         
         # Calculate the total amount
         total_amount = plot_price + gst_amount + other_charges
+        # Generate and save the receipt PDF
+        receipt_file = generate_receipt_pdf(buyer, receipt_number, gst_amount, other_charges, total_amount)
+
+        # Update the buyer instance with the receipt file (optional if you want to store it in the model)
+        buyer.receipt = receipt_file  # Assuming 'receipt' is a FileField in the PlotBooking model
+        buyer.save()
 
     # Prepare the context for rendering the template
     context = {
@@ -1727,7 +1780,8 @@ def buyer_print_view(request, buyer_id):
         'receipt_number': receipt_number,        # Add the generated receipt number
         'gst_amount': gst_amount,                # Pass GST amount to template
         'other_charges': other_charges,          # Pass other charges to template
-        'total_amount': total_amount,            # Pass calculated total amount to template
+        'total_amount': total_amount,
+        # 'receipt_file': receipt_file,            # Pass calculated total amount to template
     }
     
     # Render the template with the context
@@ -1889,35 +1943,6 @@ class KisanListView(LoginRequiredMixin, ListView):
         # Total land in sqft
         total_land_in_sqft = total_available_land * 27200
         context['total_land_in_sqft'] = total_land_in_sqft
-
-        # Calculate usable land based on land type
-        usable_land_total = 0
-        for kisan in Kisan.objects.filter(is_sold=False):
-            area_in_beegha = kisan.area_in_beegha  # Get the area in beegha
-            area_in_sqft = area_in_beegha * 27200  # Convert beegha to sqft
-            # land_type = kisan.land_type.lower()  # Ensure it is in lowercase for comparison
-
-            # Determine development percentage based on land type
-            # if land_type in ['plot', 'rowhouse']:
-            #     development_percentage = Decimal('0.30')  # 30% for plot or rowhouse
-            # elif land_type == 'flat':
-            #     development_percentage = Decimal('0.40')  # 40% for flat
-            # else:
-            #     development_percentage = Decimal('0')  # No development if land type is different
-
-            # Calculate usable land
-            # usable_land = area_in_sqft * (1 - development_percentage)
-            # print(usable_land)
-            # usable_land_total += usable_land
-            # print(usable_land_total)
-            # print(f"Area in sqft: {area_in_sqft}, Development Percentage: {development_percentage}")
-            # print(f"Processing record ID: {kisan.id}")
-
-            # kisan.usable_land_total = usable_land
-            # kisan.save() 
-
-
-        # context['usable_land_total'] = usable_land_total
 
         return context
 

@@ -129,6 +129,19 @@
           id="{{ form.area_in_beegha.id_for_label }}" value="{{ form.area_in_beegha.value|default:'' }}"
           placeholder="Area in Beegha">
       </div>
+      <div style="display: flex; justify-content: space-around; font-size: x-large; margin-top: 20px;">
+        <!-- Output for the Hectare Value -->
+        <div style="text-align: center;">
+          <label for="hectare_value" class="block mb-1">Area in Hectare</label>
+          <span id="hectare_value" class="text-white font-semibold">0</span>
+        </div>
+      
+        <!-- Output for the Square Feet Value -->
+        <div style="text-align: center;">
+          <label for="sqft_value" class="block mb-1">Area in Square Feet</label>
+          <span id="sqft_value" class="text-white font-semibold">0</span>
+        </div>
+      </div>
 
       <div>
         <label for="{{ form.land_costing.id_for_label }}" class="block mb-1">Total {{ form.land_costing.label }}</label>
@@ -142,25 +155,36 @@
           value="{{ form.land_address.value|default:'' }}" placeholder="Land Address">
       </div>
 
-      <!-- 
-      <div>
-        <label for="{{ form.basic_sales_price.id_for_label }}" class="block mb-1">{{ form.basic_sales_price.label }}</label>
-        <input type="number" step="0.01" name="{{ form.basic_sales_price.name }}" id="{{ form.basic_sales_price.id_for_label }}" 
-               value="{{ form.basic_sales_price.value|default:'' }}" placeholder="Basic Sales Price">
-      </div> -->
-
-      <!-- <div>
-        <label for="{{ form.land_type.id_for_label }}" class="block mb-1">{{ form.land_type.label }}</label>
-        <select name="{{ form.land_type.name }}" id="{{ form.land_type.id_for_label }}">
-          {% for value, display in form.land_type.field.choices %}
-            <option value="{{ value }}"{% if value == form.land_type.value %} selected{% endif %}>{{ display }}</option>
-          {% endfor %}
-        </select>
-      </div> -->
     </div>
 
     <button type="submit">Save Kisan</button>
   </form>
 
 </div>
+<!-- JavaScript for Real-Time Conversion -->
+<script>
+  // Select the beegha input and hectare/sqft display elements by their IDs
+  const beeghaInput = document.getElementById('{{ form.area_in_beegha.id_for_label }}');
+  const hectareOutput = document.getElementById('hectare_value');
+  const sqftOutput = document.getElementById('sqft_value');
+
+  // Conversion factors
+  const BEEGHA_TO_HECTARE = 0.25;
+  const BEEGHA_TO_SQFT = 27200;
+
+  // Check if elements are found, then listen for input changes
+  if (beeghaInput && hectareOutput && sqftOutput) {
+    beeghaInput.addEventListener('input', function () {
+      const beeghaValue = parseFloat(beeghaInput.value) || 0;  // Get input value or default to 0
+
+      // Convert to hectare and square feet, rounding results for display
+      const hectareValue = (beeghaValue * BEEGHA_TO_HECTARE).toFixed(4);
+      const sqftValue = (beeghaValue * BEEGHA_TO_SQFT).toFixed(2);
+
+      // Display the results
+      hectareOutput.textContent = hectareValue;
+      sqftOutput.textContent = sqftValue;
+    });
+  }
+</script>
 {% endblock %}

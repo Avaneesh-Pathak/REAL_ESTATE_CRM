@@ -27,7 +27,7 @@ def send_sms(to, message):
         message_sent = client.messages.create(
             body=message,
             from_=settings.TWILIO_PHONE_NUMBER,
-            to='+918052513208'  # Use the `to` argument passed into the function
+            to='+919548582538'  # Use the `to` argument passed into the function
         )
         print(f"Message sent successfully with SID: {message_sent.sid}")
     except Exception as e:
@@ -649,7 +649,7 @@ def log_userprofile_deletion(sender, instance, **kwargs):
         message += f"\nRemark: {instance.remark}"
     
     # Send SMS for deletion (replace with your actual phone number)
-    my_number = '+918052513208'  # Replace with your actual phone number
+    my_number = '+919548582538'  # Replace with your actual phone number
     send_sms(to=my_number, message=message)
 
 # PROMOTER MODEL
@@ -701,6 +701,7 @@ class PlotBooking(models.Model):
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # Interest rate as a percentage
     emi_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=True)  # Calculated EMI amount
     remark = models.TextField(blank=True, null=True)
+    receipt = models.FileField(upload_to='receipts/', null=True, blank=True)
     
 
     
@@ -740,7 +741,7 @@ def log_userprofile_deletion(sender, instance, **kwargs):
     logger.info(f'PlotBooking instance  was Deleted. Data: {data}')
     # # Send SMS when a plot booking is deleted
     message = f"Plot booking was deleted:\nName: {instance.name}\nBooking Date: {instance.booking_date}"
-    my_number = '+918052513208'  # Replace with the recipient's phone number
+    my_number = '+919548582538'  # Replace with the recipient's phone number
     send_sms(to=my_number, message=message)
 
 
@@ -855,6 +856,10 @@ class Kisan(models.Model):
         logger.debug(f"Converted area from {self.area_in_beegha} beegha to {sqft} sqft.")
         return sqft
     
+    def beegha_to_hectare(self):
+        # 1 beegha = 0.25 hectares
+        return self.area_in_beegha * Decimal('0.25') 
+    
     def __str__(self) -> str:
         return f"Kisan: {self.first_name} {self.last_name}"
     
@@ -879,6 +884,5 @@ def log_userprofile_deletion(sender, instance, **kwargs):
     logger.info(f'Kisan instance  was Deleted. Data: {data}')  
 
 
-# Billing
 
 

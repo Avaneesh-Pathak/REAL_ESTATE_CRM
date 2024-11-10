@@ -226,7 +226,7 @@
         </div>
 
         <!-- Hide this section in the print view -->
-        <div class="gst-input">
+        {% comment %} <div class="gst-input">
             <form method="POST" action="">
                 {% csrf_token %}
                 <label for="gst_amount">GST Amount (in %):</label>
@@ -237,18 +237,20 @@
 
                 <button type="submit">Add</button>
             </form>
-        </div>
+        </div> {% endcomment %}
 
-        <!-- Display the Receipt Summary with Total Amount -->
+        {% comment %} <!-- Display the Receipt Summary with Total Amount -->
         <h4>Receipt Summary</h4>
         <table class="details-table">
             <tr><td>Plot Price:</td><td>₹{{ buyer.Plot_price|floatformat:2 }}</td></tr>
             <tr><td id="gst_label">GST @ {{ gst_amount }}%:</td><td id="gst_amount_value">₹{{ gst_amount|floatformat:2 }}</td></tr>
             <tr><td>Other Charges:</td><td>₹{{ other_charges|floatformat:2 }}</td></tr>
             <tr><th>Total Amount:</th><th>₹{{ total_amount|floatformat:2 }}</th></tr>
-        </table>
+        </table> {% endcomment %}
 
         <button class="print-button" onclick="window.print()">Print Receipt</button>
+        
+
 
         <div class="footer">
             <p>Thank you for your registration.</p>
