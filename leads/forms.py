@@ -388,3 +388,48 @@ class KisanForm(forms.ModelForm):
             field.widget.attrs.update({
                 'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm'
             })
+
+
+
+
+
+
+
+
+
+
+
+from django import forms
+from .models import Product, Bill, BillItem
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'price']
+
+from django import forms
+from .models import Bill, BillItem
+
+class BillForm(forms.ModelForm):
+    class Meta:
+        model = Bill
+        fields = ['buyer_name', 'buyer_address', 'buyer_pan_number', 'buyer_state', 
+                  'invoice_date', 'due_date', 'tax_percentage', 'other_charges']
+
+class BillItemForm(forms.ModelForm):
+    class Meta:
+        model = BillItem
+        fields = ['description', 'quantity', 'rate', 'tax']
+
+
+
+
+
+
+
+
+
+
+
+
+

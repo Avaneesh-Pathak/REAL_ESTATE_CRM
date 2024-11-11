@@ -1434,7 +1434,7 @@ class BalanceUpdateView(LoginRequiredMixin, View):
             message = f"Balance has been {action_message} by {amount}. Current balance: {balance.amount}"
 
             # Send SMS to the specified phone number (replace with the actual number)
-            my_number = '+919548582538'  # Replace with your actual phone number
+            my_number = '+918052513208'  # Replace with your actual phone number
             send_sms(to=my_number, message=message)
             return redirect('leads:daybook_list')
         return render(request, self.template_name, {'form': form})
@@ -1516,18 +1516,20 @@ class PlotRegistrationView(LoginRequiredMixin, View):
         if form.is_valid():
             print("help")
             # Retrieve EMI amount and tenure from the form
-            emi_amount = form.cleaned_data.get('emi_amount')
-            print(emi_amount)
+            emi_amount = form.cleaned_data.get('emi-amount')
             tenure = form.cleaned_data.get('emi_tenure')
             print(tenure)
+            print(emi_amount)
             project = form.cleaned_data.get('project')
             interest_rate = form.cleaned_data.get('interest_rate')
+            booking_amount = form.cleaned_data.get('booking_amount')
             Property_inst = Property.objects.get(id = project.id)
-            Plot_price = Property_inst.totalprice
-            form.instance.Plot_price = Property_inst.totalprice  
+            form.instance.Plot_price = Property_inst.totalprice 
+            plot_price = Property_inst.totalprice
             form.save()
+
+            Plot_price = plot_price - booking_amount
             # Calculate EMI with interest rate if applicable
-            interest_rate = form.cleaned_data.get('interest_rate')  # Interest rate from form
             if emi_amount is None and tenure and Plot_price:
                 emi_amount = calculate_emi(Plot_price, interest_rate, tenure)
             
@@ -1536,21 +1538,20 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                 form.instance.emi_amount = emi_amount  # Save EMI amount
             agent = form.cleaned_data.get('agent')
             payment_type = form.cleaned_data.get('payment_type')  # Get the payment type
-            print(agent)
             if agent:
                 agent_level = agent.level
                 print(agent_level)
                 for i in range(1,agent_level+1):
                     if i == 1:
-                        base_salary = int(Plot_price)/10
+                        base_salary = int(booking_amount)/10
                     elif i == 2:
-                        base_salary = int(Plot_price)/25
+                        base_salary = int(booking_amount)/25
                     elif i == 3:
-                        base_salary = int(Plot_price)*3/100
+                        base_salary = int(booking_amount)*3/100
                     elif i == 4:
-                        base_salary = int(Plot_price)/50
+                        base_salary = int(booking_amount)/50
                     elif i == 5:
-                        base_salary = int(Plot_price)/100
+                        base_salary = int(booking_amount)/100
 
                     prop = Property.objects.get(title=project)
                     Salary.objects.create(
@@ -1620,6 +1621,8 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                 Mode of Payment: {plot_booking.mode_of_payment}
                 EMI Tenure: {plot_booking.emi_tenure} months (if applicable)
                 Interest Rate: {plot_booking.interest_rate}%
+                {'EMI Amount: {:.2f} INR'.format(monthly_emi) if monthly_emi else 'EMI Amount: N/A'}
+                EMI Start Date: {emi_start_date_formatted}
                 
 
                 Agent Details:
@@ -1647,7 +1650,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                 Mode of Payment: {plot_booking.mode_of_payment}
                 EMI Tenure: {plot_booking.emi_tenure} months (if applicable)
                 Interest Rate: {plot_booking.interest_rate}%
-                {'EMI Amount: ' + str(monthly_emi) + ' INR' if monthly_emi else 'EMI Amount: N/A'}
+                {'EMI Amount: {:.2f} INR'.format(monthly_emi) if monthly_emi else 'EMI Amount: N/A'}
                 EMI Start Date: {emi_start_date_formatted}
 
 
@@ -1659,7 +1662,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
 
 
 #             # Send SMS to your number (replace with your actual number)
-            my_number = '+919548582538'  # Replace with your actual phone number
+            my_number = '+918052513208'  # Replace with your actual phone number
             send_sms(to=my_number, message=message)
             return redirect('plot_registration/buyers_list')  # Ensure this matches your URL configuration
         else:
@@ -1842,11 +1845,11 @@ def buyer_detail_view(request, buyer_id):
     }
     return render(request, 'plot_registration/buyer_detail.html', context)
 
-def mark_as_paid(request, payment_id):
-    payment = get_object_or_404(EMIPayment, id=payment_id)  # Fetch the EMI payment record
-    if payment.status == 'Pending':
-        payment.pay_emi(payment.emi_amount)  # Pay the full EMI amount
-    return redirect('leads:buyer_detail', buyer_id=payment.plot_booking.id)
+# def mark_as_paid(request, payment_id):
+#     payment = get_object_or_404(EMIPayment, id=payment_id)  # Fetch the EMI payment record
+#     if payment.status == 'Pending':
+#         payment.pay_emi(payment.emi_amount)  # Pay the full EMI amount
+#     return redirect('leads:buyer_detail', buyer_id=payment.plot_booking.id)
 
 def pay_emi(request, payment_id):
     if request.method == 'POST':
@@ -1856,6 +1859,43 @@ def pay_emi(request, payment_id):
             payment.status = 'Paid'
             payment.save()
             plotbooking = payment.plot_booking
+            print("emi payment gvcdghnbvcdg",plotbooking)
+            agent = plotbooking.agent
+            print(agent)
+            if agent:
+                agent_level = agent.level
+                print(agent_level)
+                for i in range(1,agent_level+1):
+                    if i == 1:
+                        base_salary = (payment.amount_for_agent)/10
+                    elif i == 2:
+                        base_salary = (payment.amount_for_agent)/25
+                    elif i == 3:
+                        base_salary = (payment.amount_for_agent)*3/100
+                    elif i == 4:
+                        base_salary = (payment.amount_for_agent)/50
+                    elif i == 5:
+                        base_salary = (payment.amount_for_agent)/100
+
+                    salary = Salary.objects.get(property = payment.plot_booking.project,agent = agent.user)
+                    salary.base_salary += base_salary
+                    salary.save()
+                    print(base_salary)
+                    print(agent)
+                    print(salary)
+
+                    # prop = Property.objects.get(title=project)
+                    # Salary.objects.create(
+                    #     agent = agent.user,
+                    #     base_salary=base_salary,
+                    #     bonus = 0,
+                    #     payment_date=date.today(),  # Adds the current date to payment_date
+                    #     property=prop
+                    # )
+                    # print(property)
+                    agent=agent.parent_agent
+
+
             x = False 
             p = EMIPayment.objects.filter(plot_booking = plotbooking)
             for allemi in p:
@@ -2080,5 +2120,142 @@ def export_kisans_to_csv(request):
 
 
 
+from django.shortcuts import render, redirect
+from .forms import BillForm, BillItemForm
+from .models import Bill, BillItem
+from django.http import HttpResponse
+from io import BytesIO
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import os
+from django.conf import settings
+from num2words import num2words
+
+# Function to convert number to words
+def convert_number_to_words(amount):
+    return num2words(amount)
+
+# Function to generate PDF
+def render_to_pdf(template_name, context):
+    template = get_template(template_name)
+    html = template.render(context)
+    pdf = BytesIO()
+    pisa.CreatePDF(html, dest=pdf)
+    pdf.seek(0)
+    return pdf
+
+# Create Bill and Bill Items
+class CreateBillView(LoginRequiredMixin, ListView):
+    model = Bill
+    template_name = 'billing/create_bill.html'
+    context_object_name = 'bills'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'bill_form': BillForm(),
+            'bill_item_forms': [BillItemForm(prefix=str(i)) for i in range(1)],  # Default to one item form
+        })
+        return context
+
+    def post(self, request, *args, **kwargs):
+        # Initialize the BillForm with the request data
+        bill_form = BillForm(request.POST)
+
+        # Dynamically create BillItemForm instances based on submitted data
+        item_count = len(request.POST.getlist('0-description'))
+        bill_item_forms = [
+            BillItemForm(request.POST, prefix=str(i)) 
+            for i in range(item_count)
+        ]
+
+        # Debug: Print POST data to verify item form submission
+        print("Request POST Data:", request.POST)
+
+        # Check if both BillForm and all BillItemForms are valid
+        if bill_form.is_valid() and all(form.is_valid() for form in bill_item_forms):
+            # Save the Bill
+            bill = bill_form.save(commit=False)
+            bill.save()  # Save to assign an ID to the Bill instance
+
+            total_amount = 0
+
+            # Save each BillItem
+            for i, form in enumerate(bill_item_forms):
+                # Debug: Check if each form is valid and print form data
+                if form.is_valid():
+                    print(f"Saving item {i}: ", form.cleaned_data)
+
+                    item = form.save(commit=False)
+                    item.bill = bill  # Associate each item with the main Bill
+                    item.total_price = item.quantity * item.rate  # Calculate total price
+                    item.save()  # Save item to the database
+
+                    # Calculate total with tax for each item
+                    total_amount += item.total_price + (item.total_price * (item.tax / 100))
+
+            # Add other charges and update Bill total amount
+            bill.total_amount = total_amount + bill.other_charges
+            bill.save()
+
+            # Prepare the PDF context
+            context = {
+                'bill': bill,
+                'items': bill.items.all(),
+                'total_amount': total_amount,
+            }
+
+            pdf = render_to_pdf('billing/bill_template.html', context)
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="bill_{bill.bill_number}.pdf"'
+            return response
+
+        # Debug: If any form is invalid, print errors
+        else:
+            print("BillForm errors:", bill_form.errors)
+            for i, form in enumerate(bill_item_forms):
+                print(f"BillItemForm {i} errors:", form.errors)
+
+        # If form is invalid, re-render the page with errors
+        return render(request, 'billing/create_bill.html', {
+            'bill_form': bill_form,
+            'bill_item_forms': bill_item_forms,
+        })
+    
 
 
+
+
+    from django.shortcuts import render, redirect
+from django.forms import modelformset_factory
+from .models import Bill, BillItem
+from .forms import BillForm, BillItemForm
+# Create the BillItemFormSet
+BillItemFormSet = modelformset_factory(BillItem, fields=('description', 'quantity', 'rate', 'tax'), extra=1)
+
+def create_bill(request):
+    if request.method == 'POST':
+        bill_form = BillForm(request.POST)
+        formset = BillItemFormSet(request.POST)
+        if bill_form.is_valid() and formset.is_valid():
+            # Handle form saving logic here
+            # Save the bill and associated items
+            bill = bill_form.save()
+            for form in formset:
+                if form.cleaned_data:
+                    # Create BillItem for each valid form in the formset
+                    BillItem.objects.create(
+                        bill=bill,
+                        description=form.cleaned_data['description'],
+                        quantity=form.cleaned_data['quantity'],
+                        rate=form.cleaned_data['rate'],
+                        tax=form.cleaned_data['tax'],
+                    )
+            return redirect('bill_success_url')  # redirect to a success page
+    else:
+        bill_form = BillForm()
+        formset = BillItemFormSet(queryset=BillItem.objects.none())  # empty queryset for a new bill
+    return render(request, 'leads/create_bill.html', {
+        'bill_form': bill_form,
+        'formset': formset,
+    })

@@ -17,6 +17,7 @@ from leads.views import LandingPageView, SignupView, DashboardView,update_profil
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
     path('', LandingPageView.as_view(), name='landing_page'),
     path('profile/', user_profile, name='profile'),  # Profile view
     path('search/', search_view, name='search'),

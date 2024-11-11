@@ -28,6 +28,10 @@ DEBUG = True
 ALLOWED_HOSTS =['2113-2409-40e3-5b-c458-f5dd-7044-a4e3-f39f.ngrok-free.app','127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://2113-2409-40e3-5b-c458-f5dd-7044-a4e3-f39f.ngrok-free.app']
 
+TWILIO_ACCOUNT_SID = 'AC1aecf01fb386ff58a11d18179e2e0b7b'
+TWILIO_AUTH_TOKEN = '4abc8383bf19094d68ff84ba3fe3e3f6'
+TWILIO_PHONE_NUMBER = '+12565888618'
+
 
 # Installed apps
 INSTALLED_APPS = [
@@ -49,6 +53,7 @@ INSTALLED_APPS = [
     
     # Local Apps
     'leads',
+   
     'agents',
 ]
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (User, Lead, Agent, UserProfile, Category, FollowUp, Salary, Sale,Project,Area,Typeplot,PlotBooking,Kisan,EMIPayment,
-                     Property, Bonus, EmiPlan, Daybook, Promoter)
+                     Property, Bonus, EmiPlan, Daybook, Promoter,Bill,BillItem)
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -66,6 +66,8 @@ admin.site.register(FollowUp)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(Area)
 admin.site.register(EMIPayment)
+admin.site.register(BillItem)
+admin.site.register(Bill)
 admin.site.register(Kisan)
 admin.site.register(Property, PropertyAdmin)
 admin.site.register(Bonus, BonusAdmin)

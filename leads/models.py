@@ -27,7 +27,7 @@ def send_sms(to, message):
         message_sent = client.messages.create(
             body=message,
             from_=settings.TWILIO_PHONE_NUMBER,
-            to='+919548582538'  # Use the `to` argument passed into the function
+            to='+918052513208'  # Use the `to` argument passed into the function
         )
         print(f"Message sent successfully with SID: {message_sent.sid}")
     except Exception as e:
@@ -649,7 +649,7 @@ def log_userprofile_deletion(sender, instance, **kwargs):
         message += f"\nRemark: {instance.remark}"
     
     # Send SMS for deletion (replace with your actual phone number)
-    my_number = '+919548582538'  # Replace with your actual phone number
+    my_number = '+918052513208'  # Replace with your actual phone number
     send_sms(to=my_number, message=message)
 
 # PROMOTER MODEL
@@ -741,7 +741,7 @@ def log_userprofile_deletion(sender, instance, **kwargs):
     logger.info(f'PlotBooking instance  was Deleted. Data: {data}')
     # # Send SMS when a plot booking is deleted
     message = f"Plot booking was deleted:\nName: {instance.name}\nBooking Date: {instance.booking_date}"
-    my_number = '+919548582538'  # Replace with the recipient's phone number
+    my_number = '+918052513208'  # Replace with the recipient's phone number
     send_sms(to=my_number, message=message)
 
 
@@ -749,6 +749,7 @@ class EMIPayment(models.Model):
     plot_booking = models.ForeignKey('PlotBooking', on_delete=models.DO_NOTHING, related_name='emi_payments')
     due_date = models.DateField()
     emi_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_for_agent = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Paid', 'Paid')], default='Pending')
 
@@ -757,45 +758,24 @@ class EMIPayment(models.Model):
         remaining = self.emi_amount - self.amount_paid
         logger.debug(f"Remaining amount for EMI: {remaining} for {self.plot_booking}.")
         return remaining
+    
+    def agent_amount(self):
+        """Calculate the remaining amount to be paid."""
+        tenu = self.plot_booking.emi_tenure
+        print(tenu)
+        amount = self.plot_booking.Plot_price - self.plot_booking.booking_amount
+        print(amount)
+        agentamount = amount/tenu
+        print(agentamount)
+        # logger.debug(f"Remaining amount for EMI: {remaining} for {self.plot_booking}.")
+        return agentamount
 
-    def pay_emi(self, amount):
-        """Pay the EMI with the specified amount."""
-        remaining = self.remaining_amount()
-        
-        # Log the details of the payment attempt
-        logger.info(f"Attempting to pay EMI: Current Amount Paid: {self.amount_paid}, Attempting to Pay: {amount}, Remaining: {remaining}")
-
-        if amount <= 0:
-            logger.warning(f"Invalid payment attempt: Amount must be greater than zero. Payment details: {amount}")
-            return {'success': False, 'message': "Payment amount must be greater than zero."}
-        
-        if amount > remaining:
-            logger.warning(f"Payment exceeds remaining EMI: Amount exceeds {remaining}. Payment details: {amount}")
-            return {'success': False, 'message': f"Payment amount cannot exceed the remaining amount of {remaining}."}
-
-        self.amount_paid += amount
-
-        # Update the status based on the total amount paid
-        if self.amount_paid >= self.emi_amount:
-            self.amount_paid = self.emi_amount
-            self.status = 'Paid'
-        else:
-            self.status = 'Pending'
-
-        # Save the changes to the database
-        self.save()
-
-        # Check if all EMIs for this plot booking are paid
-        self.plot_booking.update_property_status_if_paid()  # Update property status based on payment status
-        logger.info(f"EMI payment processed: {amount} for {self.plot_booking}. Status: {self.status}")
-        return {'success': True, 'message': "Payment processed successfully."}
-
-    def __str__(self):
-        logger.info(f"EMI Payment for Plot Booking: {self.plot_booking} - Due: {self.due_date}")
-        return f"EMI Payment for {self.plot_booking} - Due: {self.due_date} - Status: {self.status}"
     def save(self, *args, **kwargs):
         # Check if it's a new instance or an update
         is_new_instance = self.pk is None
+        print(self.amount_for_agent)
+        self.amount_for_agent = self.agent_amount()
+        print(self.amount_for_agent)
 
         # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)
@@ -806,6 +786,42 @@ class EMIPayment(models.Model):
         # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
         logger.info(f'EMi Payment instance {self.pk} was {action}. Data: {data}')
+
+    # def pay_emi(self, amount):
+    #     """Pay the EMI with the specified amount."""
+    #     remaining = self.remaining_amount()
+        
+    #     # Log the details of the payment attempt
+    #     logger.info(f"Attempting to pay EMI: Current Amount Paid: {self.amount_paid}, Attempting to Pay: {amount}, Remaining: {remaining}")
+
+    #     if amount <= 0:
+    #         logger.warning(f"Invalid payment attempt: Amount must be greater than zero. Payment details: {amount}")
+    #         return {'success': False, 'message': "Payment amount must be greater than zero."}
+        
+    #     if amount > remaining:
+    #         logger.warning(f"Payment exceeds remaining EMI: Amount exceeds {remaining}. Payment details: {amount}")
+    #         return {'success': False, 'message': f"Payment amount cannot exceed the remaining amount of {remaining}."}
+
+    #     self.amount_paid += amount
+
+    #     # Update the status based on the total amount paid
+    #     if self.amount_paid >= self.emi_amount:
+    #         self.amount_paid = self.emi_amount
+    #         self.status = 'Paid'
+    #     else:
+    #         self.status = 'Pending'
+
+    #     # Save the changes to the database
+    #     self.save()
+
+    #     # Check if all EMIs for this plot booking are paid
+    #     self.plot_booking.update_property_status_if_paid()  # Update property status based on payment status
+    #     logger.info(f"EMI payment processed: {amount} for {self.plot_booking}. Status: {self.status}")
+    #     return {'success': True, 'message': "Payment processed successfully."}
+
+    def __str__(self):
+        logger.info(f"EMI Payment for Plot Booking: {self.plot_booking} - Due: {self.due_date}")
+        return f"EMI Payment for {self.plot_booking} - Due: {self.due_date} - Status: {self.status}"
 
     class Meta:
         ordering = ['due_date']  # Order EMI payments by due date
@@ -886,3 +902,53 @@ def log_userprofile_deletion(sender, instance, **kwargs):
 
 
 
+
+
+
+from django.db import models
+
+class Product(models.Model):
+    name = models.CharField(max_length=255)
+    Qty = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.name
+
+
+class Bill(models.Model):
+    bill_number = models.CharField(max_length=20, unique=True, blank=True)
+    buyer_name = models.CharField(max_length=255)
+    buyer_address = models.TextField()
+    buyer_pan_number = models.CharField(max_length=20)
+    buyer_state = models.CharField(max_length=50)
+    invoice_date = models.DateField()
+    due_date = models.DateField()
+    total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    tax_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    other_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.bill_number:
+            # Generate the bill number automatically (you can customize this logic)
+            self.bill_number = f"INV-{Bill.objects.count() + 1}"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Bill #{self.bill_number}"
+
+class BillItem(models.Model):
+    bill = models.ForeignKey(Bill, related_name='items', on_delete=models.CASCADE)
+    description = models.CharField(max_length=255)
+    quantity = models.PositiveIntegerField()
+    rate = models.DecimalField(max_digits=10, decimal_places=2)
+    tax = models.DecimalField(max_digits=5, decimal_places=2)
+    total_price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+
+    def save(self, *args, **kwargs):
+        # Calculate total_price based on rate, quantity, and tax
+        self.total_price = (self.rate * self.quantity) + ((self.tax / 100) * (self.rate * self.quantity))
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.description} - Qty: {self.quantity}, Rate: {self.rate}, Tax: {self.tax}, Total: {self.total_price}"

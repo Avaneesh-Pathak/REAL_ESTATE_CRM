@@ -12,7 +12,7 @@ from .views import (
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
     PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,DaybookListView,DaybookCreateView,add_promoter,update_delete_promoter,
-    PromoterListView,load_properties,PlotRegistrationView,user_profile_view,BalanceUpdateView,
+    PromoterListView,load_properties,PlotRegistrationView,user_profile_view,BalanceUpdateView,CreateBillView,
     update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView,kisan_view,KisanListView,KisanUpdateView,KisanDeleteView
 )
 
@@ -86,7 +86,7 @@ urlpatterns = [
     path('export/salaries/', views.export_salaries_to_csv, name='export_salaries_to_csv'),
     path('export/kisans/', views.export_kisans_to_csv, name='export_kisans_to_csv'),
   
-
+    path('create_bill/',CreateBillView.as_view(), name='create_bill'),
 
 ]   
 

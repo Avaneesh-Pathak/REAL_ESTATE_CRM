@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - {{ bill.bill_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .invoice-header,
+        .invoice-footer {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ccc;
+        }
+        .invoice-header p,
+        .invoice-footer p {
+            margin: 5px 0;
+        }
+        .buyer-details,
+        .invoice-details {
+            width: 48%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .summary {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .summary p {
+            margin: 5px 0;
+        }
+        .total-amount {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .amount-in-words {
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Invoice - {{ bill.bill_number }}</h1>
+
+    <div class="invoice-header">
+        <div class="invoice-details">
+            <p><strong>Date:</strong> {{ bill.invoice_date }}</p>
+            <p><strong>Due Date:</strong> {{ bill.due_date }}</p>
+        </div>
+        <div class="buyer-details">
+            <p><strong>Buyer Name:</strong> {{ bill.buyer_name }}</p>
+            <p><strong>Address:</strong> {{ bill.buyer_address }}</p>
+            <p><strong>PAN Number:</strong> {{ bill.buyer_pan_number }}</p>
+            <p><strong>State:</strong> {{ bill.buyer_state }}</p>
+        </div>
+    </div>
+
+    <table>
+        <tr>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Rate</th>
+            <th>Tax (%)</th>
+            <th>Total</th>
+        </tr>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.description }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.rate }}</td>
+            <td>{{ item.tax }}</td>
+            <td>{{ item.total_price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="summary">
+        <p>Subtotal: {{ total_amount }}</p>
+        <p>Tax: {{ tax_amount }}</p>
+        <p>Other Charges: {{ bill.other_charges }}</p>
+        <p class="total-amount">Total Amount (including tax): {{ total_amount_with_tax }}</p>
+    </div>
+
+    <p class="amount-in-words">Total Amount in Words: {{ total_in_words|floatformat:2 }}</p>
+
+</body>
+</html>
