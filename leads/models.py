@@ -27,7 +27,7 @@ def send_sms(to, message):
         message_sent = client.messages.create(
             body=message,
             from_=settings.TWILIO_PHONE_NUMBER,
-            to='+918052513208'  # Use the `to` argument passed into the function
+            to='+9195485 82538'  # Use the `to` argument passed into the function
         )
         print(f"Message sent successfully with SID: {message_sent.sid}")
     except Exception as e:

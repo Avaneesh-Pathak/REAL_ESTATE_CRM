@@ -24,7 +24,6 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* Ensure body takes up full viewport height */
             color: #333;
         }
 
@@ -36,7 +35,6 @@
             width: 90%;
             max-width: 1000px;
             padding: 30px;
-            animation: fadeIn 1s ease-in-out;
         }
 
         .bill-header {
@@ -50,13 +48,13 @@
             font-weight: bold;
         }
 
-        .form-group {
+        .form-group, .product-fields {
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
         }
 
-        .form-group label {
+        .form-group label, .product-field label {
             font-weight: bold;
             color: #495057;
             margin-bottom: 8px;
@@ -70,90 +68,49 @@
             font-size: 16px;
             border: 1px solid #ced4da;
             border-radius: 5px;
-            transition: border-color 0.3s;
         }
 
-        .form-group input:focus {
+        .form-group input:focus, .product-field input:focus {
             border-color: #007bff;
             outline: none;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+        .product-fields {
+            border-top: 1px solid #e9ecef;
+            padding-top: 15px;
         }
 
-        th,
-        td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e9ecef;
+        .product-field {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
         }
 
-        th {
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        td {
-            color: #495057;
-        }
-
-        /* Hover effect on table rows */
-        tr:hover {
-            background-color: #f8f9fa;
-            transition: background-color 0.3s;
-        }
-
-        /* Button styles */
-        .btn-submit {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            color: #ffffff;
-            background-color: #28a745;
+        /* Add and Submit Button styles */
+        .add-button, .submit-button, .remove-button {
+            padding: 10px;
+            font-size: 14px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .add-button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .submit-button {
+            background-color: #28a745;
+            color: white;
             font-weight: bold;
-            text-transform: uppercase;
+            width: 100%;
         }
 
-        .btn-submit:hover {
-            background-color: #218838;
-            transform: scale(1.02);
-        }
-
-        /* Fade-in animation */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* Media query for responsiveness */
-        @media (max-width: 600px) {
-
-            .form-group label,
-            .bill-header h2 {
-                font-size: 18px;
-            }
-
-            .form-group input,
-            th,
-            td,
-            .btn-submit {
-                font-size: 14px;
-            }
+        .remove-button {
+            background-color: #dc3545;
+            color: white;
         }
     </style>
 </head>
@@ -165,95 +122,77 @@
         </div>
         <form method="POST" class="form-container">
             {% csrf_token %}
-            
+
             <div class="form-group">
-              <label for="buyer_name">Buyer Name:</label>
-              <input type="text" id="buyer_name" name="buyer_name" class="form-input" required />
+                <label for="buyer_name">Buyer Name:</label>
+                <input type="text" id="buyer_name" name="buyer_name" required />
             </div>
-            
+
             <div class="form-group">
-              <label for="buyer_address">Buyer Address:</label>
-              <textarea id="buyer_address" name="buyer_address" class="form-input" rows="4" required></textarea>
+                <label for="buyer_address">Buyer Address:</label>
+                <textarea id="buyer_address" name="buyer_address" rows="4" required></textarea>
             </div>
-            
+
             <div class="form-group">
-              <label for="buyer_pan_number">Buyer PAN Number:</label>
-              <input type="text" id="buyer_pan_number" name="buyer_pan_number" class="form-input" required />
+                <label for="buyer_pan_number">Buyer PAN Number:</label>
+                <input type="text" id="buyer_pan_number" name="buyer_pan_number" required />
             </div>
-            
+
             <div class="form-group">
-              <label for="buyer_state">Buyer State:</label>
-              <input type="text" id="buyer_state" name="buyer_state" class="form-input" required />
+                <label for="buyer_state">Buyer State:</label>
+                <input type="text" id="buyer_state" name="buyer_state" required />
             </div>
-            
+
             <div class="form-group">
-              <label for="invoice_date">Invoice Date:</label>
-              <input type="date" id="invoice_date" name="invoice_date" class="form-input" required />
+                <label for="invoice_date">Invoice Date:</label>
+                <input type="date" id="invoice_date" name="invoice_date" required />
             </div>
-          
+
             <div class="form-group">
-              <label for="due_date">Due Date:</label>
-              <input type="date" id="due_date" name="due_date" class="form-input" required />
+                <label for="due_date">Due Date:</label>
+                <input type="date" id="due_date" name="due_date" required />
             </div>
-          
+
             <div class="form-group">
-              <label for="other_charges">Other Charges:</label>
-              <input type="number" id="other_charges" name="other_charges" class="form-input" step="0.01" required />
+                <label for="other_charges">Other Charges:</label>
+                <input type="number" id="other_charges" name="other_charges" step="0.01" required />
             </div>
-          
+
             <h3>Product Details</h3>
             <div class="product-fields" id="product-fields">
-              <div class="product-field">
-                <label for="description">Description:</label>
-                <input type="text" name="description[]" class="form-input" required />
-              </div>
-              <div class="product-field">
-                <label for="quantity">Quantity:</label>
-                <input type="number" name="quantity[]" class="form-input" required />
-              </div>
-              <div class="product-field">
-                <label for="rate">Rate:</label>
-                <input type="number" name="rate[]" class="form-input" step="0.01" required />
-              </div>
-              <div class="product-field">
-                <label for="tax">Tax (%):</label>
-                <input type="number" name="tax[]" class="form-input" step="0.01" required />
-              </div>
+                <div class="product-field">
+                    <input type="text" name="description[]" placeholder="Description" required />
+                    <input type="number" name="quantity[]" placeholder="Quantity" required />
+                    <input type="number" name="rate[]" placeholder="Rate" step="0.01" required />
+                    <input type="number" name="tax[]" placeholder="Tax (%)" step="0.01" required />
+                    <button type="button" class="remove-button" onclick="removeProduct(this)">Remove</button>
+                </div>
             </div>
-            
-            <!-- Button to add more product details -->
+
             <button type="button" id="add-product-btn" class="add-button">Add More Product</button>
-            
             <button type="submit" class="submit-button">Submit</button>
-          </form>
-          
+        </form>
     </div>
 
-<script>
-  document.getElementById('add-product-btn').addEventListener('click', function() {
-    // Get the product fields container
-    const productFieldsContainer = document.getElementById('product-fields');
-    
-    // Create a new product field row
-    const newProductField = document.createElement('div');
-    newProductField.classList.add('product-field');
-    
-    // Create new input fields for description, quantity, rate, tax
-    newProductField.innerHTML = `
-      <label for="description">Description:</label>
-      <input type="text" name="description[]" class="form-input" required />
-      <label for="quantity">Quantity:</label>
-      <input type="number" name="quantity[]" class="form-input" required />
-      <label for="rate">Rate:</label>
-      <input type="number" name="rate[]" class="form-input" step="0.01" required />
-      <label for="tax">Tax (%):</label>
-      <input type="number" name="tax[]" class="form-input" step="0.01" required />
-    `;
-    
-    // Append the new product field row to the container
-    productFieldsContainer.appendChild(newProductField);
-  });
-</script>
+    <script>
+        document.getElementById('add-product-btn').addEventListener('click', function() {
+            const productFieldsContainer = document.getElementById('product-fields');
+            const newProductField = document.createElement('div');
+            newProductField.classList.add('product-field');
+            newProductField.innerHTML = `
+                <input type="text" name="description[]" placeholder="Description" required />
+                <input type="number" name="quantity[]" placeholder="Quantity" required />
+                <input type="number" name="rate[]" placeholder="Rate" step="0.01" required />
+                <input type="number" name="tax[]" placeholder="Tax (%)" step="0.01" required />
+                <button type="button" class="remove-button" onclick="removeProduct(this)">Remove</button>
+            `;
+            productFieldsContainer.appendChild(newProductField);
+        });
+
+        function removeProduct(button) {
+            button.parentElement.remove();
+        }
+    </script>
 </body>
 
 </html>

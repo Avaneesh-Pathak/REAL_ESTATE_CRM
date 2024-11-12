@@ -94,7 +94,7 @@
     <table>
         <thead>
             <tr>
-                <th>Description</th>
+                <th>Items</th>
                 <th>Quantity</th>
                 <th>Rate</th>
                 <th>Tax (%)</th>
@@ -115,13 +115,14 @@
     </table>
 
     <div class="summary">
-        <p>Subtotal: {{ total_amount }}</p>
-        <p>Tax: {{ total_tax }}</p>
-        <p>Other Charges: {{ bill.other_charges }}</p>
-        <p class="total-amount">Total Amount (including tax): {{ total_with_tax }}</p>
+        <p>total amount: Rupees {{ item_total_with_tax }}</p>
+        <p>Other Charges: Rupees {{ bill.other_charges }}</p>
+        <p>Subtotal: Rupees {{ total_amount }}</p>
+        <!-- <p>Tax: {{ total_tax }}</p> -->
+        <p class="total-amount">Total Amount (including tax):Rupees {{ total_amount }}</p>
     </div>
 
-    <p class="amount-in-words">Total Amount in Words: {{ total_amount_in_words }}</p>
+    <p class="total-amount">Total Amount in Words: {{ amount_in_words  }} Rupees</p>
 
     <div class="footer-note">
         <p>Thank you for your business!</p>

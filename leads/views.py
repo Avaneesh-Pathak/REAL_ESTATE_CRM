@@ -2254,92 +2254,92 @@ from num2words import num2words
 from django.shortcuts import render, redirect
 from decimal import Decimal
 
-class CreateBillView(LoginRequiredMixin, TemplateView):
-    template_name = 'billing/create_bill.html'
+# class CreateBillView(LoginRequiredMixin, TemplateView):
+#     template_name = 'billing/create_bill.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
 
-        item_count = len(self.request.POST.getlist('description[]')) if self.request.method == 'POST' else 1
+#         item_count = len(self.request.POST.getlist('description[]')) if self.request.method == 'POST' else 1
 
-        bill_item_forms = []
-        if self.request.method == 'POST':
-            for i in range(item_count):
-                prefix = str(i)
-                form_data = {
-                    'description': self.request.POST.getlist('description[]')[i],
-                    'quantity': self.request.POST.getlist('quantity[]')[i],
-                    'rate': self.request.POST.getlist('rate[]')[i],
-                    'tax': self.request.POST.getlist('tax[]')[i]
-                }
-                form = BillItemForm(form_data, prefix=prefix)
-                bill_item_forms.append(form)
-        else:
-            bill_item_forms = [BillItemForm(prefix=str(i)) for i in range(item_count)]
+#         bill_item_forms = []
+#         if self.request.method == 'POST':
+#             for i in range(item_count):
+#                 prefix = str(i)
+#                 form_data = {
+#                     'description': self.request.POST.getlist('description[]')[i],
+#                     'quantity': self.request.POST.getlist('quantity[]')[i],
+#                     'rate': self.request.POST.getlist('rate[]')[i],
+#                     'tax': self.request.POST.getlist('tax[]')[i]
+#                 }
+#                 form = BillItemForm(form_data, prefix=prefix)
+#                 bill_item_forms.append(form)
+#         else:
+#             bill_item_forms = [BillItemForm(prefix=str(i)) for i in range(item_count)]
 
-        context.update({
-            'bill_form': BillForm(),
-            'bill_item_forms': bill_item_forms,
-        })
+#         context.update({
+#             'bill_form': BillForm(),
+#             'bill_item_forms': bill_item_forms,
+#         })
 
-        return context
+#         return context
 
-    def post(self, request, *args, **kwargs):
-        bill_form = BillForm(request.POST)
-        item_count = len(request.POST.getlist('description[]'))
-        print(item_count)
-        # bill_item_forms = []
+#     def post(self, request, *args, **kwargs):
+#         bill_form = BillForm(request.POST)
+#         item_count = len(request.POST.getlist('description[]'))
+#         print(item_count)
+#         # bill_item_forms = []
 
 
-        for i in range(item_count):
-            bill = self.bill_form
-            description = request.POST.getlist('description[]')[i],
-            quantity= request.POST.getlist('quantity[]')[i],
-            rate= request.POST.getlist('rate[]')[i],
-            tax= request.POST.getlist('tax[]')[i]
+#         for i in range(item_count):
+#             bill = self.bill_form
+#             description = request.POST.getlist('description[]')[i],
+#             quantity= request.POST.getlist('quantity[]')[i],
+#             rate= request.POST.getlist('rate[]')[i],
+#             tax= request.POST.getlist('tax[]')[i]
 
-            BillItem.objects.create()
-            form = BillItemForm(form_data, prefix=prefix)
-            bill_item_forms.append(form)
+#             BillItem.objects.create()
+#             form = BillItemForm(form_data, prefix=prefix)
+#             bill_item_forms.append(form)
 
-        # Debug: Print form validation errors
-        if not bill_form.is_valid():
-            print("BillForm errors:", bill_form.errors)
+#         # Debug: Print form validation errors
+#         if not bill_form.is_valid():
+#             print("BillForm errors:", bill_form.errors)
         
-        for index, form in enumerate(bill_item_forms):
-            if not form.is_valid():
-                print(f"BillItemForm {index} errors:", form.errors)
+#         for index, form in enumerate(bill_item_forms):
+#             if not form.is_valid():
+#                 print(f"BillItemForm {index} errors:", form.errors)
 
-        # Check if the main form and all item forms are valid
-        if bill_form.is_valid() and all(form.is_valid() for form in bill_item_forms):
-            # Save the main Bill form
-            bill = bill_form.save(commit=False)
-            bill.save()
+#         # Check if the main form and all item forms are valid
+#         if bill_form.is_valid() and all(form.is_valid() for form in bill_item_forms):
+#             # Save the main Bill form
+#             bill = bill_form.save(commit=False)
+#             bill.save()
 
-            total_amount = Decimal(0)
-            total_with_tax = Decimal(0)
+#             total_amount = Decimal(0)
+#             total_with_tax = Decimal(0)
 
-            # Save each BillItem form and calculate totals
-            for form in bill_item_forms:
-                bill_item = form.save(commit=False)
-                bill_item.bill = bill  # Link each item to the main Bill
-                bill_item.save()
+#             # Save each BillItem form and calculate totals
+#             for form in bill_item_forms:
+#                 bill_item = form.save(commit=False)
+#                 bill_item.bill = bill  # Link each item to the main Bill
+#                 bill_item.save()
 
-                # Calculate the totals
-                item_total = bill_item.quantity * bill_item.rate
-                total_amount += item_total
-                total_with_tax += item_total * (1 + (bill_item.tax / 100))
+#                 # Calculate the totals
+#                 item_total = bill_item.quantity * bill_item.rate
+#                 total_amount += item_total
+#                 total_with_tax += item_total * (1 + (bill_item.tax / 100))
 
-            # Update the Bill with calculated totals and save
-            bill.total_amount = total_amount
-            bill.total_with_tax = total_with_tax
-            bill.save()
+#             # Update the Bill with calculated totals and save
+#             bill.total_amount = total_amount
+#             bill.total_with_tax = total_with_tax
+#             bill.save()
 
-            # Redirect after successful save
-            return redirect('success_url')  # Replace 'success_url' with your actual redirect URL
+#             # Redirect after successful save
+#             return redirect('success_url')  # Replace 'success_url' with your actual redirect URL
 
-        # If forms are not valid, re-render the page with errors
-        return self.render_to_response(self.get_context_data(bill_form=bill_form, bill_item_forms=bill_item_forms))
+#         # If forms are not valid, re-render the page with errors
+#         return self.render_to_response(self.get_context_data(bill_form=bill_form, bill_item_forms=bill_item_forms))
 
 
 class BillListView(ListView):
@@ -2383,3 +2383,161 @@ def download_invoice(request, bill_id):
     except Bill.DoesNotExist:
         # Handle error if the bill is not found
         return HttpResponse("Invoice not found.", status=404)
+
+
+from django.shortcuts import render, redirect
+from .forms import BillForm, BillItemForm
+from .models import Bill, BillItem
+from django.http import HttpResponse
+from io import BytesIO
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import os
+from django.conf import settings
+from num2words import num2words
+
+# Function to convert number to words
+def convert_number_to_words(amount):
+    return num2words(amount)
+
+# Function to generate PDF
+def render_to_pdf(template_name, context):
+    template = get_template(template_name)
+    html = template.render(context)
+    pdf = BytesIO()
+    pisa.CreatePDF(html, dest=pdf)
+    pdf.seek(0)
+    return pdf
+
+# Create Bill and Bill Items
+class CreateBillView(LoginRequiredMixin, ListView):
+    model = Bill
+    template_name = 'billing/create_bill.html'
+    context_object_name = 'bills'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'bill_form': BillForm(),
+            'bill_item_forms': [BillItemForm(prefix=str(i)) for i in range(1)],  # Default to one item form
+        })
+        return context
+
+    def post(self, request, *args, **kwargs):
+        bill_form = BillForm(request.POST)
+
+        # Extract list data for each bill item field
+        descriptions = request.POST.getlist('description[]')
+        quantities = request.POST.getlist('quantity[]')
+        rates = request.POST.getlist('rate[]')
+        taxes = request.POST.getlist('tax[]')
+
+        # Debug: Print POST data to verify item form submission
+        print("Request POST Data:", request.POST)
+
+        if bill_form.is_valid():
+            # Save the Bill
+            bill = bill_form.save(commit=False)
+            bill.save()  # Save to assign an ID to the Bill instance
+
+            total_amount = 0  # Initialize total amount
+
+            # Loop through items and create BillItem instances
+            for i in range(len(descriptions)):
+                description = descriptions[i]
+                quantity = int(quantities[i])
+                rate = float(rates[i])
+                tax = float(taxes[i])
+
+                # Calculate total price and add tax for the current item
+                item_total_price = quantity * rate
+                print("Item Total Price",item_total_price)
+                item_total_with_tax = item_total_price + (item_total_price * (tax / 100))
+                print("Item Total with tax",item_total_with_tax)
+
+                # Create and save each BillItem
+                BillItem.objects.create(
+                    bill=bill,
+                    description=description,
+                    quantity=quantity,
+                    rate=rate,
+                    tax=tax,
+                    total_price=item_total_price
+                )
+                print("Bill Items are",BillItem)
+                # Add to the overall bill total
+                total_amount += item_total_with_tax
+                print("total amount with tax 1",total_amount)
+
+            # Add any other charges and finalize Bill's total amount
+            bill.total_amount = total_amount + float(bill.other_charges)
+            print("bill toal amount",bill.total_amount)
+            total_amount += bill.total_amount
+            print("new total",total_amount)
+            bill.save()
+
+            # Convert total amount to words
+            # amount_in_words = num2words(total_amount, to='currency', lang='en_IN')
+            amount_in_words = convert_number_to_words(bill.total_amount)
+            print(amount_in_words)
+
+            # Prepare the PDF context
+            context = {
+                'bill': bill,
+                'items': bill.items.all(),
+                'item_total_with_tax':item_total_with_tax,
+                'total_amount': bill.total_amount,
+                'amount_in_words': amount_in_words, 
+            }
+
+            pdf = render_to_pdf('billing/bill_template.html', context)
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="bill_{bill.bill_number}.pdf"'
+            return response
+
+        # Debug: If form is invalid, print errors
+        else:
+            print("BillForm errors:", bill_form.errors)
+
+        # If form is invalid, re-render the page with errors
+        return render(request, 'billing/create_bill.html', {
+            'bill_form': bill_form,
+            'bill_item_forms': [BillItemForm(prefix=str(i)) for i in range(len(descriptions))],
+        })
+
+
+
+
+    from django.shortcuts import render, redirect
+from django.forms import modelformset_factory
+from .models import Bill, BillItem
+from .forms import BillForm, BillItemForm
+# Create the BillItemFormSet
+BillItemFormSet = modelformset_factory(BillItem, fields=('description', 'quantity', 'rate', 'tax'), extra=1)
+
+def create_bill(request):
+    if request.method == 'POST':
+        bill_form = BillForm(request.POST)
+        formset = BillItemFormSet(request.POST)
+        if bill_form.is_valid() and formset.is_valid():
+            # Handle form saving logic here
+            # Save the bill and associated items
+            bill = bill_form.save()
+            for form in formset:
+                if form.cleaned_data:
+                    # Create BillItem for each valid form in the formset
+                    BillItem.objects.create(
+                        bill=bill,
+                        description=form.cleaned_data['description'],
+                        quantity=form.cleaned_data['quantity'],
+                        rate=form.cleaned_data['rate'],
+                        tax=form.cleaned_data['tax'],
+                    )
+            return redirect('bill_success_url')  # redirect to a success page
+    else:
+        bill_form = BillForm()
+        formset = BillItemFormSet(queryset=BillItem.objects.none())  # empty queryset for a new bill
+    return render(request, 'leads/create_bill.html', {
+        'bill_form': bill_form,
+        'formset': formset,
+    })
