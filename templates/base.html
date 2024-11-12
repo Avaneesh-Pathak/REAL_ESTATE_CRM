@@ -475,12 +475,7 @@
                         <a href="{% url 'leads:property-create' %}"><i class="fas fa-plus-square"></i> Property
                             Create</a>
                     </div>
-                    <!-- Add this link inside your sidebar navigation -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'leads:create_bill' %}">
-                            <i class="fa fa-file-invoice"></i> Create Bill
-                        </a>
-                    </li>
+                    
                     <a href="{% url 'leads:salary_list' %}"><i class="fas fa-rupee-sign"></i> Salary</a>
                     <a href="{% url 'leads:daybook_list' %}"><i class="fas fa-book"></i> Daybook</a>
                     <a href="{% url 'leads:buyers_list' %}"><i class="fas fa-user-friends"></i> Buyers List</a>
@@ -488,6 +483,15 @@
                         Plot</a>
                     <a href="{% url 'leads:kisan_list' %}"> <i class="fas fa-seedling"></i> View Kisan List</a>
                     <a href="{% url 'leads:kisan_create' %}"><i class="fas fa-plus-circle"></i> Add Kisan</a>
+                    <!-- Add this link inside your sidebar navigation -->
+                    <a class="nav-link" href="{% url 'leads:create_bill' %}">
+                        <i class="fa fa-file-invoice"></i> Create Bill
+                    </a>
+                    <a href="{% url 'leads:bill_list' %}" class="sidebar-btn">
+                        <button class="download-btn">
+                            <i class="fa fa-receipt"></i> View All Bills
+                        </button>
+                    </a>
                 </nav>
             </div>
 

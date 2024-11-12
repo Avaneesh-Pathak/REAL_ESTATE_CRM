@@ -693,6 +693,8 @@ class PlotBooking(models.Model):
     associate_detail = models.BooleanField(default=False)
     agent = models.ForeignKey(Agent, on_delete=models.SET_NULL, null=True, blank=True, related_name='plot_bookings')  # Changed to lowercase
     Plot_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
+    total_paid = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)#principal amount
+    total_paidbycust = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)#principal amount
     payment_type = models.CharField(max_length=50, choices=[('custom', 'Custom Payment'), ('installment', 'Installments')])
     booking_amount = models.DecimalField(max_digits=10, decimal_places=2)
     mode_of_payment = models.CharField(max_length=50, choices=[('cheque', 'Cheque'), ('rtgs', 'RTGS/NEFT'), ('cash', 'Cash')])
@@ -758,6 +760,12 @@ class EMIPayment(models.Model):
         remaining = self.emi_amount - self.amount_paid
         logger.debug(f"Remaining amount for EMI: {remaining} for {self.plot_booking}.")
         return remaining
+    
+    def interest_earned(self):
+        """Calculate the remaining amount to be paid."""
+        int_earn = self.emi_amount - self.amount_for_agent
+        logger.debug(f"interest amount for EMI: {int_earn} for {self.plot_booking}.")
+        return int_earn
     
     def agent_amount(self):
         """Calculate the remaining amount to be paid."""
@@ -925,7 +933,7 @@ class Bill(models.Model):
     invoice_date = models.DateField()
     due_date = models.DateField()
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    tax_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+ 
     other_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def save(self, *args, **kwargs):

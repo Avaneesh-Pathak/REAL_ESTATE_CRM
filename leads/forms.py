@@ -275,9 +275,9 @@ class PlotBookingForm(forms.ModelForm):
         fields = [
             'booking_date', 'name', 'father_husband_name', 'gender', 'custom_gender', 'dob', 'mobile_no',
             'address', 'bank_name', 'account_no', 'email', 'nominee_name', 'corner_plot_10', 'corner_plot_5',
-            'full_pay_discount', 'location', 'project', 'agent', 'Plot_price',
+            'full_pay_discount', 'location', 'project', 'agent', 'Plot_price','total_paid',
             'payment_type', 'booking_amount', 'mode_of_payment', 'payment_date', 'remark','emi_tenure', 'interest_rate'
-        ]
+        ] 
         widgets = {
             'booking_date': forms.DateInput(attrs={'type': 'date'}),
             'dob': forms.DateInput(attrs={'type': 'date'}),
@@ -414,7 +414,7 @@ class BillForm(forms.ModelForm):
     class Meta:
         model = Bill
         fields = ['buyer_name', 'buyer_address', 'buyer_pan_number', 'buyer_state', 
-                  'invoice_date', 'due_date', 'tax_percentage', 'other_charges']
+                  'invoice_date', 'due_date', 'other_charges']
 
 class BillItemForm(forms.ModelForm):
     class Meta:

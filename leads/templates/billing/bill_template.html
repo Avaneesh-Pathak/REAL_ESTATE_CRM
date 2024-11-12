@@ -9,6 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 20px;
             color: #333;
+            line-height: 1.6;
         }
         h1 {
             text-align: center;
@@ -30,6 +31,9 @@
         .invoice-details {
             width: 48%;
         }
+        .invoice-details {
+            text-align: right;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -39,7 +43,7 @@
             border: 1px solid #ccc;
         }
         th, td {
-            padding: 8px;
+            padding: 12px;
             text-align: center;
         }
         th {
@@ -54,11 +58,19 @@
         }
         .total-amount {
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.5em;
+            color: #2c3e50;
         }
         .amount-in-words {
             margin-top: 20px;
             font-style: italic;
+            text-align: right;
+        }
+        .footer-note {
+            margin-top: 30px;
+            font-size: 0.9em;
+            text-align: center;
+            color: #777;
         }
     </style>
 </head>
@@ -80,32 +92,41 @@
     </div>
 
     <table>
-        <tr>
-            <th>Description</th>
-            <th>Quantity</th>
-            <th>Rate</th>
-            <th>Tax (%)</th>
-            <th>Total</th>
-        </tr>
-        {% for item in items %}
-        <tr>
-            <td>{{ item.description }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.rate }}</td>
-            <td>{{ item.tax }}</td>
-            <td>{{ item.total_price }}</td>
-        </tr>
-        {% endfor %}
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Rate</th>
+                <th>Tax (%)</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.description }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.rate }}</td>
+                <td>{{ item.tax }}</td>
+                <td>{{ item.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
     <div class="summary">
         <p>Subtotal: {{ total_amount }}</p>
-        <p>Tax: {{ tax_amount }}</p>
+        <p>Tax: {{ total_tax }}</p>
         <p>Other Charges: {{ bill.other_charges }}</p>
-        <p class="total-amount">Total Amount (including tax): {{ total_amount_with_tax }}</p>
+        <p class="total-amount">Total Amount (including tax): {{ total_with_tax }}</p>
     </div>
 
-    <p class="amount-in-words">Total Amount in Words: {{ total_in_words|floatformat:2 }}</p>
+    <p class="amount-in-words">Total Amount in Words: {{ total_amount_in_words }}</p>
+
+    <div class="footer-note">
+        <p>Thank you for your business!</p>
+        <p>If you have any questions regarding this invoice, please contact us.</p>
+    </div>
 
 </body>
 </html>

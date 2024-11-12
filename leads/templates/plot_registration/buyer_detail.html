@@ -6,7 +6,7 @@
     <div class="card-body">
         <div class="d-flex justify-content-between">
             <p><strong>Name:</strong> {{ buyer.name }}</p>
-            <p><strong>Father's Name:</strong> {{ buyer.father_husband_name }}</p>  
+            <p><strong>Father's Name:</strong> {{ buyer.father_husband_name }}</p>
         </div>
         <div class="d-flex justify-content-between">
             <p><strong>Address:</strong> {{ buyer.address }}</p>
@@ -18,22 +18,84 @@
         </div>
         <div class="d-flex justify-content-between">
             <p><strong>Property ID:</strong> {{ buyer.project.title }}</p>
+            <p><strong>Total amount Paid by Customer: ₹</strong> {{ total_amount_paid }}</p>
+            <p><strong>Total Interest Paid by Customer: ₹</strong> {{ total_interest_earned }}</p>
             <p><strong>Agent Name:</strong> {{ buyer.agent.user.username }}</p>
         </div>
         <div class="d-flex justify-content-between">
-            <p><strong>Booking Amount:</strong> {{ buyer.booking_amount }}</p>
-            <p><strong>Property Price:</strong> {{ buyer.Plot_price }}</p>
+            <p><strong>Booking Amount: ₹</strong> {{ buyer.booking_amount }}</p>
+            <p><strong>Property Price: ₹</strong> {{ buyer.Plot_price }}</p>
+            <p><strong>Total principal amount Paid: ₹</strong> {{ buyer.total_paid }}</p>
             <p><strong>Payment Date:</strong> {{ buyer.payment_date }}</p>
         </div>
     </div>
 </div>
+
 <h2 class="text-primary">EMI Payments</h2>
+<form method="post">
+    {% csrf_token %}
+    <div class="custom-payment-form">
+        <h3>Pay Custom EMI</h3>
+        <div class="form-group">
+            <label for="custom_amount">Enter Payment Amount</label>
+            <input type="number" name="custom_amount" id="custom_amount" placeholder="Enter Amount" step="0.01" required>
+        </div>
+        <!-- <button type="submit" class="btn btn-primary">Pay</button> -->
+    </div>
+
+    <!-- EMI Options -->
+    <div class="emi-options">
+        <div class="form-group">
+            <label for="emi_tenure">EMI Tenure (Months)</label>
+            <input type="number" name="emi_tenure" id="emi_tenure" class="form-control" placeholder="Enter Tenure in Months" required>
+        </div>
+        <div class="form-group">
+            <label for="interest_rate">Interest Rate (%)</label>
+            <input type="number" name="interest_rate" id="interest_rate" class="form-control" step="0.01" placeholder="Enter Interest Rate" required>
+        </div>
+        <div class="form-group">
+            <label>Calculated EMI (Per Month)</label>
+            <input type="text" name="calculated_emi" id="calculated-emi" class="form-control" readonly>
+        </div>
+        <button type="submit" class="btn btn-success">Set Up EMI</button>
+    </div>
+</form>
+
+</div>
+
+<!-- {% if remaining_balance > 0 %} -->
+<!-- EMI Options Form -->
+<div class="emi-options">
+    <h4>Set Up EMI for Pending Amount</h4>
+    <form method="post">
+        {% csrf_token %}
+        <input name="remaining_balance" value="#">
+        <div class="form-group">
+            <label for="emi_tenure">EMI Tenure (Months)</label>
+            <input type="number" name="emi_tenure" id="emi_tenure" class="form-control"
+                placeholder="Enter Tenure in Months" required>
+        </div>
+        <div class="form-group">
+            <label for="interest_rate">Interest Rate (%)</label>
+            <input type="number" name="interest_rate" id="interest_rate" class="form-control" step="0.01"
+                placeholder="Enter Interest Rate" required>
+        </div>
+        <div class="form-group">
+            <label>Calculated EMI (Per Month)</label>
+            <input type="text" name="calculated_emi" id="calculated-emi" class="form-control" readonly>
+        </div>
+        <button type="submit" class="btn btn-success">Set Up EMI</button>
+    </form>
+</div>
+<!-- {% endif %} -->
+
+
 <table class="table table-bordered table-hover">
     <thead class="thead-dark">
         <tr>
             <th>Due Date</th>
-            <th>EMI Amount</th>
-            <th>Amount Paid</th>
+            <th>Principal Amount</th>
+            <th>Interest Amount</th>
             <th>Status</th>
             <th>Pending Amount</th>
             <th>Action</th>
@@ -43,10 +105,11 @@
         {% for payment in emi_payments %}
         <tr id="payment-row-{{ payment.id }}" {% if payment.status == 'Paid' %}class="table-success"{% elif payment.status == 'Pending' %}class="table-warning"{% endif %}>
             <td>{{ payment.due_date }}</td>
-            <td>{{ payment.emi_amount|floatformat:2 }}</td>
-            <td>{{ payment.amount_paid|floatformat:2 }}</td>
+            <td>₹{{ payment.amount_for_agent|floatformat:2 }}</td>
+            <td>₹{{ payment.interest_earned|floatformat:2 }}</td>
+            {% comment %} <td>{{ payment.amount_paid|floatformat:2 }}</td> {% endcomment %}
             <td class="status-text">{{ payment.status }}</td>
-            <td>{{ payment.remaining_amount|floatformat:2 }}</td>
+            <td>₹{{ payment.remaining_amount|floatformat:2 }}</td>
             <td>
                 {% if payment.status == 'Pending' %}
                 <button onclick="payEmi({{ payment.id }})" class="btn btn-success" id="pay-button-{{ payment.id }}">Pay EMI</button>
@@ -63,8 +126,8 @@
     </tbody>
 </table>
 
-<!-- AJAX and JavaScript -->
 <script>
+
     function payEmi(paymentId) {
         const button = document.getElementById(`pay-button-${paymentId}`);
         const row = document.getElementById(`payment-row-${paymentId}`);
@@ -77,25 +140,25 @@
                 'Content-Type': 'application/json'
             },
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Update the button and row to indicate the payment was made
-                button.textContent = 'Paid EMI';
-                button.classList.remove('btn-success');
-                button.classList.add('btn-secondary', 'disabled');
-                button.disabled = true;
-                row.classList.remove('table-warning');
-                row.classList.add('table-success');
-                statusText.textContent = 'Paid';
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update the button and row to indicate the payment was made
+                    button.textContent = 'Paid EMI';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-secondary', 'disabled');
+                    button.disabled = true;
+                    row.classList.remove('table-warning');
+                    row.classList.add('table-success');
+                    statusText.textContent = 'Paid';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
     }
 </script>
 <!-- Bootstrap CSS and JS for better interaction -->
@@ -110,20 +173,26 @@
         background-color: #007bff;
         color: white;
     }
+
     .table td {
         vertical-align: middle;
     }
+
     .text-primary {
         margin-top: 20px;
         margin-bottom: 15px;
         font-weight: bold;
         text-align: center;
     }
+
     .table-success {
-        background-color: #d4edda !important; /* Light green for paid */
+        background-color: #d4edda !important;
+        /* Light green for paid */
     }
+
     .table-warning {
-        background-color: #fff3cd !important; /* Light yellow for pending */
+        background-color: #fff3cd !important;
+        /* Light yellow for pending */
     }
 </style>
 {%endblock content %}

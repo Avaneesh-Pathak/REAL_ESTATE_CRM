@@ -198,7 +198,7 @@
             <p><strong>Agent</strong>
                 <select name="agent"
                     class="form-control">
-                    <option value="">Select an Agent</option>
+                    <option value=""><b>Select an Agent</b></option>
                     {% for agent in agents %}
                     <option value="{{ agent.id }}">{{ agent.user.username }} level{{ agent.level}}</option>
                     {% endfor %}
@@ -206,7 +206,8 @@
         </div>
         <div class="d-flex justify-content-between">
             <p><strong>Property Price:</strong><br> <span style="font-size: 30px; color: rgb(93, 97, 218);" class="font-bold" id="property-price">Rs</span></p>
-            <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>
+            <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p>
+            {% comment %} <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p> {% endcomment %}
         </div>
         <script>
             const properties = {{ properties|safe }};
@@ -236,7 +237,7 @@
                 }
             });
         </script>
-        <!-- EMI Options -->
+        {% comment %} <!-- EMI Options -->
         <div class="parent-div">
             <div id="emi-options" style="display:none;">
                 <h4 class="section-subheading">EMI Details</h4>
@@ -253,18 +254,39 @@
                     <input name="calculated-emi" type="text" id="calculated-emi" readonly class="form-control">
                 </div>
             </div>
-        </div>
+        </div> {% endcomment %}
 
         <!-- Payment Information Section -->
         <h4 class="section-subheading">Payment Information</h4>
         <div class="d-flex justify-content-between">
-            <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p>
+            <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>
+
+            {% comment %} <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p> {% endcomment %}
             <p><strong>{{ form.mode_of_payment.label }}</strong>{{ form.mode_of_payment }}</p>
         </div>
+                <!-- EMI Options -->
+                <div class="parent-div">
+                    <div id="emi-options" style="display:none;">
+                        <h4 class="section-subheading">EMI Details</h4>
+                        <div class="form-group">
+                            <label>EMI Tenure in Months</label>
+                            {{ form.emi_tenure }}
+                        </div>
+                        <div class="form-group">
+                            <label>Interest Rate (in %) Annually</label>
+                            {{ form.interest_rate }}
+                        </div>
+                        <div class="form-group">
+                            <label>Calculated EMI:(Per Months)</label>
+                            <input name="calculated-emi" type="text" id="calculated-emi" readonly class="form-control">
+                        </div>
+                    </div>
+                </div>
         <div class="d-flex justify-content-between">
             <p class="col-md-2"><strong>{{ form.payment_date.label }}</strong>{{ form.payment_date }}</p>
             <p><strong>{{ form.remark.label }}</strong>{{ form.remark }}</p>
         </div>
+
 
         <!-- Submit Button -->
         <div class="w-full relative flex justify-center flex-wrap gap-5">

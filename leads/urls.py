@@ -12,7 +12,7 @@ from .views import (
     FollowUpCreateView, FollowUpUpdateView, FollowUpDeleteView,FollowupList, manage_salary, manage_sale,
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
     PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,DaybookListView,DaybookCreateView,add_promoter,update_delete_promoter,
-    PromoterListView,load_properties,PlotRegistrationView,user_profile_view,BalanceUpdateView,CreateBillView,
+    PromoterListView,load_properties,PlotRegistrationView,user_profile_view,BalanceUpdateView,CreateBillView,BillListView,
     update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView,kisan_view,KisanListView,KisanUpdateView,KisanDeleteView
 )
 
@@ -87,6 +87,8 @@ urlpatterns = [
     path('export/kisans/', views.export_kisans_to_csv, name='export_kisans_to_csv'),
   
     path('create_bill/',CreateBillView.as_view(), name='create_bill'),
+    path('bills/', BillListView.as_view(), name='bill_list'),
+    path('download_invoice/<int:bill_id>/', views.download_invoice, name='download_invoice'),
 
 ]   
 

@@ -2,6 +2,7 @@ import logging
 import datetime
 from leads.models import models
 from datetime import timedelta , date
+from django.views.generic import TemplateView
 from django.core.files import File
 
 from decimal import Decimal, InvalidOperation
@@ -1494,7 +1495,9 @@ class PlotRegistrationView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form = PlotBookingForm()
         agents = Agent.objects.all()
-        properties = list(Property.objects.values('id', 'totalprice', 'project_name'))  # Fetch only necessary fields
+        # properties = list(Property.objects.values('id', 'totalprice', 'project_name'))  # Fetch only necessary fields
+        properties = list(Property.objects.filter(is_in_emi=False, is_sold=False).values('id', 'totalprice', 'project_name'))
+
         print("get")
         properties = [
         {
@@ -1525,6 +1528,8 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             booking_amount = form.cleaned_data.get('booking_amount')
             Property_inst = Property.objects.get(id = project.id)
             form.instance.Plot_price = Property_inst.totalprice 
+            form.instance.total_paid = booking_amount
+            form.instance.total_paidbycust = booking_amount
             plot_price = Property_inst.totalprice
             form.save()
 
@@ -1838,10 +1843,81 @@ def update_delete_buyer(request, id):
 def buyer_detail_view(request, buyer_id):
     buyer = get_object_or_404(PlotBooking, id=buyer_id)
     emi_payments = buyer.emi_payments.all()  # Fetch EMI payments linked to this buyer
+    emipayments = buyer.emi_payments.filter(status = 'Paid')
+    total_amount_paid  = buyer.total_paidbycust + sum(emi_payment.emi_amount for emi_payment  in emipayments )
+    total_interest_earned = sum(emi_payment.emi_amount for emi_payment  in emipayments ) - sum(emi_payment.amount_for_agent for emi_payment  in emipayments )
+
+    if request.method == 'POST':  
+
+        custom_amount = Decimal(request.POST.get('custom_amount'))  # Get the custom EMI amount from the form
+        interest_rate = Decimal(request.POST.get('interest_rate'))  # Get the custom EMI amount from the form
+        emi_tenure = int(request.POST.get('emi_tenure'))  # Get the custom EMI amount from the form
+        if custom_amount>0 and emi_tenure>0 and interest_rate>0:
+            print(custom_amount)
+            emi_payment = buyer.emi_payments.filter(status='Pending')
+            emi_payment.delete()
+            plotprice = buyer.Plot_price - buyer.total_paid - custom_amount
+            buyer.total_paid = (buyer.total_paid  + custom_amount)
+            buyer.total_paidbycust = (buyer.total_paidbycust  + custom_amount)
+            buyer.save()
+            print("dfghjhgfds",plotprice)
+            new_emi = calculate_emi(plotprice, interest_rate, emi_tenure)
+            for month in range(emi_tenure):
+                due_date = buyer.payment_date + timedelta(days=30 * month)
+                EMIPayment.objects.create(
+                    plot_booking=buyer,
+                    due_date=due_date,
+                    emi_amount=new_emi  # Store calculated EMI
+                )
+            emipaymentcreated = buyer.emi_payments.filter(status = 'Pending')
+            amtfagent = plotprice/emi_tenure
+            emipaymentcreated.update(amount_for_agent = amtfagent)
+            agent = buyer.agent
+            print(agent)
+            if agent:
+                agent_level = agent.level
+                print(agent_level)
+                for i in range(1,agent_level+1):
+                    if i == 1:
+                        base_salary = (custom_amount)/10
+                    elif i == 2:
+                        base_salary = (custom_amount)/25
+                    elif i == 3:
+                        base_salary = (custom_amount)*3/100
+                    elif i == 4:
+                        base_salary = (custom_amount)/50
+                    elif i == 5:
+                        base_salary = (custom_amount)/100
+
+                    salary = Salary.objects.get(property = buyer.project,agent = agent.user)
+                    salary.base_salary += base_salary
+                    salary.save()
+
+        return redirect('leads:buyers_list')
+
+
+
+        
+
+
+        # emi_payment.save()
+
+        # # Update EMI payment
+        # emi_payment.amount_paid = custom_amount
+        # emi_payment.status = 'Paid'
+        # emi_payment.save()
+
+        # Add a success message
+        # messages.success(request, f'EMI Payment of {custom_amount} successfully paid.')
+
+        # return render(request, 'plot_registration/buyer_detail.html', context)
+    
 
     context = {
         'buyer': buyer,
         'emi_payments': emi_payments,  # Pass the EMI payments to the template
+        'total_amount_paid': total_amount_paid,  # Pass the EMI payments to the template
+        'total_interest_earned': total_interest_earned,  # Pass the EMI payments to the template
     }
     return render(request, 'plot_registration/buyer_detail.html', context)
 
@@ -1857,8 +1933,10 @@ def pay_emi(request, payment_id):
 
         if payment.status == 'Pending':
             payment.status = 'Paid'
-            payment.save()
             plotbooking = payment.plot_booking
+            plotbooking.total_paid = plotbooking.total_paid + payment.amount_for_agent
+            plotbooking.save()
+            payment.save()
             print("emi payment gvcdghnbvcdg",plotbooking)
             agent = plotbooking.agent
             print(agent)
@@ -2119,7 +2197,7 @@ def export_kisans_to_csv(request):
 
 
 
-
+from django.forms import modelformset_factory
 from django.shortcuts import render, redirect
 from .forms import BillForm, BillItemForm
 from .models import Bill, BillItem
@@ -2128,6 +2206,8 @@ from io import BytesIO
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 import os
+from decimal import Decimal, ROUND_HALF_UP
+
 from django.conf import settings
 from num2words import num2words
 
@@ -2145,117 +2225,161 @@ def render_to_pdf(template_name, context):
     return pdf
 
 # Create Bill and Bill Items
-class CreateBillView(LoginRequiredMixin, ListView):
-    model = Bill
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from decimal import Decimal, ROUND_HALF_UP
+from num2words import num2words
+from .forms import BillForm, BillItemForm
+from .models import Bill, BillItem
+from weasyprint import HTML
+from django.template.loader import render_to_string
+
+def render_to_pdf(template_src, context_dict):
+    html_string = render_to_string(template_src, context_dict)
+    pdf_file = HTML(string=html_string).write_pdf()
+    return pdf_file
+
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import BillForm, BillItemForm
+from .models import Bill, BillItem
+from decimal import Decimal, ROUND_HALF_UP
+from num2words import num2words
+# from .utils import render_to_pdf  # Assuming you have a utility to render PDF
+
+from django.shortcuts import render, redirect
+from decimal import Decimal
+
+class CreateBillView(LoginRequiredMixin, TemplateView):
     template_name = 'billing/create_bill.html'
-    context_object_name = 'bills'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        item_count = len(self.request.POST.getlist('description[]')) if self.request.method == 'POST' else 1
+
+        bill_item_forms = []
+        if self.request.method == 'POST':
+            for i in range(item_count):
+                prefix = str(i)
+                form_data = {
+                    'description': self.request.POST.getlist('description[]')[i],
+                    'quantity': self.request.POST.getlist('quantity[]')[i],
+                    'rate': self.request.POST.getlist('rate[]')[i],
+                    'tax': self.request.POST.getlist('tax[]')[i]
+                }
+                form = BillItemForm(form_data, prefix=prefix)
+                bill_item_forms.append(form)
+        else:
+            bill_item_forms = [BillItemForm(prefix=str(i)) for i in range(item_count)]
+
         context.update({
             'bill_form': BillForm(),
-            'bill_item_forms': [BillItemForm(prefix=str(i)) for i in range(1)],  # Default to one item form
+            'bill_item_forms': bill_item_forms,
         })
+
         return context
 
     def post(self, request, *args, **kwargs):
-        # Initialize the BillForm with the request data
         bill_form = BillForm(request.POST)
+        item_count = len(request.POST.getlist('description[]'))
+        print(item_count)
+        # bill_item_forms = []
 
-        # Dynamically create BillItemForm instances based on submitted data
-        item_count = len(request.POST.getlist('0-description'))
-        bill_item_forms = [
-            BillItemForm(request.POST, prefix=str(i)) 
-            for i in range(item_count)
-        ]
 
-        # Debug: Print POST data to verify item form submission
-        print("Request POST Data:", request.POST)
+        for i in range(item_count):
+            bill = self.bill_form
+            description = request.POST.getlist('description[]')[i],
+            quantity= request.POST.getlist('quantity[]')[i],
+            rate= request.POST.getlist('rate[]')[i],
+            tax= request.POST.getlist('tax[]')[i]
 
-        # Check if both BillForm and all BillItemForms are valid
+            BillItem.objects.create()
+            form = BillItemForm(form_data, prefix=prefix)
+            bill_item_forms.append(form)
+
+        # Debug: Print form validation errors
+        if not bill_form.is_valid():
+            print("BillForm errors:", bill_form.errors)
+        
+        for index, form in enumerate(bill_item_forms):
+            if not form.is_valid():
+                print(f"BillItemForm {index} errors:", form.errors)
+
+        # Check if the main form and all item forms are valid
         if bill_form.is_valid() and all(form.is_valid() for form in bill_item_forms):
-            # Save the Bill
+            # Save the main Bill form
             bill = bill_form.save(commit=False)
-            bill.save()  # Save to assign an ID to the Bill instance
-
-            total_amount = 0
-
-            # Save each BillItem
-            for i, form in enumerate(bill_item_forms):
-                # Debug: Check if each form is valid and print form data
-                if form.is_valid():
-                    print(f"Saving item {i}: ", form.cleaned_data)
-
-                    item = form.save(commit=False)
-                    item.bill = bill  # Associate each item with the main Bill
-                    item.total_price = item.quantity * item.rate  # Calculate total price
-                    item.save()  # Save item to the database
-
-                    # Calculate total with tax for each item
-                    total_amount += item.total_price + (item.total_price * (item.tax / 100))
-
-            # Add other charges and update Bill total amount
-            bill.total_amount = total_amount + bill.other_charges
             bill.save()
 
-            # Prepare the PDF context
-            context = {
-                'bill': bill,
-                'items': bill.items.all(),
-                'total_amount': total_amount,
-            }
+            total_amount = Decimal(0)
+            total_with_tax = Decimal(0)
 
-            pdf = render_to_pdf('billing/bill_template.html', context)
-            response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="bill_{bill.bill_number}.pdf"'
-            return response
+            # Save each BillItem form and calculate totals
+            for form in bill_item_forms:
+                bill_item = form.save(commit=False)
+                bill_item.bill = bill  # Link each item to the main Bill
+                bill_item.save()
 
-        # Debug: If any form is invalid, print errors
-        else:
-            print("BillForm errors:", bill_form.errors)
-            for i, form in enumerate(bill_item_forms):
-                print(f"BillItemForm {i} errors:", form.errors)
+                # Calculate the totals
+                item_total = bill_item.quantity * bill_item.rate
+                total_amount += item_total
+                total_with_tax += item_total * (1 + (bill_item.tax / 100))
 
-        # If form is invalid, re-render the page with errors
-        return render(request, 'billing/create_bill.html', {
-            'bill_form': bill_form,
-            'bill_item_forms': bill_item_forms,
-        })
-    
+            # Update the Bill with calculated totals and save
+            bill.total_amount = total_amount
+            bill.total_with_tax = total_with_tax
+            bill.save()
 
+            # Redirect after successful save
+            return redirect('success_url')  # Replace 'success_url' with your actual redirect URL
 
+        # If forms are not valid, re-render the page with errors
+        return self.render_to_response(self.get_context_data(bill_form=bill_form, bill_item_forms=bill_item_forms))
 
 
-    from django.shortcuts import render, redirect
-from django.forms import modelformset_factory
-from .models import Bill, BillItem
-from .forms import BillForm, BillItemForm
-# Create the BillItemFormSet
-BillItemFormSet = modelformset_factory(BillItem, fields=('description', 'quantity', 'rate', 'tax'), extra=1)
+class BillListView(ListView):
+    model = Bill
+    template_name = 'billing/invoice_list.html'  # Specify your template
+    context_object_name = 'bills'  # This will be the name of the context variable in the template
 
-def create_bill(request):
-    if request.method == 'POST':
-        bill_form = BillForm(request.POST)
-        formset = BillItemFormSet(request.POST)
-        if bill_form.is_valid() and formset.is_valid():
-            # Handle form saving logic here
-            # Save the bill and associated items
-            bill = bill_form.save()
-            for form in formset:
-                if form.cleaned_data:
-                    # Create BillItem for each valid form in the formset
-                    BillItem.objects.create(
-                        bill=bill,
-                        description=form.cleaned_data['description'],
-                        quantity=form.cleaned_data['quantity'],
-                        rate=form.cleaned_data['rate'],
-                        tax=form.cleaned_data['tax'],
-                    )
-            return redirect('bill_success_url')  # redirect to a success page
-    else:
-        bill_form = BillForm()
-        formset = BillItemFormSet(queryset=BillItem.objects.none())  # empty queryset for a new bill
-    return render(request, 'leads/create_bill.html', {
-        'bill_form': bill_form,
-        'formset': formset,
-    })
+    def get_queryset(self):
+        """
+        Optionally, you can filter the list of bills here if you need to.
+        For example, if you want to show only bills from the current year:
+        """
+        return Bill.objects.all() 
+
+
+from weasyprint import HTML 
+def download_invoice(request, bill_id):
+    try:
+        # Get the bill object
+        bill = Bill.objects.get(id=bill_id)
+
+        # Prepare the context for the bill PDF
+        context = {
+            'bill': bill,
+            'items': bill.items.all(),
+            'total_amount': bill.total_amount,
+            'total_amount_in_words': num2words(bill.total_amount, lang='en').capitalize(),
+        }
+
+        # Render the HTML content using a template (for the PDF)
+        html_content = render_to_string('billing/bill_template.html', context)
+
+        # Convert HTML to PDF using WeasyPrint
+        pdf = HTML(string=html_content).write_pdf()
+
+        # Return the PDF as an HTTP response with the appropriate content type
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="bill_{bill.bill_number}.pdf"'
+
+        return response
+    except Bill.DoesNotExist:
+        # Handle error if the bill is not found
+        return HttpResponse("Invoice not found.", status=404)
