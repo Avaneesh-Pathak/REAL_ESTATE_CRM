@@ -2441,6 +2441,9 @@ class CreateBillView(LoginRequiredMixin, ListView):
             bill.save()  # Save to assign an ID to the Bill instance
 
             total_amount = 0  # Initialize total amount
+            product_total_amount = 0
+            # total_tax_rate = sum(map(float, taxes))
+            # print("Final Total Tax Rate (Sum of Tax Percentages):", total_tax_rate)
 
             # Loop through items and create BillItem instances
             for i in range(len(descriptions)):
@@ -2449,7 +2452,7 @@ class CreateBillView(LoginRequiredMixin, ListView):
                 rate = float(rates[i])
                 tax = float(taxes[i])
 
-                # Calculate total price and add tax for the current item
+                
                 item_total_price = quantity * rate
                 print("Item Total Price",item_total_price)
                 item_total_with_tax = item_total_price + (item_total_price * (tax / 100))
@@ -2465,10 +2468,13 @@ class CreateBillView(LoginRequiredMixin, ListView):
                     total_price=item_total_price
                 )
                 print("Bill Items are",BillItem)
-                # Add to the overall bill total
                 total_amount += item_total_with_tax
-                print("total amount with tax 1",total_amount)
+                print("Accumulated Total Amount with Tax In Loop:", total_amount)
 
+            
+            product_total_amount += total_amount
+            print("Accumulated Total Amount with Tax:", product_total_amount)
+        
             # Add any other charges and finalize Bill's total amount
             bill.total_amount = total_amount + float(bill.other_charges)
             print("bill toal amount",bill.total_amount)
@@ -2477,17 +2483,18 @@ class CreateBillView(LoginRequiredMixin, ListView):
             bill.save()
 
             # Convert total amount to words
-            # amount_in_words = num2words(total_amount, to='currency', lang='en_IN')
-            amount_in_words = convert_number_to_words(bill.total_amount)
+            amount_in_words = convert_number_to_words(round(bill.total_amount, 2))
             print(amount_in_words)
 
             # Prepare the PDF context
             context = {
                 'bill': bill,
                 'items': bill.items.all(),
-                'item_total_with_tax':item_total_with_tax,
-                'total_amount': bill.total_amount,
-                'amount_in_words': amount_in_words, 
+                'item_total_with_tax': f"{item_total_with_tax:.2f}",
+                'total_amount': f"{bill.total_amount:.2f}",
+                'product_total_amount': f"{product_total_amount:.2f}",
+                'amount_in_words': amount_in_words,
+                # 'total_tax_rate': total_tax_rate, 
             }
 
             pdf = render_to_pdf('billing/bill_template.html', context)

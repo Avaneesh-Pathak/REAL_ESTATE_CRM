@@ -5,195 +5,313 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generate Bill</title>
-    <style>
-        /* General Reset */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Bill</title>
+  <style>
+    /* General Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        /* Body Styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: #333;
-        }
+    /* Body Styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #333;
+    }
 
-        /* Bill Container */
-        .bill-container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 1000px;
-            padding: 30px;
-        }
+    /* Bill Container */
+    .bill-container {
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 1000px;
+      padding: 30px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
 
-        .bill-header {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #007bff;
-        }
+    .bill-header {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #007bff;
+    }
 
-        .bill-header h2 {
-            font-size: 28px;
-            font-weight: bold;
-        }
+    .bill-header h2 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
 
-        .form-group, .product-fields {
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-        }
+    /* Form Group */
+    .form-group,
+    .product-fields {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .form-group label, .product-field label {
-            font-weight: bold;
-            color: #495057;
-            margin-bottom: 8px;
-        }
+    .form-group label,
+    .product-field label {
+      font-weight: bold;
+      color: #14171a;
+      margin-bottom: 8px;
+    }
 
-        .form-group input[type="text"],
-        .form-group input[type="date"],
-        .form-group input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-        }
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="number"],
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
 
-        .form-group input:focus, .product-field input:focus {
-            border-color: #007bff;
-            outline: none;
-        }
+    .form-group input:focus,
+    .product-field input:focus,
+    .form-group textarea:focus {
+      border-color: #007bff;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
 
-        .product-fields {
-            border-top: 1px solid #e9ecef;
-            padding-top: 15px;
-        }
+    /* Product Fields Styling */
+    .product-fields {
+      border-top: 1px solid #e9ecef;
+      padding-top: 20px;
+    }
 
-        .product-field {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
+    .product-field {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      align-items: center;
+      border: 1px solid #e9ecef;
+      padding: 15px;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
 
-        /* Add and Submit Button styles */
-        .add-button, .submit-button, .remove-button {
-            padding: 10px;
-            font-size: 14px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+    .product-field input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #080e15;
+      border-radius: 5px;
+      max-width: 162px;
+    }
 
-        .add-button {
-            background-color: #007bff;
-            color: white;
-        }
+    .add-button,
+    .submit-button,
+    .remove-button {
+      padding: 12px;
+      font-size: 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-        .submit-button {
-            background-color: #28a745;
-            color: white;
-            font-weight: bold;
-            width: 100%;
-        }
+    .add-button {
+      background-color: #007bff;
+      color: white;
+      font-weight: 600;
+    }
 
-        .remove-button {
-            background-color: #dc3545;
-            color: white;
-        }
-    </style>
+    .add-button:hover {
+      background-color: #0056b3;
+    }
+
+    .submit-button {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .submit-button:hover {
+      background-color: #218838;
+    }
+
+    .remove-button {
+      background-color: #dc3545;
+      color: white;
+      font-weight: bold;
+      padding: 10px 15px;
+    }
+
+    .remove-button:hover {
+      background-color: #c82333;
+    }
+
+    /* Typography */
+    h3 {
+      font-size: 22px;
+      color: #333;
+      margin-bottom: 15px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .total-section {
+      margin-top: 20px;
+      display: flex;
+      justify-content:center;
+      font-weight: bold;
+    }
+
+    .total-section span {
+      font-size: 20px;
+    }
+
+    .total-section .amount {
+      color: #007bff;
+    }
+
+    .product-field {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 
 <body>
-    <div class="bill-container">
-        <div class="bill-header">
-            <h2>Generate Bill</h2>
-        </div>
-        <form method="POST" class="form-container">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="buyer_name">Buyer Name:</label>
-                <input type="text" id="buyer_name" name="buyer_name" required />
-            </div>
-
-            <div class="form-group">
-                <label for="buyer_address">Buyer Address:</label>
-                <textarea id="buyer_address" name="buyer_address" rows="4" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="buyer_pan_number">Buyer PAN Number:</label>
-                <input type="text" id="buyer_pan_number" name="buyer_pan_number" required />
-            </div>
-
-            <div class="form-group">
-                <label for="buyer_state">Buyer State:</label>
-                <input type="text" id="buyer_state" name="buyer_state" required />
-            </div>
-
-            <div class="form-group">
-                <label for="invoice_date">Invoice Date:</label>
-                <input type="date" id="invoice_date" name="invoice_date" required />
-            </div>
-
-            <div class="form-group">
-                <label for="due_date">Due Date:</label>
-                <input type="date" id="due_date" name="due_date" required />
-            </div>
-
-            <div class="form-group">
-                <label for="other_charges">Other Charges:</label>
-                <input type="number" id="other_charges" name="other_charges" step="0.01" required />
-            </div>
-
-            <h3>Product Details</h3>
-            <div class="product-fields" id="product-fields">
-                <div class="product-field">
-                    <input type="text" name="description[]" placeholder="Description" required />
-                    <input type="number" name="quantity[]" placeholder="Quantity" required />
-                    <input type="number" name="rate[]" placeholder="Rate" step="0.01" required />
-                    <input type="number" name="tax[]" placeholder="Tax (%)" step="0.01" required />
-                    <button type="button" class="remove-button" onclick="removeProduct(this)">Remove</button>
-                </div>
-            </div>
-
-            <button type="button" id="add-product-btn" class="add-button">Add More Product</button>
-            <button type="submit" class="submit-button">Submit</button>
-        </form>
+  <div class="bill-container">
+    <div class="bill-header">
+      <h2>Generate Bill</h2>
     </div>
+    <form method="POST" class="form-container">
+      {% csrf_token %}
 
-    <script>
-        document.getElementById('add-product-btn').addEventListener('click', function() {
-            const productFieldsContainer = document.getElementById('product-fields');
-            const newProductField = document.createElement('div');
-            newProductField.classList.add('product-field');
-            newProductField.innerHTML = `
-                <input type="text" name="description[]" placeholder="Description" required />
-                <input type="number" name="quantity[]" placeholder="Quantity" required />
-                <input type="number" name="rate[]" placeholder="Rate" step="0.01" required />
-                <input type="number" name="tax[]" placeholder="Tax (%)" step="0.01" required />
-                <button type="button" class="remove-button" onclick="removeProduct(this)">Remove</button>
-            `;
-            productFieldsContainer.appendChild(newProductField);
-        });
+      <div class="form-group">
+        <label for="buyer_name">Buyer Name:</label>
+        <input type="text" id="buyer_name" name="buyer_name" required />
+      </div>
 
-        function removeProduct(button) {
-            button.parentElement.remove();
-        }
-    </script>
+      <div class="form-group">
+        <label for="buyer_address">Buyer Address:</label>
+        <textarea id="buyer_address" name="buyer_address" rows="4" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="buyer_pan_number">Buyer PAN Number:</label>
+        <input type="text" id="buyer_pan_number" name="buyer_pan_number" required />
+      </div>
+
+      <div class="form-group">
+        <label for="buyer_state">Buyer State:</label>
+        <input type="text" id="buyer_state" name="buyer_state" required />
+      </div>
+
+      <div class="form-group">
+        <label for="invoice_date">Invoice Date:</label>
+        <input type="date" id="invoice_date" name="invoice_date" required />
+      </div>
+
+      <div class="form-group">
+        <label for="due_date">Due Date:</label>
+        <input type="date" id="due_date" name="due_date" required />
+      </div>
+
+      <div class="form-group">
+        <label for="other_charges">Other Charges(In ₹):</label>
+        <input type="number" id="other_charges" name="other_charges" step="0.01" required oninput="calculateTotal()" />
+      </div>
+
+      <h3>Product Details</h3>
+      <button type="button" id="add-product-btn" class="add-button">Add More Product</button>
+      <div class="product-fields" id="product-fields">
+        <div class="product-field">
+          <input type="text" name="description[]" placeholder="Items" required />
+          <input type="number" name="quantity[]" placeholder="Quantity" required oninput="calculateTotal()"/>
+          <input type="number" name="rate[]" placeholder="₹" step="0.01" required oninput="calculateTotal()"/>
+          <input type="number" name="tax[]" placeholder="Tax (%)" step="0.01" required oninput="calculateTotal()"/>
+          <input type="number" name="total[]" placeholder="Total" readonly />
+          <button type="button" class="remove-button" onclick="removeProduct(this)">Remove</button>
+        </div>
+      </div>
+
+      <!-- Subtotal and Total Calculation -->
+      <div class="total-section">
+        <span>Subtotal: </span>
+        <span id="subtotal" class="amount">0.00</span>
+      </div>
+      <div class="total-section">
+        <span>Total Amount: </span>
+        <span id="total-amount" class="amount">0.00</span>
+      </div>
+
+      
+      <button type="submit" class="submit-button">Submit</button>
+
+      
+    </form>
+  </div>
+
+  <script>
+    // Function to calculate totals
+    // Function to calculate totals
+    function calculateTotal() {
+      let subtotal = 0;
+      let otherCharges = parseFloat(document.getElementById('other_charges').value) || 0;
+
+      // Loop through each product field to calculate total for each item
+      const productFields = document.querySelectorAll('.product-field');
+      productFields.forEach((field) => {
+        let qty = parseFloat(field.querySelector('input[name="quantity[]"]').value) || 0;
+        let rate = parseFloat(field.querySelector('input[name="rate[]"]').value) || 0;
+        let tax = parseFloat(field.querySelector('input[name="tax[]"]').value) || 0;
+
+        // Calculate item total (Qty * Rate)
+        let itemTotal = qty * rate;
+
+        // Calculate tax on item total
+        let itemTax = itemTotal * (tax / 100);
+
+        // Calculate total for the item (Item total + Tax)
+        let itemTotalWithTax = itemTotal + itemTax;
+
+        // Update the total field for each product
+        field.querySelector('input[name="total[]"]').value = itemTotalWithTax.toFixed(2);
+
+        // Add item total to the subtotal
+        subtotal += itemTotalWithTax;
+      });
+
+      // Update subtotal
+      document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+
+      // Calculate total amount (Subtotal + Other charges)
+      let totalAmount = subtotal + otherCharges;
+      document.getElementById('total-amount').textContent = totalAmount.toFixed(2);
+    }
+
+    // Function to add new product row
+    document.getElementById('add-product-btn').addEventListener('click', () => {
+      const productFieldsContainer = document.getElementById('product-fields');
+      const newProductField = document.querySelector('.product-field').cloneNode(true);
+      productFieldsContainer.appendChild(newProductField);
+    });
+
+    // Function to remove product row
+    function removeProduct(button) {
+      button.closest('.product-field').remove();
+      calculateTotal(); // Recalculate totals after removing product
+    }
+  </script>
 </body>
 
 </html>
-{% endblock content %}
+
+{% endblock %}
