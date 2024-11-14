@@ -206,8 +206,9 @@
         </div>
         <div class="d-flex justify-content-between">
             <p><strong>Property Price:</strong><br> <span style="font-size: 30px; color: rgb(93, 97, 218);" class="font-bold" id="property-price">Rs</span></p>
-            <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p>
-            {% comment %} <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p> {% endcomment %}
+            <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>
+
+            
         </div>
         <script>
             const properties = {{ properties|safe }};
@@ -237,29 +238,9 @@
                 }
             });
         </script>
-        {% comment %} <!-- EMI Options -->
-        <div class="parent-div">
-            <div id="emi-options" style="display:none;">
-                <h4 class="section-subheading">EMI Details</h4>
-                <div class="form-group">
-                    <label>EMI Tenure in Months</label>
-                    {{ form.emi_tenure }}
-                </div>
-                <div class="form-group">
-                    <label>Interest Rate (in %)</label>
-                    {{ form.interest_rate }}
-                </div>
-                <div class="form-group">
-                    <label>Calculated EMI:(Per Months)</label>
-                    <input name="calculated-emi" type="text" id="calculated-emi" readonly class="form-control">
-                </div>
-            </div>
-        </div> {% endcomment %}
-
         <!-- Payment Information Section -->
         <h4 class="section-subheading">Payment Information</h4>
         <div class="d-flex justify-content-between">
-            <p><strong>{{ form.payment_type.label }}</strong>{{ form.payment_type }}</p>
 
             {% comment %} <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p> {% endcomment %}
             <p><strong>{{ form.mode_of_payment.label }}</strong>{{ form.mode_of_payment }}</p>
@@ -267,6 +248,7 @@
                 <!-- EMI Options -->
                 <div class="parent-div">
                     <div id="emi-options" style="display:none;">
+                        <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p>
                         <h4 class="section-subheading">EMI Details</h4>
                         <div class="form-group">
                             <label>EMI Tenure in Months</label>

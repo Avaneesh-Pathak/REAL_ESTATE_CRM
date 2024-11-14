@@ -63,6 +63,7 @@
             top: 0;
             bottom: 0;
             width: 200px;
+            overflow-y: auto; 
             background-color: #030648;
             padding-top: 1rem;
             z-index: 1000;
@@ -472,10 +473,12 @@
                         <a href="{% url 'leads:property_list' %}"><i class="fas fa-list-alt"></i> Property List</a>
                         <a href="{% url 'leads:plot_registration' %}"><i class="fas fa-map-marker-alt"></i> Register
                             Plot</a>
+                        <a href="{% url 'leads:project-create' %}" class="fas fa-project-diagram">Create
+                            Project</a>
                         <a href="{% url 'leads:property-create' %}"><i class="fas fa-plus-square"></i> Property
                             Create</a>
                     </div>
-                    
+
                     <a href="{% url 'leads:salary_list' %}"><i class="fas fa-rupee-sign"></i> Salary</a>
                     <a href="{% url 'leads:daybook_list' %}"><i class="fas fa-book"></i> Daybook</a>
                     <a href="{% url 'leads:buyers_list' %}"><i class="fas fa-user-friends"></i> Buyers List</a>
@@ -505,7 +508,7 @@
                 </a>
             </div>
 
-           
+
 
             <!-- User Profile Dropdown -->
             {% if request.user.is_authenticated %}
@@ -637,7 +640,7 @@
                 }
             });
 
-            
+
         });
         // Toggle nested menu for Sales
         $('#toggle-properties-menu').on('click', function (e) {

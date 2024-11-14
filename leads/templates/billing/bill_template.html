@@ -1,133 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
     <title>Invoice - {{ bill.bill_number }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             color: #333;
-            line-height: 1.6;
         }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .invoice-header,
-        .invoice-footer {
-            width: 100%;
+
+        header {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #ccc;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        .invoice-header p,
-        .invoice-footer p {
-            margin: 5px 0;
+
+        header img {
+            width: 120px;
+            height: auto;
         }
-        .buyer-details,
-        .invoice-details {
-            width: 48%;
-        }
-        .invoice-details {
+
+        header .company-info {
             text-align: right;
+            font-size: 14px;
         }
+
+        header .company-info p {
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .invoice-details .to {
+            font-weight: bold;
+        }
+
+        .invoice-details .client-info {
+            text-align: right;
+            font-size: 14px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: 20px 0;
         }
-        table, th, td {
-            border: 1px solid #ccc;
+
+        table th,
+        table td {
+            padding: 2px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
         }
-        th, td {
-            padding: 12px;
-            text-align: center;
-        }
-        th {
-            background-color: #f5f5f5;
-        }
-        .summary {
-            margin-top: 20px;
-            text-align: right;
-        }
-        .summary p {
-            margin: 5px 0;
-        }
-        .total-amount {
+
+
+        .total-row {
             font-weight: bold;
-            font-size: 1.5em;
-            color: #2c3e50;
         }
-        .amount-in-words {
-            margin-top: 20px;
-            font-style: italic;
-            text-align: right;
+
+        .total-row td {
+            background-color: #f9f9f9;
         }
-        .footer-note {
-            margin-top: 30px;
-            font-size: 0.9em;
+
+        #thanks {
             text-align: center;
+            margin-top: 30px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #notices {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
             color: #777;
         }
     </style>
 </head>
+
 <body>
+    <header>
+        <table>
+            <thead>
+                <tr>
+                    <th><img src="D:\DJ_RealEstate_CRM\static\images\Screenshot 2024-10-19 002628.png"
+                            alt="Company Logo"></th>
+                    <th>
+                        <div class="company-info">
+                            <p><strong>PMA Advertiser</strong></p>
+                            <p>Safedaba, Barabanki Road, Lucknow, Uttar Pradesh, 226001</p>
+                            <p>Mobile: 7232979999 | PAN Number: AGSPN7543F</p>
+                            <p>company@example.com</p>
+                    </th>
+                    </div>
+                </tr>
+            </thead>
+        </table>
+        <table>
+            <thead  style="display: flex;">
+                <th style="background-color: #dbdbdb;" >
+                    <p><strong>Invoice -</strong> {{ bill.bill_number }}</p>
+                </th>
+                <th style="background-color: #dbdbdb;">
+                    <p><strong>Invoice Date:</strong> {{ bill.invoice_date }}</p>
+                </th>
+                <th style="background-color: #dbdbdb;">
+                    <p><strong>Due Date:</strong> {{ bill.due_date }}</p>
+                </th>
+            </thead>
+        </table>
+    </header>
 
-    <h1>Invoice - {{ bill.bill_number }}</h1>
-
-    <div class="invoice-header">
-        <div class="invoice-details">
-            <p><strong>Date:</strong> {{ bill.invoice_date }}</p>
-            <p><strong>Due Date:</strong> {{ bill.due_date }}</p>
-        </div>
-        <div class="buyer-details">
-            <p><strong>Buyer Name:</strong> {{ bill.buyer_name }}</p>
-            <p><strong>Address:</strong> {{ bill.buyer_address }}</p>
-            <p><strong>PAN Number:</strong> {{ bill.buyer_pan_number }}</p>
-            <p><strong>State:</strong> {{ bill.buyer_state }}</p>
-        </div>
+    <div style="align-items: self-start;" class="client-info">
+        <p><strong>INVOICE TO:</strong></p>
+        <p><strong>Name:</strong>{{ bill.buyer_name }}</p>
+        <p><strong>Contact No.</strong>{{ bill.buyer_number }}</p>
+        <p><strong>Pan No.</strong>{{ bill.buyer_pan_number }}</p>
+        <p><strong>Address:</strong>{{ bill.buyer_address }}</p>
+        <p><strong>State</strong>{{ bill.buyer_state }}</p>
+    </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Items</th>
-                <th>Quantity</th>
-                <th>Rate</th>
-                <th>Tax (%)</th>
-                <th>Total</th>
+                <th style="background-color: #dbdbdb;" class="desc">ITEMS</th>
+                <th style="background-color: #dbdbdb;" class="unit">QTY</th>
+                <th style="background-color: #dbdbdb;"class="qty">RATE</th>
+                <th style="background-color: #dbdbdb;"class="no">TAX(%)</th>
+                <th style="background-color: #dbdbdb;"class="total">TOTAL</th>
             </tr>
         </thead>
         <tbody>
             {% for item in items %}
             <tr>
-                <td>{{ item.description }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.rate }}</td>
-                <td>{{ item.tax }}</td>
-                <td>{{ item.total_price }}</td>
+                <td class="desc">{{ item.description }}</td>
+                <td class="unit">{{ item.quantity }}</td>
+                <td class="qty">{{ item.rate }}</td>
+                <td class="no">{{ item.tax }}</td>
+                <td class="total">{{ item.total_price }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <table>
+        <thead>
+            <tr>
+                <th class="desc">SUBTOTAL</th>
+                <th class="unit">{{ product_total_amount }}</th>
+            </tr>
+        </thead>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th class="desc">OTHER CHARGES</th>
+                <th class="unit">{{ bill.other_charges }}</th>
+            </tr>
+        </thead>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th class="desc">GRAND TOTAL</th>
+                <th class="unit">{{ total_amount }}</th>
+            </tr>
+        </thead>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th class="desc">TOTAL AMOUNT IN WORDS</th>
+                <th class="unit">{{ amount_in_words }} Rupees</th>
+            </tr>
+        </thead>
+    </table>
 
-    <div class="summary">
-        <p>total amount: Rupees {{ product_total_amount }}</p>
-        <p>Other Charges: Rupees {{ bill.other_charges }}</p>
-        <p>Subtotal: Rupees {{ total_amount }}</p>
-        <!-- <p>Total Tax: {{ total_tax_rate }}%</p> -->
-        <p class="total-amount">Total Amount (including tax):Rupees {{ total_amount }}</p>
+
+    <div id="thanks">Thank you for your business!</div>
+
+    <div id="notices">
+        <div><strong>NOTICE:</strong></div>
+        <div class="notice">A finance charge of 1.5% will be applied to unpaid balances after 30 days.</div>
     </div>
 
-    <p class="total-amount">Total Amount in Words: {{ amount_in_words  }} Rupees</p>
-
-    <div class="footer-note">
-        <p>Thank you for your business!</p>
-        <p>If you have any questions regarding this invoice, please contact us.</p>
-    </div>
-
+    <footer>
+        Invoice was created on a computer and is valid without a signature and seal.
+    </footer>
 </body>
+
 </html>

@@ -193,41 +193,102 @@
     </div>
     <form method="POST" class="form-container">
       {% csrf_token %}
-
       <div class="form-group">
         <label for="buyer_name">Buyer Name:</label>
         <input type="text" id="buyer_name" name="buyer_name" required />
+        {% if form.buyer_name.errors %}
+            <div class="error">
+                {% for error in form.buyer_name.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="buyer_number">Contact Number:</label>
+        <input type="number" id="buyer_number" name="buyer_number" required />
+        {% if form.buyer_number.errors %}
+            <div class="error">
+                {% for error in form.buyer_number.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
       </div>
 
       <div class="form-group">
         <label for="buyer_address">Buyer Address:</label>
         <textarea id="buyer_address" name="buyer_address" rows="4" required></textarea>
+        {% if form.buyer_address.errors %}
+            <div class="error">
+                {% for error in form.buyer_address.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
       </div>
 
       <div class="form-group">
         <label for="buyer_pan_number">Buyer PAN Number:</label>
         <input type="text" id="buyer_pan_number" name="buyer_pan_number" required />
+        {% if form.buyer_pan_number.errors %}
+            <div class="error">
+                {% for error in form.buyer_pan_number.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
       </div>
 
       <div class="form-group">
         <label for="buyer_state">Buyer State:</label>
         <input type="text" id="buyer_state" name="buyer_state" required />
+        {% if form.buyer_state.errors %}
+            <div class="error">
+                {% for error in form.buyer_state.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
       </div>
 
       <div class="form-group">
         <label for="invoice_date">Invoice Date:</label>
         <input type="date" id="invoice_date" name="invoice_date" required />
+        {% if form.invoice_date.errors %}
+            <div class="error">
+                {% for error in form.invoice_date.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
       </div>
 
       <div class="form-group">
         <label for="due_date">Due Date:</label>
         <input type="date" id="due_date" name="due_date" required />
+        {% if form.due_date.errors %}
+            <div class="error">
+                {% for error in form.due_date.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
       </div>
 
       <div class="form-group">
         <label for="other_charges">Other Charges(In ₹):</label>
         <input type="number" id="other_charges" name="other_charges" step="0.01" required oninput="calculateTotal()" />
+        {% if form.other_charges.errors %}
+            <div class="error">
+                {% for error in form.other_charges.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
       </div>
+
 
       <h3>Product Details</h3>
       <button type="button" id="add-product-btn" class="add-button">Add More Product</button>

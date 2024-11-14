@@ -182,22 +182,22 @@
             <div class="card text-center text-white">
                 <div class="card-body">
                     <h3>Total Sales</h3>
-                    <p class="display-4">₹{{ total_sales }}</p>
+                    <p class="display-4">{{ total_sales }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card text-center text-white">
                 <div class="card-body">
-                    <h3>Total Cost</h3>
-                    <p class="display-4">-₹{{ total_cost|floatformat:2  }}</p>
+                    <h3>Total Cost of registered Buyer</h3>
+                    <p class="display-4">₹{{ total_cost|floatformat:2  }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card text-center text-white">
                 <div class="card-body">
-                    <h3>Total Profit</h3>
+                    <h3>Total Profit of Buyers</h3>
                     <p class="display-4">₹{{ total_profit|floatformat:2  }}</p>
                 </div>
             </div>

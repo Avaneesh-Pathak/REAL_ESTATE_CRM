@@ -194,6 +194,13 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
         user = self.request.user
+        property = Property.objects.filter(is_sold = True,is_in_emi = True)
+        totalpropertysold = property.count()
+        totalpropertysoldamount = sum(pro.totalprice for pro in property)
+        plt = PlotBooking.objects.all()
+        emi = EMIPayment.objects.filter(status = 'Paid')
+        totalmoneyearned = sum( plot.total_paidbycust for plot in plt) + sum(em.emi_amount for em in emi) - totalpropertysoldamount
+
 
         # Total leads
         total_lead_count = Lead.objects.all().count()
@@ -236,17 +243,17 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
         salaryDistribution_labels = ['Salary Distributed', 'Remaining Profit']
 
         # Debugging
-        print("Labels:", labels)
-        print("Total cost:" , total_cost)
-        print("Sales Data:", sales_data)
-        print("Total Sales:", total_sales)
-        print("Total Land Cost:", total_land_cost)
-        print("Total Development Cost:", total_development_cost)
-        print("Profit Data:", profit_data)
-        print("Total Profit:", total_profit)
-        print("Total salary_distribution:", salary_distribution)
-        print("Salary Distribution Data:", salary_distribution)
-        print("Salary Distribution Labels:", salaryDistribution_labels)
+        # print("Labels:", labels)
+        # print("Total cost:" , total_cost)
+        # print("Sales Data:", sales_data)
+        # print("Total Sales:", totalpropertysold)
+        # print("Total Land Cost:", total_land_cost)
+        # print("Total Development Cost:", total_development_cost)
+        # print("Profit Data:", profit_data)
+        # print("Total Profit:", total_profit)
+        # print("Total salary_distribution:", salary_distribution)
+        # print("Salary Distribution Data:", salary_distribution)
+        # print("Salary Distribution Labels:", salaryDistribution_labels)
 
 
         # Leads in last 30 days
@@ -270,9 +277,9 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
             'total_lead_count': total_lead_count,
             'total_in_past30': total_in_past30,
             'converted_in_past30': converted_in_past30,
-            'total_sales': total_sales,
-            'total_cost': total_cost,
-            'total_profit': total_profit,
+            'total_sales': totalpropertysold,
+            'total_cost': totalpropertysoldamount,
+            'total_profit': totalmoneyearned,
             'salary_distribution': salary_distribution,
             'salaryDistribution_labels': salaryDistribution_labels,
             
@@ -1517,21 +1524,32 @@ class PlotRegistrationView(LoginRequiredMixin, View):
         
 
         if form.is_valid():
-            print("help")
             # Retrieve EMI amount and tenure from the form
-            emi_amount = form.cleaned_data.get('emi-amount')
-            tenure = form.cleaned_data.get('emi_tenure')
-            print(tenure)
-            print(emi_amount)
             project = form.cleaned_data.get('project')
             interest_rate = form.cleaned_data.get('interest_rate')
-            booking_amount = form.cleaned_data.get('booking_amount')
+            payment_type = form.cleaned_data.get('payment_type')
             Property_inst = Property.objects.get(id = project.id)
+            print(payment_type)
+            if payment_type == 'installment':
+                booking_amount = form.cleaned_data.get('booking_amount')
+                emi_amount = form.cleaned_data.get('emi-amount')
+                tenure = form.cleaned_data.get('emi_tenure')
+                print(tenure,"tenure")
+
+            else:
+                booking_amount = None
+                emi_amount = None
+                tenure = None
+                booking_amount = Property_inst.totalprice
+            print(booking_amount)
+
             form.instance.Plot_price = Property_inst.totalprice 
             form.instance.total_paid = booking_amount
             form.instance.total_paidbycust = booking_amount
+            form.instance.booking_amount = booking_amount
             plot_price = Property_inst.totalprice
             form.save()
+
 
             Plot_price = plot_price - booking_amount
             # Calculate EMI with interest rate if applicable
@@ -1566,7 +1584,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                         payment_date=date.today(),  # Adds the current date to payment_date
                         property=prop
                     )
-                    print(property)
+                    # print(property)
                     agent=agent.parent_agent
 
 
@@ -1579,16 +1597,11 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                 prop.is_in_emi = False
             prop.save()  # Save the updated property
             plot_booking = form.save()
-
+            monthly_emi = None
             # Ensure emi_amount is a Decimal and tenure is an integer
             # if emi_amount is not None and tenure is not None and tenure > 0:
             if tenure and emi_amount:
                 monthly_emi = emi_amount
-                print("monthy emi is",monthly_emi)
-                # print(tenure)
-                # monthly_emi = emi_amount / tenure  # EMI per month
-                # print(monthly_emi)
-                
                 # Generate EMI payment records
                 for month in range(tenure):
                     due_date = plot_booking.payment_date + timedelta(days=30 * month)
@@ -1600,6 +1613,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             elif emi_amount is None and tenure is None:
                 # Handle missing or invalid EMI amount or tenure
                 form.add_error(None, 'Invalid EMI amount or tenure.')
+            print("monthy emi is",monthly_emi)
 
 
             # Prepare the message content
@@ -2344,16 +2358,25 @@ from decimal import Decimal
 
 class BillListView(ListView):
     model = Bill
-    template_name = 'billing/invoice_list.html'  # Specify your template
-    context_object_name = 'bills'  # This will be the name of the context variable in the template
+    template_name = 'billing/invoice_list.html'
+    context_object_name = 'bills'
 
     def get_queryset(self):
-        """
-        Optionally, you can filter the list of bills here if you need to.
-        For example, if you want to show only bills from the current year:
-        """
-        return Bill.objects.all() 
-
+        queryset = Bill.objects.all().order_by('-invoice_date')
+        search_query = self.request.GET.get('search', None)
+        
+        # Filter for bills created within the last month by default
+        one_month_ago = timezone.now() - timedelta(days=30)
+        if search_query:
+            # Search for bills by bill number or buyer name
+            queryset = queryset.filter(
+                Q(bill_number__icontains=search_query) |
+                Q(buyer_name__icontains=search_query)
+            )
+        else:
+            queryset = queryset.filter(invoice_date__gte=one_month_ago)
+        
+        return queryset
 
 from weasyprint import HTML 
 def download_invoice(request, bill_id):

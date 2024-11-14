@@ -1,42 +1,102 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h1 style="font-size: x-large; font-weight: bold;" class="text-center mb-4">Invoice List</h1>
-        
-        <div class="table-responsive">
-            <table class="table table-hover table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Bill Number</th>
-                        <th>Buyer Name</th>
-                        <th>Invoice Date</th>
-                        <th>Total Amount</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for bill in bills %}
-                        <tr>
-                            <td>{{ bill.bill_number }}</td>
-                            <td>{{ bill.buyer_name }}</td>
-                            <td>{{ bill.invoice_date|date:"Y-m-d" }}</td>
-                            <td>
-                                <strong class="text-success">{{ bill.total_amount|floatformat:2 }}</strong>
-                            </td>
-                            <td>
-                                <a href="{% url 'leads:download_invoice' bill.id %}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-download"></i> Download
-                                </a>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center">No bills found.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<style>
+    /* Custom table styling */
+    .custom-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-table th,
+    .custom-table td {
+        vertical-align: middle;
+        padding: 12px 15px;
+        text-align: center;
+    }
+
+    .custom-table thead th {
+        background-color: #343a40;
+        color: #ffffff;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .custom-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .custom-table tbody tr:hover {
+        background-color: #f1f1f1;
+        transform: scale(1.01);
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-table tbody td {
+        border-top: 1px solid #ddd;
+    }
+
+    .custom-table .text-success {
+        font-weight: bold;
+    }
+
+    .custom-table .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.3s ease;
+    }
+
+    .custom-table .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+</style>
+<div class="container mt-5">
+    <h1 style="font-size: x-large; font-weight: bold;" class="text-center mb-4">Invoice List</h1>
+     <!-- Search form -->
+     <form method="get" action="{% url 'leads:bill_list' %}" class="mb-4 d-flex justify-content-center">
+        <input type="text" name="search" placeholder="Search by Bill Number or Buyer Name" 
+               class="form-control mr-2" value="{{ request.GET.search }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered custom-table">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Bill Number</th>
+                    <th>Buyer Name</th>
+                    <th>Invoice Date</th>
+                    <th>Total Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bill in bills %}
+                <tr>
+                    <td>{{ bill.bill_number }}</td>
+                    <td>{{ bill.buyer_name }}</td>
+                    <td>{{ bill.invoice_date|date:"Y-m-d" }}</td>
+                    <td>
+                        <strong class="text-success">{{ bill.total_amount|floatformat:2 }}</strong>
+                    </td>
+                    <td>
+                        <a href="{% url 'leads:download_invoice' bill.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No bills found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 {% endblock %}

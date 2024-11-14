@@ -270,6 +270,7 @@ def calculate_emi(principal, booking_amount, tenure, interest_rate):
 
 class PlotBookingForm(forms.ModelForm):
     agent = forms.ModelChoiceField(queryset=Agent.objects.all(), required=False)
+        
     class Meta:
         model = PlotBooking
         fields = [
@@ -304,6 +305,7 @@ class PlotBookingForm(forms.ModelForm):
             self.fields['payment_type'].disabled = True
             self.fields['agent'].disabled = True
         self.fields['project'].required = True  # Set the field as required
+        self.fields['project'].queryset = Property.objects.filter(is_sold=False)
         self.fields['booking_date'].initial = date.today()
 
         # Define PLC choices and add plc_charge field
@@ -322,8 +324,8 @@ class PlotBookingForm(forms.ModelForm):
 
         self.fields['final_price'] = forms.DecimalField(label='Final Price', required=False, initial=0.0, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
 
-        self.fields['agent'].queryset = Agent.objects.all()
-        self.fields['project'].queryset = Property.objects.all()
+        # self.fields['agent'].queryset = Agent.objects.all()
+        # self.fields['project'].queryset = Property.objects.all()
 
         if project:
             try:
@@ -413,8 +415,13 @@ from .models import Bill, BillItem
 class BillForm(forms.ModelForm):
     class Meta:
         model = Bill
-        fields = ['buyer_name', 'buyer_address', 'buyer_pan_number', 'buyer_state', 
+        fields = ['buyer_name','buyer_number', 'buyer_address', 'buyer_pan_number', 'buyer_state', 
                   'invoice_date', 'due_date', 'other_charges']
+    def clean_buyer_number(self):
+        buyer_number = self.cleaned_data.get('buyer_number')
+        if buyer_number and len(str(buyer_number)) != 10:
+            raise forms.ValidationError("Buyer number must be in 10 digits.")
+        return buyer_number
 
 class BillItemForm(forms.ModelForm):
     class Meta:
