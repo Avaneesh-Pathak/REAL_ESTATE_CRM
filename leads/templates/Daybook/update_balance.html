@@ -10,10 +10,15 @@
             <label for="action" class="block text-gray-700">Action</label>
             {{ form.action }}
         </div>
-        <div class="mb-4">
+        
+        <div>
+            <label for="amount" class="block text-lg font-semibold text-gray-700 mb-2">Amount</label>
+            <input type="number" name="amount" class="block w-full bg-gray-100 text-gray-800 py-3 px-4 rounded-lg shadow-sm border border-gray-300 focus:outline-none focus:bg-white focus:border-blue-400 transition duration-200">
+        </div>
+        {% comment %} <div class="mb-4">
             <label for="amount" class="block text-gray-700">Amount</label>
             {{ form.amount }}
-        </div>
+        </div> {% endcomment %}
         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
             Update Balance
         </button>

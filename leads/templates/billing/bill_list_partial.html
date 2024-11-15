@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- billing/bill_list_partial.html -->
+{% for bill in bills %}
+<tr>
+    <td>{{ bill.bill_number }}</td>
+    <td>{{ bill.buyer_name }}</td>
+    <td>{{ bill.invoice_date|date:"Y-m-d" }}</td>
+    <td>
+        <strong class="text-success">{{ bill.total_amount|floatformat:2 }}</strong>
+    </td>
+    <td>
+        <a href="{% url 'leads:download_invoice' bill.id %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-download"></i> Download
+        </a>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="5" class="text-center">No bills found.</td>
+</tr>
+{% endfor %}
+{% endblock %}
