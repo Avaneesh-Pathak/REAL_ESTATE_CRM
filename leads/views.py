@@ -194,7 +194,7 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
         user = self.request.user
-        property = Property.objects.filter(is_sold = True,is_in_emi = True)
+        property = Property.objects.filter(is_sold = True)
         totalpropertysold = property.count()
         totalpropertysoldamount = sum(pro.totalprice for pro in property)
         plt = PlotBooking.objects.all()
@@ -816,6 +816,8 @@ class PropertyDetailView(generic.DetailView):
         # Fetch related PlotBooking for the specific property
         plot_booking = PlotBooking.objects.filter(project=property).first()
         salarys = Salary.objects.filter(property = property)
+        emipayments = EMIPayment.objects.filter(plot_booking = plot_booking ,status = 'Paid')
+        # totalemipaid = emipayments.plot_booking.all()
         print(salarys)
         tot_sal = sum(salary.base_salary for salary in salarys)
 
@@ -851,6 +853,9 @@ class PropertyDetailView(generic.DetailView):
         print(total_plot_price)
 
         final_pr = property.totalprice - cost_for_land - tot_sal 
+        # if plot_booking:
+            # totalmoneypaidbycust = plot_booking.total_paidbycust + sum(emi.emi_amount for emi in emipayments)
+            # fprforbuyer = totalmoneypaidbycust - cost_for_land  - tot_sal 
 
 #Update context with all relevant details
         context.update({
@@ -860,6 +865,8 @@ class PropertyDetailView(generic.DetailView):
             'plot_booking': plot_booking,
             'total_land_cost': total_land_cost,
             'total_development_cost': total_development_cost,
+            # 'totalmoneypaidbycust': totalmoneypaidbycust,
+            # 'fprforbuyer': fprforbuyer,
             'agent': salarys,
             'tot_sal': tot_sal,
             'final_pr': final_pr,
@@ -869,8 +876,7 @@ class PropertyDetailView(generic.DetailView):
         })
 
         return context
-        
-        
+
 
 # Function-based view to display properties
 def properties_view(request):
@@ -1520,6 +1526,18 @@ class PlotRegistrationView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = PlotBookingForm(request.POST)
         agents = Agent.objects.all()
+        properties = list(Property.objects.filter(is_in_emi=False, is_sold=False).values('id', 'totalprice', 'project_name'))
+
+        print("get")
+        properties = [
+        {
+            'id': prop['id'],
+            'price': str(prop['totalprice']),  # Convert Decimal to string
+            'project_name': prop['project_name']
+        }
+        for prop in properties
+]
+   
         print("post")
         
 
@@ -1537,7 +1555,6 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                 print(tenure,"tenure")
 
             else:
-                booking_amount = None
                 emi_amount = None
                 tenure = None
                 booking_amount = Property_inst.totalprice
@@ -1689,7 +1706,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             messages.error(request, 'A buyer with this project already exists!')
 
             #return redirect('plot_registration/buyers_list.html')
-            return render(request, self.template_name, {'form': form, 'agents': agents})
+            return render(request, self.template_name, {'form': form, 'agents': agents,'properties':properties})
 
 def load_properties(request):
     project_name = request.GET.get('property.title')

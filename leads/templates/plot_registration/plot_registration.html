@@ -183,7 +183,7 @@
         <!-- Booking Details -->
         <h4 class="section-subheading">Booking Details</h4>
         <div class="d-flex justify-content-between">
-            <p><strong>{{ form.location.label }}</strong>{{ form.location }}</p>
+            <p><strong>Property {{ form.location.label }}</strong>{{ form.location }}</p>
             <p><strong>Property</strong>{{ form.project }}</p>
             {% if form.project.errors %}
             <div class="error">{{ form.project.errors }}</div>
@@ -198,7 +198,7 @@
             <p><strong>Agent</strong>
                 <select name="agent"
                     class="form-control">
-                    <option value=""><b>Select an Agent</b></option>
+                    <option value="">Select an Agent</option>
                     {% for agent in agents %}
                     <option value="{{ agent.id }}">{{ agent.user.username }} level{{ agent.level}}</option>
                     {% endfor %}
@@ -210,45 +210,17 @@
 
             
         </div>
-        <script>
-            const properties = {{ properties|safe }};
-            console.log("Selected Property ID:", properties);  // This will print the selected ID in the console
-        
-            // Assuming form.project is a dropdown and its ID is 'project-select'
-            const projectSelect = document.getElementById('project-select');  // Replace with actual ID if different
-            const priceDisplay = document.getElementById('property-price');
-        
-        
-            // Listen for changes in the property selection
-            projectSelect.addEventListener('change', function() {
-                const selectedPropertyId = projectSelect.value;
-                console.log("Selected Property ID:", selectedPropertyId);  // This will print the selected ID in the console
-        
-        
-                // Find the property in the properties list by ID
-                const selectedProperty = properties.find(property => property.id == selectedPropertyId);
-                console.log("Selected Property ID:", selectedProperty);  // This will print the selected ID in the console
-        
-        
-                // Display the price if the property is found
-                if (selectedProperty) {
-                    priceDisplay.textContent = selectedProperty.price;
-                } else {
-                    priceDisplay.textContent = "N/A";
-                }
-            });
-        </script>
         <!-- Payment Information Section -->
         <h4 class="section-subheading">Payment Information</h4>
         <div class="d-flex justify-content-between">
 
+            <p class="form-group"><strong>{{ form.booking_amount.label }}</strong> {{ form.booking_amount }}</p>
             {% comment %} <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p> {% endcomment %}
             <p><strong>{{ form.mode_of_payment.label }}</strong>{{ form.mode_of_payment }}</p>
         </div>
                 <!-- EMI Options -->
                 <div class="parent-div">
                     <div id="emi-options" style="display:none;">
-                        <p><strong>{{ form.booking_amount.label }}</strong>{{ form.booking_amount }}</p>
                         <h4 class="section-subheading">EMI Details</h4>
                         <div class="form-group">
                             <label>EMI Tenure in Months</label>
@@ -284,22 +256,54 @@
 </div>
 <!-- JavaScript to handle field visibility and EMI calculation -->
 <script>
-    document.getElementById("id_gender").addEventListener("change", function () {
-        const customGenderField = document.getElementById("custom-gender-field");
-        customGenderField.style.display = this.value === "other" ? "block" : "none";
-    });
+    const properties = {{ properties|safe }};
+    let selectedProperty = null;  // Define this in the broader scope to be accessible
 
-    // document.getElementById("id_associate_detail").addEventListener("change", function () {
-    //     const agentField = document.getElementById("agent-field");
-    //     agentField.style.display = this.checked ? "block" : "none";
-    // });
+    // Assuming form.project is a dropdown and its ID is 'project-select'
+    const projectSelect = document.getElementById('project-select');  // Replace with actual ID if different
+    const priceDisplay = document.getElementById('property-price');
+    const book_am = document.getElementById('id_booking_amount');  // Correct variable
+
+    // Listen for changes in the property selection
+    projectSelect.addEventListener('change', function () {
+        const selectedPropertyId = projectSelect.value;
+        console.log("Selected Property ID:", selectedPropertyId);  // This will print the selected ID in the console
+
+        // Find the property in the properties list by ID
+        selectedProperty = properties.find(property => property.id == selectedPropertyId);
+        console.log("Selected Property:", selectedProperty);  // This will print the selected property in the console
+
+        // Display the price if the property is found
+        if (selectedProperty) {
+            priceDisplay.textContent = selectedProperty.price;
+            book_am.value = selectedProperty.price;  // Set booking amount to property price
+        } else {
+            priceDisplay.textContent = "N/A";
+            book_am.value = "";  // Clear booking amount if no property selected
+        }
+    });
 
     document.getElementById("id_payment_type").addEventListener("change", function () {
         const emiOptions = document.getElementById("emi-options");
-        console.log(document.getElementById("id_payment_type"))
-        emiOptions.style.display = this.value === "installment" ? "block" : "none";
-    });
 
+        if (this.value === "installment") {
+            emiOptions.style.display = "block";
+            book_am.required = true;  // Set booking amount to required
+            book_am.disabled = false;  // Set booking amount to required
+        } else if (this.value === "custom") {
+            emiOptions.style.display = "none";
+            book_am.value = 0;  // Set booking amount to 0 for custom payment
+            book_am.required = true;  // Remove required
+            book_am.disabled = false;  // Remove required
+        } else {
+            emiOptions.style.display = "none";
+            if (selectedProperty) {
+                book_am.value = selectedProperty.price;  // Use selected property price
+            }
+            book_am.disabled = true;  // Disable editing for this case
+        }
+        console.log("Payment Type Changed:", this.value);
+    });
     function calculateEMI() {
         // const plotPrice =document.getElementById("property-price").value || 0;
        

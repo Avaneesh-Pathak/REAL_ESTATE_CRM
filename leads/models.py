@@ -695,7 +695,7 @@ class PlotBooking(models.Model):
     Plot_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     total_paid = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)#principal amount
     total_paidbycust = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)#principal amount
-    payment_type = models.CharField(max_length=50, choices=[('custom', 'Custom Payment'), ('installment', 'Installments')])
+    payment_type = models.CharField(max_length=50, choices=[('custom', 'Custom Payment'), ('installment', 'Installments'), ('full', 'Full Payment')])
     booking_amount = models.DecimalField(max_digits=10, decimal_places=2)
     mode_of_payment = models.CharField(max_length=50, choices=[('cheque', 'Cheque'), ('rtgs', 'RTGS/NEFT'), ('cash', 'Cash')])
     payment_date = models.DateField()

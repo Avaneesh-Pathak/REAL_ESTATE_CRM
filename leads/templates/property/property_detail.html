@@ -84,6 +84,7 @@
                     <p><strong>Payment Type:</strong> {{ plot_booking.payment_type }}</p><br>
                     <p><strong>Plot Price:</strong> ₹{{ plot_booking.Plot_price|floatformat:2 }}</p><br>
                     <p><strong>Booking Amount:</strong> ₹{{ plot_booking.booking_amount|floatformat:2 }}</p><br>
+                    <p><strong>Total Amount Paid by Cust:</strong> ₹{{ totalmoneypaidbycust|floatformat:2 }}</p><br>
                     <p><strong>Agent:</strong> {{ plot_booking.agent }}</p><br>
                 </div>
             </div>
@@ -98,10 +99,13 @@
                     <h2 class="card-title text-primary border-bottom pb-2">Profit Information</h2>
                     <p style="border-radius: 20px; padding: 10px;" class="bg-red-200 text-Black-800"><strong class="ml-2">Project Land Cost:</strong> ₹{{ total_land_cost }}</p><br>
                     <p style="border-radius: 20px; padding: 10px;" class="bg-red-200 text-Black-800"><strong class="ml-2">Project Development Cost:</strong> ₹{{ total_development_cost }}</p><br>
+                    <hr>
                     <p style="border-radius: 20px; padding: 10px;" class="bg-red-200 text-Black-800"><strong class="ml-2">Buying Cost per SqFt:</strong> ₹{{ cost_per_sqft|floatformat:2 }}</p><br>
                     <p style="border-radius: 20px; padding: 10px;" class="bg-red-200 text-Black-800"><strong class="ml-2">Total Buying Price for this Plot:</strong> ₹{{ total_plot_price_of_prop|floatformat:2  }}</p><br>
                     <p style="border-radius: 20px; padding: 10px;" class="bg-green-200 text-Black-800"><strong class="ml-2">Profit per SqFt:</strong> ₹{{ profit_per_sqft|floatformat:2 }}</p><br>
                     <p style="border-radius: 20px; padding: 10px;" class="bg-green-200 text-Black-800"><strong class="ml-2">Total Profit:</strong> ₹{{ total_profit_per_sqft|floatformat:2 }}</p><br>
+                    
+                    <p style="border-radius: 20px; padding: 10px;" class="bg-200 text-Black-800"><strong class="ml-2">Current Profit:</strong> ₹{{ fprforbuyer |floatformat:2 }}</p><br>
                 </div>
             </div>
         </div>
