@@ -1554,10 +1554,16 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                 tenure = form.cleaned_data.get('emi_tenure')
                 print(tenure,"tenure")
 
-            else:
+            elif payment_type == 'full':
                 emi_amount = None
                 tenure = None
                 booking_amount = Property_inst.totalprice
+
+            elif payment_type == 'custom':
+                emi_amount = None
+                tenure = None
+                booking_amount = form.cleaned_data.get('booking_amount')
+                
             print(booking_amount)
 
             form.instance.Plot_price = Property_inst.totalprice 
@@ -1608,10 +1614,11 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             prop =  Property.objects.get(title=project)
             prop.is_sold=True
             # Check if the payment type is "installment" and set is_in_emi accordingly
-            if payment_type == 'installment':
-                prop.is_in_emi = True
-            else:
-                prop.is_in_emi = False
+            if payment_type == 'installment' or payment_type == 'custom':
+                if Property_inst.totalprice - booking_amount <= 0:
+                    prop.is_in_emi = False
+                else:
+                    prop.is_in_emi = True
             prop.save()  # Save the updated property
             plot_booking = form.save()
             monthly_emi = None
@@ -2264,7 +2271,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from num2words import num2words
 from .forms import BillForm, BillItemForm
 from .models import Bill, BillItem
-from weasyprint import HTML
+# from weasyprint import HTML
 from django.template.loader import render_to_string
 
 def render_to_pdf(template_src, context_dict):
@@ -2395,7 +2402,7 @@ class BillListView(ListView):
         
         return queryset
 
-from weasyprint import HTML 
+# from weasyprint import HTML 
 def download_invoice(request, bill_id):
     try:
         # Get the bill object

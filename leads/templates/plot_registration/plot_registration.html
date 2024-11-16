@@ -285,25 +285,32 @@
 
     document.getElementById("id_payment_type").addEventListener("change", function () {
         const emiOptions = document.getElementById("emi-options");
-
+        const book_am = document.getElementById("id_booking_amount");  // Ensure this points to the correct field
+    
+        // Make sure selectedProperty is properly defined before using it
         if (this.value === "installment") {
             emiOptions.style.display = "block";
-            book_am.required = true;  // Set booking amount to required
-            book_am.disabled = false;  // Set booking amount to required
+            book_am.value = 0;  // Set booking amount to 0 for installment payment
+            book_am.setAttribute("required", "true");  // Make the field required
+            book_am.disabled = false;  // Enable editing
         } else if (this.value === "custom") {
             emiOptions.style.display = "none";
             book_am.value = 0;  // Set booking amount to 0 for custom payment
-            book_am.required = true;  // Remove required
-            book_am.disabled = false;  // Remove required
-        } else {
+            book_am.removeAttribute("required");  // Remove the required attribute for custom payment
+            book_am.disabled = false;  // Enable editing
+        } else if (this.value === "full") {
             emiOptions.style.display = "none";
             if (selectedProperty) {
-                book_am.value = selectedProperty.price;  // Use selected property price
+                book_am.value = selectedProperty.price;  // Set the price from selected property
+                id_booking_amount.value = selectedProperty.price;  // Set the price from selected property
             }
-            book_am.disabled = true;  // Disable editing for this case
+            id_booking_amount.readOnly = true;  // Disable editing if it's not installment or custom
         }
+    
         console.log("Payment Type Changed:", this.value);
+        console.log("Updated Booking Amount:", book_am.value);
     });
+    
     function calculateEMI() {
         // const plotPrice =document.getElementById("property-price").value || 0;
        
