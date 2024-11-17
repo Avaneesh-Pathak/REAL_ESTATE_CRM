@@ -15,3 +15,4 @@ CREATE DATABASE my_new_database;
 -- List tables in the database
 \dt;
 
+href="{% url 'agents:agent-detail' agent.pk %}"
