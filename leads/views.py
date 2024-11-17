@@ -2261,7 +2261,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from num2words import num2words
 from .forms import BillForm, BillItemForm
 from .models import Bill, BillItem
-# from weasyprint import HTML
+from weasyprint import HTML
 from django.template.loader import render_to_string
 
 def render_to_pdf(template_src, context_dict):
@@ -2281,93 +2281,6 @@ from num2words import num2words
 
 from django.shortcuts import render, redirect
 from decimal import Decimal
-
-# class CreateBillView(LoginRequiredMixin, TemplateView):
-#     template_name = 'billing/create_bill.html'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-
-#         item_count = len(self.request.POST.getlist('description[]')) if self.request.method == 'POST' else 1
-
-#         bill_item_forms = []
-#         if self.request.method == 'POST':
-#             for i in range(item_count):
-#                 prefix = str(i)
-#                 form_data = {
-#                     'description': self.request.POST.getlist('description[]')[i],
-#                     'quantity': self.request.POST.getlist('quantity[]')[i],
-#                     'rate': self.request.POST.getlist('rate[]')[i],
-#                     'tax': self.request.POST.getlist('tax[]')[i]
-#                 }
-#                 form = BillItemForm(form_data, prefix=prefix)
-#                 bill_item_forms.append(form)
-#         else:
-#             bill_item_forms = [BillItemForm(prefix=str(i)) for i in range(item_count)]
-
-#         context.update({
-#             'bill_form': BillForm(),
-#             'bill_item_forms': bill_item_forms,
-#         })
-
-#         return context
-
-#     def post(self, request, *args, **kwargs):
-#         bill_form = BillForm(request.POST)
-#         item_count = len(request.POST.getlist('description[]'))
-#         print(item_count)
-#         # bill_item_forms = []
-
-
-#         for i in range(item_count):
-#             bill = self.bill_form
-#             description = request.POST.getlist('description[]')[i],
-#             quantity= request.POST.getlist('quantity[]')[i],
-#             rate= request.POST.getlist('rate[]')[i],
-#             tax= request.POST.getlist('tax[]')[i]
-
-#             BillItem.objects.create()
-#             form = BillItemForm(form_data, prefix=prefix)
-#             bill_item_forms.append(form)
-
-#         # Debug: Print form validation errors
-#         if not bill_form.is_valid():
-#             print("BillForm errors:", bill_form.errors)
-        
-#         for index, form in enumerate(bill_item_forms):
-#             if not form.is_valid():
-#                 print(f"BillItemForm {index} errors:", form.errors)
-
-#         # Check if the main form and all item forms are valid
-#         if bill_form.is_valid() and all(form.is_valid() for form in bill_item_forms):
-#             # Save the main Bill form
-#             bill = bill_form.save(commit=False)
-#             bill.save()
-
-#             total_amount = Decimal(0)
-#             total_with_tax = Decimal(0)
-
-#             # Save each BillItem form and calculate totals
-#             for form in bill_item_forms:
-#                 bill_item = form.save(commit=False)
-#                 bill_item.bill = bill  # Link each item to the main Bill
-#                 bill_item.save()
-
-#                 # Calculate the totals
-#                 item_total = bill_item.quantity * bill_item.rate
-#                 total_amount += item_total
-#                 total_with_tax += item_total * (1 + (bill_item.tax / 100))
-
-#             # Update the Bill with calculated totals and save
-#             bill.total_amount = total_amount
-#             bill.total_with_tax = total_with_tax
-#             bill.save()
-
-#             # Redirect after successful save
-#             return redirect('success_url')  # Replace 'success_url' with your actual redirect URL
-
-#         # If forms are not valid, re-render the page with errors
-#         return self.render_to_response(self.get_context_data(bill_form=bill_form, bill_item_forms=bill_item_forms))
 
 
 class BillListView(ListView):

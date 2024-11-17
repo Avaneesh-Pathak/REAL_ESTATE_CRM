@@ -1,51 +1,78 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2 class="text-primary">Buyer Details</h2>
-<div class="card mb-4">
+<h2 class="mt-4 text-primary mb-4">Buyer Details</h2>
+<div class=" card shadow mb-4">
     <div class="card-body">
-        <div class="d-flex justify-content-between">
-            <p><strong>Name:</strong> {{ buyer.name }}</p>
-            <p><strong>Father's Name:</strong> {{ buyer.father_husband_name }}</p>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Name:</strong> {{ buyer.name }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Father's Name:</strong> {{ buyer.father_husband_name }}</p>
+            </div>
         </div>
-        <div class="d-flex justify-content-between">
-            <p><strong>Address:</strong> {{ buyer.address }}</p>
-            <p><strong>Email:</strong> {{ buyer.email }}</p>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Address:</strong> {{ buyer.address }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Email:</strong> {{ buyer.email }}</p>
+            </div>
         </div>
-        <div class="d-flex justify-content-between">
-            <p><strong>Phone:</strong> {{ buyer.phone }}</p>
-            <p><strong>Property Location:</strong> {{ buyer.location }}</p>
-            <p><strong>Property restamount:</strong> {{ restamount }}</p>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Phone:</strong> {{ buyer.phone }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Property Location:</strong> {{ buyer.location }}</p>
+            </div>
         </div>
-        <div class="d-flex justify-content-between">
-            <p><strong>Property ID:</strong> {{ buyer.project.title }}</p>
-            <p><strong>Total amount Paid by Customer: ₹</strong> {{ total_amount_paid }}</p>
-            <p><strong>Total Interest Paid by Customer: ₹</strong> {{ total_interest_earned }}</p>
-            <p><strong>Agent Name:</strong> {{ buyer.agent.user.username }}</p>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Property ID:</strong> <span class="badge badge-info">{{ buyer.project.title }}</span></p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Agent Name:</strong> {{ buyer.agent.user.username }}</p>
+            </div>
         </div>
-        <div class="d-flex justify-content-between">
-            <p><strong>Booking Amount: ₹</strong> {{ buyer.booking_amount }}</p>
-            <p><strong>Property Price: ₹</strong> {{ buyer.Plot_price }}</p>
-            <p><strong>Total principal amount Paid: ₹</strong> {{ buyer.total_paid }}</p>
-            <p><strong>Payment Date:</strong> {{ buyer.payment_date }}</p>
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <p><strong>Booking Amount:</strong> <span class="text-success">₹{{ buyer.booking_amount }}</span></p>
+            </div>
+            <div class="col-md-3">
+                <p><strong>Property Price:</strong> <span class="text-primary">₹{{ buyer.Plot_price }}</span></p>
+            </div>
+            <div class="col-md-3">
+                <p><strong>Total Paid:</strong> <span class="text-success">₹{{ buyer.total_paid }}</span></p>
+            </div>
+            <div class="col-md-3">
+                <p><strong>Payment Date:</strong> {{ buyer.payment_date }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Total Amount Paid:</strong> <span class="text-primary">₹{{ total_amount_paid }}</span></p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Total Interest Paid:</strong> <span class="text-danger">₹{{ total_interest_earned }}</span></p>
+            </div>
         </div>
     </div>
 </div>
 
-<h2 class="text-primary">EMI Payments</h2>
+<h2 class="text-primary mb-4">EMI Payments</h2>
 <form method="post">
     {% csrf_token %}
-    <div class="custom-payment-form">
-        <h3>Pay Custom EMI</h3>
+    <div class="custom-payment-form card shadow p-3 mb-4">
+        <h4 class="text-secondary">Pay Custom EMI</h4>
         <div class="form-group">
             <label for="custom_amount">Enter Payment Amount</label>
-            <input type="number" name="custom_amount" id="custom_amount" placeholder="Enter Amount" step="0.01" required>
+            <input type="number" name="custom_amount" id="custom_amount" placeholder="Enter Amount" step="0.01" class="form-control" required>
         </div>
-        <!-- <button type="submit" class="btn btn-primary">Pay</button> -->
     </div>
-
-    <!-- EMI Options -->
-    <div class="emi-options">
+    <div class="emi-options card shadow p-3 mb-4">
+        <h4 class="text-secondary">EMI Options</h4>
         <div class="form-group">
             <label for="emi_tenure">EMI Tenure (Months)</label>
             <input type="number" name="emi_tenure" id="emi_tenure" class="form-control" placeholder="Enter Tenure in Months" value="0">
@@ -58,42 +85,13 @@
         
         <div class="form-group">
             <label>Calculated EMI (Per Month)</label>
-            <input type="text" name="calculated_emi" id="calculated-emi" class="form-control" readonly>
+            <input type="text" name="calculated_emi" id="calculated-emi" class="form-control bg-light" readonly>
         </div>
-        <button type="submit" class="btn btn-success">Set Up EMI</button>
+        <button type="submit" class="btn btn-success w-100">Set Up EMI</button>
     </div>
 </form>
 
-</div>
-
-<!-- {% if remaining_balance > 0 %} -->
-<!-- EMI Options Form -->
-<div class="emi-options">
-    <h4>Set Up EMI for Pending Amount</h4>
-    <form method="post">
-        {% csrf_token %}
-        <input name="remaining_balance" value="#">
-        <div class="form-group">
-            <label for="emi_tenure">EMI Tenure (Months)</label>
-            <input type="number" name="emi_tenure" id="emi_tenure" class="form-control"
-                placeholder="Enter Tenure in Months" required>
-        </div>
-        <div class="form-group">
-            <label for="interest_rate">Interest Rate (%)</label>
-            <input type="number" name="interest_rate" id="interest_rate" class="form-control" step="0.01"
-                placeholder="Enter Interest Rate" required>
-        </div>
-        <div class="form-group">
-            <label>Calculated EMI (Per Month)</label>
-            <input type="text" name="calculated_emi" id="calculated-emi" class="form-control" readonly>
-        </div>
-        <button type="submit" class="btn btn-success">Set Up EMI</button>
-    </form>
-</div>
-<!-- {% endif %} -->
-
-
-<table class="table table-bordered table-hover">
+<table class="table table-bordered table-hover shadow">
     <thead class="thead-dark">
         <tr>
             <th>Due Date</th>
@@ -106,18 +104,18 @@
     </thead>
     <tbody>
         {% for payment in emi_payments %}
-        <tr id="payment-row-{{ payment.id }}" {% if payment.status == 'Paid' %}class="table-success"{% elif payment.status == 'Pending' %}class="table-warning"{% endif %}>
+        <tr id="payment-row-{{ payment.id }}" 
+            {% if payment.status == 'Paid' %}class="table-success"{% elif payment.status == 'Pending' %}class="table-warning"{% endif %}>
             <td>{{ payment.due_date }}</td>
-            <td>₹{{ payment.amount_for_agent|floatformat:2 }}</td>
-            <td>₹{{ payment.interest_earned|floatformat:2 }}</td>
-            {% comment %} <td>{{ payment.amount_paid|floatformat:2 }}</td> {% endcomment %}
+            <td class="text-primary">₹{{ payment.amount_for_agent|floatformat:2 }}</td>
+            <td class="text-danger">₹{{ payment.interest_earned|floatformat:2 }}</td>
             <td class="status-text">{{ payment.status }}</td>
-            <td>₹{{ payment.remaining_amount|floatformat:2 }}</td>
+            <td class="text-warning">₹{{ payment.remaining_amount|floatformat:2 }}</td>
             <td>
                 {% if payment.status == 'Pending' %}
-                <button onclick="payEmi({{ payment.id }})" class="btn btn-success" id="pay-button-{{ payment.id }}">Pay EMI</button>
+                <button onclick="payEmi({{ payment.id }})" class="btn btn-success btn-sm" id="pay-button-{{ payment.id }}">Pay EMI</button>
                 {% else %}
-                <span class="badge badge-success">Paid EMI</span>
+                <span class="badge badge-success">Paid</span>
                 {% endif %}
             </td>
         </tr>
@@ -130,6 +128,25 @@
 </table>
 
 <script>
+    function calculateEmi() {
+        const principalAmount = {{ buyer.Plot_price }};
+        const emiTenure = document.getElementById("emi_tenure").value;
+        const interestRate = document.getElementById("interest_rate").value;
+
+        if (emiTenure && interestRate) {
+            const interestAmount = (principalAmount * interestRate * emiTenure) / 100;
+            const totalAmount = principalAmount + interestAmount;
+            const emiAmount = totalAmount / emiTenure;
+
+            document.getElementById("calculated-emi").value = emiAmount.toFixed(2);
+        } else {
+            document.getElementById("calculated-emi").value = "Enter both Tenure and Interest Rate";
+        }
+    }
+
+    // Trigger EMI calculation on input change
+    document.getElementById("emi_tenure").addEventListener("input", calculateEmi);
+    document.getElementById("interest_rate").addEventListener("input", calculateEmi);
 
     function payEmi(paymentId) {
         const button = document.getElementById(`pay-button-${paymentId}`);
@@ -139,63 +156,42 @@
         fetch(`{% url 'leads:pay_emi' 0 %}`.replace(0, paymentId), {
             method: 'POST',
             headers: {
-                'X-CSRFToken': '{{ csrf_token }}',  // Include CSRF token for security
+                'X-CSRFToken': '{{ csrf_token }}',
                 'Content-Type': 'application/json'
             },
         })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Update the button and row to indicate the payment was made
-                    button.textContent = 'Paid EMI';
-                    button.classList.remove('btn-success');
-                    button.classList.add('btn-secondary', 'disabled');
-                    button.disabled = true;
-                    row.classList.remove('table-warning');
+                    button.textContent = 'Paid';
+                    button.classList.add('disabled');
                     row.classList.add('table-success');
                     statusText.textContent = 'Paid';
                 } else {
                     alert('Error: ' + data.message);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            });
+            .catch(error => alert('Error occurred.'));
     }
 </script>
-<!-- Bootstrap CSS and JS for better interaction -->
+
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <style>
-    /* Custom styling for the EMI payments table */
-    .table th {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .table td {
-        vertical-align: middle;
-    }
-
-    .text-primary {
-        margin-top: 20px;
-        margin-bottom: 15px;
-        font-weight: bold;
+    .text-primary, .text-secondary {
         text-align: center;
     }
-
-    .table-success {
-        background-color: #d4edda !important;
-        /* Light green for paid */
+    .badge-info {
+        font-size: 1.1rem;
     }
-
-    .table-warning {
-        background-color: #fff3cd !important;
-        /* Light yellow for pending */
+    .card {
+        border-radius: 10px;
+    }
+    .table th, .table td {
+        vertical-align: middle;
     }
 </style>
-{%endblock content %}
+{% endblock %}
