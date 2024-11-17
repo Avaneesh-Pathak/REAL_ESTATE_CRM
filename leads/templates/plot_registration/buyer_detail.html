@@ -15,6 +15,7 @@
         <div class="d-flex justify-content-between">
             <p><strong>Phone:</strong> {{ buyer.phone }}</p>
             <p><strong>Property Location:</strong> {{ buyer.location }}</p>
+            <p><strong>Property restamount:</strong> {{ restamount }}</p>
         </div>
         <div class="d-flex justify-content-between">
             <p><strong>Property ID:</strong> {{ buyer.project.title }}</p>
@@ -47,12 +48,14 @@
     <div class="emi-options">
         <div class="form-group">
             <label for="emi_tenure">EMI Tenure (Months)</label>
-            <input type="number" name="emi_tenure" id="emi_tenure" class="form-control" placeholder="Enter Tenure in Months" required>
+            <input type="number" name="emi_tenure" id="emi_tenure" class="form-control" placeholder="Enter Tenure in Months" value="0">
         </div>
+        
         <div class="form-group">
             <label for="interest_rate">Interest Rate (%)</label>
-            <input type="number" name="interest_rate" id="interest_rate" class="form-control" step="0.01" placeholder="Enter Interest Rate" required>
+            <input type="number" name="interest_rate" id="interest_rate" class="form-control" step="0.01" placeholder="Enter Interest Rate" value="0">
         </div>
+        
         <div class="form-group">
             <label>Calculated EMI (Per Month)</label>
             <input type="text" name="calculated_emi" id="calculated-emi" class="form-control" readonly>

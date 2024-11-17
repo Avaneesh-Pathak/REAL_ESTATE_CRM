@@ -1883,6 +1883,7 @@ def buyer_detail_view(request, buyer_id):
     emi_payments = buyer.emi_payments.all()  # Fetch EMI payments linked to this buyer
     emipayments = buyer.emi_payments.filter(status = 'Paid')
     total_amount_paid  = buyer.total_paidbycust + sum(emi_payment.emi_amount for emi_payment  in emipayments )
+    restamount  = buyer.Plot_price - buyer.total_paidbycust + sum(emi_payment.amount_for_agent for emi_payment  in emipayments )
     total_interest_earned = sum(emi_payment.emi_amount for emi_payment  in emipayments ) - sum(emi_payment.amount_for_agent for emi_payment  in emipayments )
 
     if request.method == 'POST':  
@@ -1890,13 +1891,14 @@ def buyer_detail_view(request, buyer_id):
         custom_amount = Decimal(request.POST.get('custom_amount'))  # Get the custom EMI amount from the form
         interest_rate = Decimal(request.POST.get('interest_rate'))  # Get the custom EMI amount from the form
         emi_tenure = int(request.POST.get('emi_tenure'))  # Get the custom EMI amount from the form
-        if custom_amount>0 and emi_tenure>0 and interest_rate>0:
+        emi_payment = buyer.emi_payments.filter(status='Pending')
+        emi_payment.delete()
+        if  emi_tenure>0 and interest_rate>0:
             print(custom_amount)
-            emi_payment = buyer.emi_payments.filter(status='Pending')
-            emi_payment.delete()
             plotprice = buyer.Plot_price - buyer.total_paid - custom_amount
-            buyer.total_paid = (buyer.total_paid  + custom_amount)
-            buyer.total_paidbycust = (buyer.total_paidbycust  + custom_amount)
+            buyer.emi_tenure = emi_tenure
+            # buyer.total_paid = (buyer.total_paid  + custom_amount)
+            # buyer.total_paidbycust = (buyer.total_paidbycust  + custom_amount)
             buyer.save()
             print("dfghjhgfds",plotprice)
             new_emi = calculate_emi(plotprice, interest_rate, emi_tenure)
@@ -1910,50 +1912,38 @@ def buyer_detail_view(request, buyer_id):
             emipaymentcreated = buyer.emi_payments.filter(status = 'Pending')
             amtfagent = plotprice/emi_tenure
             emipaymentcreated.update(amount_for_agent = amtfagent)
-            agent = buyer.agent
-            print(agent)
-            if agent:
-                agent_level = agent.level
-                print(agent_level)
-                for i in range(1,agent_level+1):
-                    if i == 1:
-                        base_salary = (custom_amount)/10
-                    elif i == 2:
-                        base_salary = (custom_amount)/25
-                    elif i == 3:
-                        base_salary = (custom_amount)*3/100
-                    elif i == 4:
-                        base_salary = (custom_amount)/50
-                    elif i == 5:
-                        base_salary = (custom_amount)/100
-
-                    salary = Salary.objects.get(property = buyer.project,agent = agent.user)
-                    salary.base_salary += base_salary
-                    salary.save()
+        agent = buyer.agent
+        print(agent)
+        if agent and custom_amount>0:
+            agent_level = agent.level
+            print(agent_level)
+            for i in range(1,agent_level+1):
+                if i == 1:
+                    base_salary = (custom_amount)/10
+                elif i == 2:
+                    base_salary = (custom_amount)/25
+                elif i == 3:
+                    base_salary = (custom_amount)*3/100
+                elif i == 4:
+                    base_salary = (custom_amount)/50
+                elif i == 5:
+                    base_salary = (custom_amount)/100
+                print(buyer.project)
+                print(agent.user)
+                salary = Salary.objects.get(property = buyer.project,agent = agent.user)
+                salary.base_salary += base_salary
+                salary.save()
+        plotprice = buyer.Plot_price - buyer.total_paid - custom_amount
+        buyer.total_paid = (buyer.total_paid  + custom_amount)
+        buyer.total_paidbycust = (buyer.total_paidbycust  + custom_amount)
+        buyer.save()
 
         return redirect('leads:buyers_list')
-
-
-
-        
-
-
-        # emi_payment.save()
-
-        # # Update EMI payment
-        # emi_payment.amount_paid = custom_amount
-        # emi_payment.status = 'Paid'
-        # emi_payment.save()
-
-        # Add a success message
-        # messages.success(request, f'EMI Payment of {custom_amount} successfully paid.')
-
-        # return render(request, 'plot_registration/buyer_detail.html', context)
-    
 
     context = {
         'buyer': buyer,
         'emi_payments': emi_payments,  # Pass the EMI payments to the template
+        'restamount': restamount,  # Pass the EMI payments to the template
         'total_amount_paid': total_amount_paid,  # Pass the EMI payments to the template
         'total_interest_earned': total_interest_earned,  # Pass the EMI payments to the template
     }
