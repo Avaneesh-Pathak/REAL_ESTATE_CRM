@@ -767,22 +767,22 @@ class EMIPayment(models.Model):
         logger.debug(f"interest amount for EMI: {int_earn} for {self.plot_booking}.")
         return int_earn
     
-    def agent_amount(self):
-        """Calculate the remaining amount to be paid."""
-        tenu = self.plot_booking.emi_tenure
-        print(tenu)
-        amount = self.plot_booking.Plot_price - self.plot_booking.booking_amount
-        print(amount)
-        agentamount = amount/tenu
-        print(agentamount)
-        # logger.debug(f"Remaining amount for EMI: {remaining} for {self.plot_booking}.")
-        return agentamount
+    # def agent_amount(self):
+    #     """Calculate the remaining amount to be paid."""
+    #     tenu = self.plot_booking.emi_tenure
+    #     print(tenu)
+    #     amount = self.plot_booking.Plot_price - self.plot_booking.total_paid
+    #     print(amount)
+    #     agentamount = amount/tenu
+    #     print(agentamount)
+    #     # logger.debug(f"Remaining amount for EMI: {remaining} for {self.plot_booking}.")
+    #     return agentamount
 
     def save(self, *args, **kwargs):
         # Check if it's a new instance or an update
         is_new_instance = self.pk is None
         print(self.amount_for_agent)
-        self.amount_for_agent = self.agent_amount()
+        # self.amount_for_agent = self.agent_amount()
         print(self.amount_for_agent)
 
         # Call the parent save method to save the instance to the database

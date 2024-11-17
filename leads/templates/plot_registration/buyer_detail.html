@@ -45,6 +45,7 @@
             </div>
             <div class="col-md-3">
                 <p><strong>Total Paid:</strong> <span class="text-success">₹{{ buyer.total_paid }}</span></p>
+                <p><strong>Total Rest Amount:</strong> <span class="text-success">₹{{ restamount }}</span></p>
             </div>
             <div class="col-md-3">
                 <p><strong>Payment Date:</strong> {{ buyer.payment_date }}</p>
@@ -59,7 +60,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>{% if restamount > 0 %}
 
 <h2 class="text-primary mb-4">EMI Payments</h2>
 <form method="post">
@@ -87,10 +88,10 @@
             <label>Calculated EMI (Per Month)</label>
             <input type="text" name="calculated_emi" id="calculated-emi" class="form-control bg-light" readonly>
         </div>
-        <button type="submit" class="btn btn-success w-100">Set Up EMI</button>
+        <button type="submit" class="btn btn-success w-100">Set Up Custom Payment and EMI</button>
     </div>
-</form>
-
+</form>{% endif %}
+{% if emi_payments %}
 <table class="table table-bordered table-hover shadow">
     <thead class="thead-dark">
         <tr>
@@ -103,6 +104,7 @@
         </tr>
     </thead>
     <tbody>
+        
         {% for payment in emi_payments %}
         <tr id="payment-row-{{ payment.id }}" 
             {% if payment.status == 'Paid' %}class="table-success"{% elif payment.status == 'Pending' %}class="table-warning"{% endif %}>
@@ -126,7 +128,7 @@
         {% endfor %}
     </tbody>
 </table>
-
+{% endif %}
 <script>
     function calculateEmi() {
         const principalAmount = {{ buyer.Plot_price }};

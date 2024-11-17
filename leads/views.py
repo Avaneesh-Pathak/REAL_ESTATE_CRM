@@ -1632,6 +1632,7 @@ class PlotRegistrationView(LoginRequiredMixin, View):
                     EMIPayment.objects.create(
                         plot_booking=plot_booking,
                         due_date=due_date,
+                        amount_for_agent = (plot_price- booking_amount)/tenure ,
                         emi_amount=monthly_emi  # Store calculated EMI
                     )
             elif emi_amount is None and tenure is None:
@@ -1893,9 +1894,13 @@ def buyer_detail_view(request, buyer_id):
         emi_tenure = int(request.POST.get('emi_tenure'))  # Get the custom EMI amount from the form
         emi_payment = buyer.emi_payments.filter(status='Pending')
         emi_payment.delete()
+        plotprice = buyer.Plot_price - buyer.total_paid - custom_amount
+        buyer.total_paid = (buyer.total_paid  + custom_amount)
+        buyer.total_paidbycust = (buyer.total_paidbycust  + custom_amount)
+        buyer.save()
         if  emi_tenure>0 and interest_rate>0:
             print(custom_amount)
-            plotprice = buyer.Plot_price - buyer.total_paid - custom_amount
+            # plotprice = buyer.Plot_price - buyer.total_paid - custom_amount
             buyer.emi_tenure = emi_tenure
             # buyer.total_paid = (buyer.total_paid  + custom_amount)
             # buyer.total_paidbycust = (buyer.total_paidbycust  + custom_amount)
@@ -1906,6 +1911,7 @@ def buyer_detail_view(request, buyer_id):
                 due_date = buyer.payment_date + timedelta(days=30 * month)
                 EMIPayment.objects.create(
                     plot_booking=buyer,
+                    amount_for_agent = (buyer.Plot_price- buyer.total_paid)/emi_tenure ,
                     due_date=due_date,
                     emi_amount=new_emi  # Store calculated EMI
                 )
@@ -1933,10 +1939,6 @@ def buyer_detail_view(request, buyer_id):
                 salary = Salary.objects.get(property = buyer.project,agent = agent.user)
                 salary.base_salary += base_salary
                 salary.save()
-        plotprice = buyer.Plot_price - buyer.total_paid - custom_amount
-        buyer.total_paid = (buyer.total_paid  + custom_amount)
-        buyer.total_paidbycust = (buyer.total_paidbycust  + custom_amount)
-        buyer.save()
 
         return redirect('leads:buyers_list')
 
@@ -2261,13 +2263,13 @@ from decimal import Decimal, ROUND_HALF_UP
 from num2words import num2words
 from .forms import BillForm, BillItemForm
 from .models import Bill, BillItem
-from weasyprint import HTML
+# from weasyprint import HTML
 from django.template.loader import render_to_string
 
-def render_to_pdf(template_src, context_dict):
-    html_string = render_to_string(template_src, context_dict)
-    pdf_file = HTML(string=html_string).write_pdf()
-    return pdf_file
+# def render_to_pdf(template_src, context_dict):
+#     html_string = render_to_string(template_src, context_dict)
+#     pdf_file = HTML(string=html_string).write_pdf()
+#     return pdf_file
 
 from django.shortcuts import render
 from django.http import HttpResponse
