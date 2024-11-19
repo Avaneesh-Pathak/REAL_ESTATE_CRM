@@ -25,8 +25,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEBUG = True
 
 # Allowed hosts (adjust for production)
-ALLOWED_HOSTS =['2113-2409-40e3-5b-c458-f5dd-7044-a4e3-f39f.ngrok-free.app','127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['https://2113-2409-40e3-5b-c458-f5dd-7044-a4e3-f39f.ngrok-free.app']
+ALLOWED_HOSTS =['*']
+CSRF_TRUSTED_ORIGINS = ['https://064b-2409-40e3-4b-165e-4d4-3c1e-2225-eac0.ngrok-free.app']
 
 TWILIO_ACCOUNT_SID = 'AC1aecf01fb386ff58a11d18179e2e0b7b'
 TWILIO_AUTH_TOKEN = '794dfc0b9d3c23a62d5382d25a282aff'

@@ -1627,8 +1627,19 @@ class PlotRegistrationView(LoginRequiredMixin, View):
             if tenure and emi_amount:
                 monthly_emi = emi_amount
                 # Generate EMI payment records
+                payment_date = plot_booking.payment_date
+                print("Plot registration paymentdate",payment_date)
+                # Calculate the 1st of the next month
+                next_month = (payment_date.month % 12) + 1
+                print(next)
+                year = payment_date.year + (payment_date.month // 12)
+                print(year)
+                first_due_date = payment_date.replace(day=1, month=next_month, year=year)
+                print(first_due_date)
+                # Generate EMI payment records
                 for month in range(tenure):
-                    due_date = plot_booking.payment_date + timedelta(days=30 * month)
+                    due_date = first_due_date.replace(month=(first_due_date.month + month - 1) % 12 + 1, year=first_due_date.year + (first_due_date.month + month - 1) // 12 )
+                    print("plotregistration due date",due_date)
                     EMIPayment.objects.create(
                         plot_booking=plot_booking,
                         due_date=due_date,
@@ -1883,8 +1894,9 @@ def buyer_detail_view(request, buyer_id):
     buyer = get_object_or_404(PlotBooking, id=buyer_id)
     emi_payments = buyer.emi_payments.all()  # Fetch EMI payments linked to this buyer
     emipayments = buyer.emi_payments.filter(status = 'Paid')
+    emip_ayments = buyer.emi_payments.filter(status = 'Pending')
     total_amount_paid  = buyer.total_paidbycust + sum(emi_payment.emi_amount for emi_payment  in emipayments )
-    restamount  = buyer.Plot_price - buyer.total_paidbycust + sum(emi_payment.amount_for_agent for emi_payment  in emipayments )
+    restamount  = buyer.Plot_price - buyer.total_paid
     total_interest_earned = sum(emi_payment.emi_amount for emi_payment  in emipayments ) - sum(emi_payment.amount_for_agent for emi_payment  in emipayments )
 
     if request.method == 'POST':  
@@ -1906,9 +1918,16 @@ def buyer_detail_view(request, buyer_id):
             # buyer.total_paidbycust = (buyer.total_paidbycust  + custom_amount)
             buyer.save()
             print("dfghjhgfds",plotprice)
+            # Generate EMI payment records
+            payment_date = buyer.payment_date
+            
+            # Calculate the 1st of the next month
+            next_month = (payment_date.month % 12) + 1
+            year = payment_date.year + (payment_date.month // 12)
+            first_due_date = payment_date.replace(day=1, month=next_month, year=year)
             new_emi = calculate_emi(plotprice, interest_rate, emi_tenure)
             for month in range(emi_tenure):
-                due_date = buyer.payment_date + timedelta(days=30 * month)
+                due_date = first_due_date.replace(month=(first_due_date.month + month - 1) % 12 + 1,year=first_due_date.year + (first_due_date.month + month - 1) // 12)
                 EMIPayment.objects.create(
                     plot_booking=buyer,
                     amount_for_agent = (buyer.Plot_price- buyer.total_paid)/emi_tenure ,
