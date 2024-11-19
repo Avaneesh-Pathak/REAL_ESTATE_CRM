@@ -1920,7 +1920,12 @@ def buyer_detail_view(request, buyer_id):
             emipaymentcreated.update(amount_for_agent = amtfagent)
         agent = buyer.agent
         print(agent)
-        if agent and custom_amount>0:
+        if (buyer.Plot_price -buyer.total_paid)<=0:
+            prop =  Property.objects.get(title=buyer.project)
+            prop.is_in_emi = False
+            prop.save()
+
+        if agent and custom_amount>=0:
             agent_level = agent.level
             print(agent_level)
             for i in range(1,agent_level+1):
@@ -1967,7 +1972,12 @@ def pay_emi(request, payment_id):
             plotbooking.total_paid = plotbooking.total_paid + payment.amount_for_agent
             plotbooking.save()
             payment.save()
-            print("emi payment gvcdghnbvcdg",plotbooking)
+            if (plotbooking.Plot_price -plotbooking.total_paid)<=0:
+                prop =  Property.objects.get(title=plotbooking.project)
+                prop.is_in_emi = False
+                prop.save()
+
+                print("emi payment gvcdghnbvcdg",plotbooking)
             agent = plotbooking.agent
             print(agent)
             if agent:
@@ -2263,7 +2273,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from num2words import num2words
 from .forms import BillForm, BillItemForm
 from .models import Bill, BillItem
-# from weasyprint import HTML
+from weasyprint import HTML
 from django.template.loader import render_to_string
 
 # def render_to_pdf(template_src, context_dict):
@@ -2467,7 +2477,7 @@ class CreateBillView(LoginRequiredMixin, ListView):
 
 
 
-    from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from .models import Bill, BillItem
 from .forms import BillForm, BillItemForm
