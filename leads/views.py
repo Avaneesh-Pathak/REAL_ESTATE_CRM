@@ -23,7 +23,7 @@ from django.views import View, generic
 from django.views.generic import ListView, UpdateView, DeleteView
 
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot,send_sms
-from agents.mixins import OrganisorAndLoginRequiredMixin
+from agents.mixins import OrganisorAndLoginRequiredMixin ,AgentAndLoginRequiredMixin
 from leads.models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,EMIPayment,Balance
 from leads.forms import (
     LeadModelForm, 
@@ -299,10 +299,273 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
 
 
     
-class LeadListView(LoginRequiredMixin,generic.ListView):
+class LeadListView(OrganisorAndLoginRequiredMixin,AgentAndLoginRequiredMixin,generic.ListView):
     
     template_name = "leads/lead_list.html"
     context_object_name = "leads"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
     def get_queryset(self):
         # Use logging in models or views
@@ -310,7 +573,7 @@ class LeadListView(LoginRequiredMixin,generic.ListView):
 
         user = self.request.user
         # initial queryset of leads for the entire organisation
-        if user.is_organisor:
+        if user:
             queryset = Lead.objects.filter(
                 # organisation=user.userprofile, 
                 agent__isnull=False
@@ -376,7 +639,7 @@ def lead_detail(request, pk):
     return render(request, "leads/lead_detail.html", context)
 
 
-class LeadCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
+class LeadCreateView(OrganisorAndLoginRequiredMixin,AgentAndLoginRequiredMixin, generic.CreateView):
     template_name = "leads/lead_create.html"
     form_class = LeadModelForm
 
@@ -2303,7 +2566,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from num2words import num2words
 from .forms import BillForm, BillItemForm
 from .models import Bill, BillItem
-from weasyprint import HTML
+# from weasyprint import HTML
 from django.template.loader import render_to_string
 
 # def render_to_pdf(template_src, context_dict):
