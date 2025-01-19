@@ -927,7 +927,7 @@ class Product(models.Model):
 class Bill(models.Model):
     bill_number = models.CharField(max_length=20, unique=True, blank=True)
     buyer_name = models.CharField(max_length=255)
-    buyer_number = models.BigIntegerField(null=True, blank=True,max_length=10)
+    buyer_number = models.IntegerField(null=True, blank=True,max_length=10)
     buyer_address = models.TextField()
     buyer_pan_number = models.CharField(max_length=10)
     invoice_date = models.DateField()

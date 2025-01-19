@@ -4,7 +4,7 @@ from leads.models import models
 from datetime import timedelta , date
 from django.views.generic import TemplateView
 from django.core.files import File
-
+from django.views.decorators.csrf import csrf_protect
 from decimal import Decimal, InvalidOperation
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -50,6 +50,17 @@ logger = logging.getLogger(__name__)
 
 # CRUD+L - Create, Retrieve, Update and Delete + List
 
+# views.py
+from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
+
+class CustomLoginView(LoginView):
+    template_name = 'registration/login.html'  # Replace with your custom login template
+    
+    def get_success_url(self):
+        print("login")
+        # Redirect to the dashboard after successful login
+        return reverse_lazy('dashboard')  # Replace 'dashboard' with your actual dashboard URL name
 
 
 class SignupView(generic.CreateView):

@@ -110,12 +110,12 @@
             {% csrf_token %}
             <div class="login__field">
                 <label for="id_username" class="login__label">{{ form.username.label }}</label>
-                {{ form.username|add_class:"login__input" }}
+                {{ form.username }}
             </div>
             <div class="login__field">
                 <label for="id_password" class="login__label">{{ form.password.label }}</label>
                 <div class="input-group">
-                    {{ form.password|add_class:"login__input" }}
+                    {{ form.password }}
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('id_password')">
                             <span id="eye-icon-id_password" class="fas fa-eye"></span>
