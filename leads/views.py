@@ -2600,6 +2600,12 @@ class BillListView(ListView):
         return queryset
 
 # from weasyprint import HTML 
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from io import BytesIO
+from django.conf import settings
+
 def download_invoice(request, bill_id):
     try:
         # Get the bill object
@@ -2610,14 +2616,25 @@ def download_invoice(request, bill_id):
             'bill': bill,
             'items': bill.items.all(),
             'total_amount': bill.total_amount,
-            'total_amount_in_words': num2words(bill.total_amount, lang='en').capitalize(),
+            'amount_in_words': num2words(bill.total_amount, lang='en').capitalize(),
         }
 
         # Render the HTML content using a template (for the PDF)
         html_content = render_to_string('billing/bill_template.html', context)
 
-        # Convert HTML to PDF using WeasyPrint
-        pdf = HTML(string=html_content).write_pdf()
+        # Create a file-like buffer to receive PDF data
+        buffer = BytesIO()
+
+        # Convert HTML to PDF using xhtml2pdf
+        pisa_status = pisa.CreatePDF(html_content, dest=buffer)
+
+        # Check if PDF was created successfully
+        if pisa_status.err:
+            return HttpResponse("Error generating PDF.", status=500)
+
+        # Get the PDF from the buffer
+        buffer.seek(0)
+        pdf = buffer.read()
 
         # Return the PDF as an HTTP response with the appropriate content type
         response = HttpResponse(pdf, content_type='application/pdf')
@@ -2748,6 +2765,7 @@ class CreateBillView(LoginRequiredMixin, ListView):
 
         # Debug: If form is invalid, print errors
         else:
+            bill_form = BillForm()
             print("BillForm errors:", bill_form.errors)
 
         # If form is invalid, re-render the page with errors
@@ -2765,30 +2783,3 @@ from .models import Bill, BillItem
 from .forms import BillForm, BillItemForm
 # Create the BillItemFormSet
 BillItemFormSet = modelformset_factory(BillItem, fields=('description', 'quantity', 'rate', 'tax'), extra=1)
-
-def create_bill(request):
-    if request.method == 'POST':
-        bill_form = BillForm(request.POST)
-        formset = BillItemFormSet(request.POST)
-        if bill_form.is_valid() and formset.is_valid():
-            # Handle form saving logic here
-            # Save the bill and associated items
-            bill = bill_form.save()
-            for form in formset:
-                if form.cleaned_data:
-                    # Create BillItem for each valid form in the formset
-                    BillItem.objects.create(
-                        bill=bill,
-                        description=form.cleaned_data['description'],
-                        quantity=form.cleaned_data['quantity'],
-                        rate=form.cleaned_data['rate'],
-                        tax=form.cleaned_data['tax'],
-                    )
-            return redirect('bill_success_url')  # redirect to a success page
-    else:
-        bill_form = BillForm()
-        formset = BillItemFormSet(queryset=BillItem.objects.none())  # empty queryset for a new bill
-    return render(request, 'leads/create_bill.html', {
-        'bill_form': bill_form,
-        'formset': formset,
-    })

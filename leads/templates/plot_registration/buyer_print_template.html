@@ -124,9 +124,9 @@
     <div class="container">
         <div style="border-radius:15%;" class="header">
             <div class="company-logo">
-                <img style="border-radius: 50px;" src="{% static 'images/Screenshot 2024-10-19 002628.png' %}" alt="Company Logo">
+                <img style="border-radius: 50px;" src="{% static 'images/mateshwarilogo.png' %}" alt="Company Logo">
             </div>
-            <div class="receipt-title">Registration Receipt</div>
+            <div class="receipt-title">Mateshwari Infrasolutions Pvt. Ltd.</div>
         </div>
 
         <div class="receipt-info">
@@ -224,38 +224,11 @@
                 </tr>
             </table>
         </div>
-
-        <!-- Hide this section in the print view -->
-        {% comment %} <div class="gst-input">
-            <form method="POST" action="">
-                {% csrf_token %}
-                <label for="gst_amount">GST Amount (in %):</label>
-                <input type="number" name="gst_amount" id="gst_amount" step="1" min="0" required value="{{ gst_amount }}" placeholder="Enter GST Percentage (e.g., 18)">
-
-                <label for="other_charges">Other Charges:</label>
-                <input type="number" name="other_charges" id="other_charges" step="0.01" required value="{{ other_charges }}">
-
-                <button type="submit">Add</button>
-            </form>
-        </div> {% endcomment %}
-
-        {% comment %} <!-- Display the Receipt Summary with Total Amount -->
-        <h4>Receipt Summary</h4>
-        <table class="details-table">
-            <tr><td>Plot Price:</td><td>₹{{ buyer.Plot_price|floatformat:2 }}</td></tr>
-            <tr><td id="gst_label">GST @ {{ gst_amount }}%:</td><td id="gst_amount_value">₹{{ gst_amount|floatformat:2 }}</td></tr>
-            <tr><td>Other Charges:</td><td>₹{{ other_charges|floatformat:2 }}</td></tr>
-            <tr><th>Total Amount:</th><th>₹{{ total_amount|floatformat:2 }}</th></tr>
-        </table> {% endcomment %}
-
         <button class="print-button" onclick="window.print()">Print Receipt</button>
-        
-
-
         <div class="footer">
             <p>Thank you for your registration.</p>
-            <p>If you have any questions, contact us at (123) 000-0000 or support@company.com</p>
-            <p>Company Address: Lucknow, UP, INDIA</p>
+            <p>If you have any questions, contact us at +91 7232979999</p>
+            <p>Company Address: Safedabad, Barabanki Road, Lucknow, Uttar Pradesh, 226001</p>
         </div>
     </div>
 

@@ -99,85 +99,182 @@
 </head>
 
 <body>
+  
   <div class="container">
+    
     <div class="bill-container">
       <div class="bill-header text-center mb-4">
+        
         <h2>Generate Bill</h2>
       </div>
+      
+
       <form method="POST" class="form-container">
         {% csrf_token %}
+        <div class="error">
+          {% for field in bill_form %}
+              <div class="mb-3">
+                  {% if field.errors %}
+                      <div class="text-danger" class="error-message" id="error-{{ forloop.counter }}">
+                          {% for error in field.errors %}
+                              <small>{{ error }}</small>
+                          {% endfor %}
+                      </div>
+                  {% endif %}
+              </div>
+          {% endfor %}
+
+          {% if bill_form.non_field_errors %}
+              <div class="alert alert-danger" id="non-field-errors">
+                  {% for error in bill_form.non_field_errors %}
+                      <p>{{ error }}</p>
+                  {% endfor %}
+              </div>
+          {% endif %}          
+        </div>
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="buyer_name" class="form-label">Buyer Name</label>
-            <input type="text" id="buyer_name" name="buyer_name" class="form-control" required>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="buyer_number" class="form-label">Contact Number</label>
-            <input type="number" id="buyer_number" name="buyer_number" class="form-control" required>
-          </div>
+            <input type="text" id="buyer_name" name="buyer_name" class="form-control" required value="{{ bill_form.buyer_name.value|default:'' }}">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="buyer_number" class="form-label">Contact Number</label>
+          <input type="number" id="buyer_number" name="buyer_number" class="form-control" required value="{{ bill_form.buyer_number.value|default:'' }}">
+          {% if bill_form.errors.buyer_number %}
+              <div class="text-danger">
+                  {% for error in bill_form.errors.buyer_number %}
+                      <small>{{ error }}</small>
+                  {% endfor %}
+              </div>
+          {% endif %}
+      </div>
           <div class="col-md-12 mb-3">
             <label for="buyer_address" class="form-label">Buyer Address</label>
-            <textarea id="buyer_address" name="buyer_address" rows="3" class="form-control" required></textarea>
+            <textarea id="buyer_address" name="buyer_address" rows="3" class="form-control" required>{{ bill_form.buyer_address.value|default:'' }}</textarea>
           </div>
           <div class="col-md-6 mb-3">
             <label for="buyer_pan_number" class="form-label">Buyer PAN Number</label>
-            <input type="text" id="buyer_pan_number" name="buyer_pan_number" class="form-control" required>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="buyer_state" class="form-label">Buyer State</label>
-            <input type="text" id="buyer_state" name="buyer_state" class="form-control" required>
+            <!-- <textarea id="buyer_pan_number" name="buyer_pan_number" class="form-control" required>{{ bill_form.buyer_pan_number.value|default:'' }}</textarea> -->
+            <input type="text" id="buyer_pan_number" name="buyer_pan_number" class="form-control" required value="{{ bill_form.buyer_pan_number.value|default:'' }}">
+            {% if bill_form.errors.buyer_pan_number %}
+                <div class="text-danger">
+                    {% for error in bill_form.errors.buyer_pan_number %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+          <div class="col-md-6">
+            <div class="col-md-12">
+              <label for="buyer_state" class="form-label">State</label>
+              <select name="buyer_state" id="buyer_state" class="form-control" required>
+                <option value="" {% if not form.buyer_state.value %} selected {% endif %}>Please select a state...</option>
+                <option value="Andhra Pradesh" {% if form.buyer_state.value == "Andhra Pradesh" %} selected {% endif %}>Andhra Pradesh</option>
+                <option value="Arunachal Pradesh" {% if form.buyer_state.value == "Arunachal Pradesh" %} selected {% endif %}>Arunachal Pradesh</option>
+                <option value="Assam" {% if form.buyer_state.value == "Assam" %} selected {% endif %}>Assam</option>
+                <option value="Bihar" {% if form.buyer_state.value == "Bihar" %} selected {% endif %}>Bihar</option>
+                <option value="Chhattisgarh" {% if form.buyer_state.value == "Chhattisgarh" %} selected {% endif %}>Chhattisgarh</option>
+                <option value="Goa" {% if form.buyer_state.value == "Goa" %} selected {% endif %}>Goa</option>
+                <option value="Gujarat" {% if form.buyer_state.value == "Gujarat" %} selected {% endif %}>Gujarat</option>
+                <option value="Haryana" {% if form.buyer_state.value == "Haryana" %} selected {% endif %}>Haryana</option>
+                <option value="Himachal Pradesh" {% if form.buyer_state.value == "Himachal Pradesh" %} selected {% endif %}>Himachal Pradesh</option>
+                <option value="Jharkhand" {% if form.buyer_state.value == "Jharkhand" %} selected {% endif %}>Jharkhand</option>
+                <option value="Karnataka" {% if form.buyer_state.value == "Karnataka" %} selected {% endif %}>Karnataka</option>
+                <option value="Kerala" {% if form.buyer_state.value == "Kerala" %} selected {% endif %}>Kerala</option>
+                <option value="Madhya Pradesh" {% if form.buyer_state.value == "Madhya Pradesh" %} selected {% endif %}>Madhya Pradesh</option>
+                <option value="Maharashtra" {% if form.buyer_state.value == "Maharashtra" %} selected {% endif %}>Maharashtra</option>
+                <option value="Manipur" {% if form.buyer_state.value == "Manipur" %} selected {% endif %}>Manipur</option>
+                <option value="Meghalaya" {% if form.buyer_state.value == "Meghalaya" %} selected {% endif %}>Meghalaya</option>
+                <option value="Mizoram" {% if form.buyer_state.value == "Mizoram" %} selected {% endif %}>Mizoram</option>
+                <option value="Nagaland" {% if form.buyer_state.value == "Nagaland" %} selected {% endif %}>Nagaland</option>
+                <option value="Odisha" {% if form.buyer_state.value == "Odisha" %} selected {% endif %}>Odisha</option>
+                <option value="Punjab" {% if form.buyer_state.value == "Punjab" %} selected {% endif %}>Punjab</option>
+                <option value="Rajasthan" {% if form.buyer_state.value == "Rajasthan" %} selected {% endif %}>Rajasthan</option>
+                <option value="Sikkim" {% if form.buyer_state.value == "Sikkim" %} selected {% endif %}>Sikkim</option>
+                <option value="Tamil Nadu" {% if form.buyer_state.value == "Tamil Nadu" %} selected {% endif %}>Tamil Nadu</option>
+                <option value="Telangana" {% if form.buyer_state.value == "Telangana" %} selected {% endif %}>Telangana</option>
+                <option value="Tripura" {% if form.buyer_state.value == "Tripura" %} selected {% endif %}>Tripura</option>
+                <option value="Uttar Pradesh" {% if form.buyer_state.value == "Uttar Pradesh" %} selected {% endif %}>Uttar Pradesh</option>
+                <option value="Uttarakhand" {% if form.buyer_state.value == "Uttarakhand" %} selected {% endif %}>Uttarakhand</option>
+                <option value="West Bengal" {% if form.buyer_state.value == "West Bengal" %} selected {% endif %}>West Bengal</option>
+                <option value="Andaman and Nicobar Islands" {% if form.buyer_state.value == "Andaman and Nicobar Islands" %} selected {% endif %}>Andaman and Nicobar Islands</option>
+                <option value="Chandigarh" {% if form.buyer_state.value == "Chandigarh" %} selected {% endif %}>Chandigarh</option>
+                <option value="Dadra and Nagar Haveli and Daman and Diu" {% if form.buyer_state.value == "Dadra and Nagar Haveli and Daman and Diu" %} selected {% endif %}>Dadra and Nagar Haveli and Daman and Diu</option>
+                <option value="Delhi" {% if form.buyer_state.value == "Delhi" %} selected {% endif %}>Delhi</option>
+                <option value="Jammu and Kashmir" {% if form.buyer_state.value == "Jammu and Kashmir" %} selected {% endif %}>Jammu and Kashmir</option>
+                <option value="Ladakh" {% if form.buyer_state.value == "Ladakh" %} selected {% endif %}>Ladakh</option>
+                <option value="Lakshadweep" {% if form.buyer_state.value == "Lakshadweep" %} selected {% endif %}>Lakshadweep</option>
+                <option value="Puducherry" {% if form.buyer_state.value == "Puducherry" %} selected {% endif %}>Puducherry</option>
+              </select>
+              {% if form.state.errors %}
+                <div style="color: red; margin-top: 5px;">{{ form.buyer_state.errors }}</div>
+              {% endif %}
+            </div>
           </div>
           <div class="col-md-6 mb-3">
             <label for="invoice_date" class="form-label">Invoice Date</label>
-            <input type="date" id="invoice_date" name="invoice_date" class="form-control" required>
-          </div>
-          <div class="col-md-6 mb-3">
-            <label for="due_date" class="form-label">Due Date</label>
-            <input type="date" id="due_date" name="due_date" class="form-control" required>
-          </div>
+            <input type="date" id="invoice_date" name="invoice_date" class="form-control" required value="{{ bill_form.invoice_date.value|default:'' }}">
+            {% if bill_form.errors.invoice_date %}
+                <div class="text-danger">
+                    {% for error in bill_form.errors.invoice_date %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="due_date" class="form-label">Due Date</label>
+          <input type="date" id="due_date" name="due_date" class="form-control" required value="{{ bill_form.due_date.value|default:'' }}">
+          {% if bill_form.errors.due_date %}
+              <div class="text-danger">
+                  {% for error in bill_form.errors.due_date %}
+                      <small>{{ error }}</small>
+                  {% endfor %}
+              </div>
+          {% endif %}
+      </div>
           <div class="col-md-12 mb-3">
             <label for="other_charges" class="form-label">Other Charges (₹)</label>
-            <input type="number" id="other_charges" name="other_charges" class="form-control" step="0.01" oninput="calculateTotal()" required>
+            <input type="number" id="other_charges" name="other_charges" class="form-control" step="0.01" oninput="calculateTotal()" required value="{{ bill_form.other_charges.value|default:'' }}">
           </div>
         </div>
 
         <h3 class="text-center my-4">Product Details</h3>
-        <button type="button" id="add-product-btn" class="btn add-button mb-3">Add More Product</button>
-        <div id="product-fields" class="product-fields">
-          <div class="product-field">
-            <label>
+    <button type="button" id="add-product-btn" class="btn add-button mb-3">Add More Product</button>
+    <div id="product-fields" class="product-fields">
+      <div class="product-field">
+          <label>
               Description:
-              <input type="text" name="description[]" placeholder="Items" class="form-control" required>
-            </label>
-            <label>
+              <input type="text" name="description[]" placeholder="Items" class="form-control" value="{% if form.description %}{{ form.description.value }}{% endif %}" required>
+          </label>
+          <label>
               Quantity:
-              <input type="number" name="quantity[]" placeholder="Quantity" class="form-control" oninput="calculateTotal()" required>
-            </label>
-            <label>
+              <input type="number" name="quantity[]" placeholder="Quantity" class="form-control" value="{% if form.quantity %}{{ form.quantity.value }}{% endif %}" oninput="calculateTotal()" required>
+          </label>
+          <label>
               Rate (₹):
-              <input type="number" name="rate[]" placeholder="₹" step="0.01" class="form-control" oninput="calculateTotal()" required>
-            </label>
-            <label>
+              <input type="number" name="rate[]" placeholder="₹" step="0.01" class="form-control" value="{% if form.rate %}{{ form.rate.value }}{% endif %}" oninput="calculateTotal()" required>
+          </label>
+          <label>
               Tax (%):
-              <input type="number" name="tax[]" placeholder="Tax (%)" step="0.01" class="form-control" oninput="calculateTotal()" required>
-            </label>
-            <label>
+              <input type="number" name="tax[]" placeholder="Tax (%)" step="0.01" class="form-control" value="{% if form.tax %}{{ form.tax.value }}{% endif %}" oninput="calculateTotal()" required>
+          </label>
+          <label>
               Total:
-              <input type="number" name="total[]" placeholder="Total" class="form-control" readonly>
-            </label>
-            <button type="button" class="btn remove-button" onclick="removeProduct(this)">Remove</button>
-          </div>
-        </div>
-        
+              <input type="number" name="total[]" placeholder="Total" class="form-control" readonly value="{% if form.total %}{{ form.total.value }}{% endif %}">
+          </label>
+          <button type="button" class="btn remove-button" onclick="removeProduct(this)">Remove</button>
+      </div>
+  </div>
 
-        <div class="total-section">
-          <span>Subtotal: ₹</span>
-          <span id="subtotal" class="amount">0.00</span>
-        </div>
-        <div class="total-section">
-          <span>Total Amount: ₹</span>
-          <span id="total-amount" class="amount">0.00</span>
-        </div>
+    <div class="total-section">
+        <span>Subtotal: ₹</span>
+        <span id="subtotal" class="amount">0.00</span>
+    </div>
+    <div class="total-section">
+        <span>Total Amount: ₹</span>
+        <span id="total-amount" class="amount">0.00</span>
+    </div>
 
         <button type="submit" class="btn submit-button mt-4">Submit</button>
       </form>
@@ -221,6 +318,44 @@
       calculateTotal();
     }
   </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Function to remove error messages after 3 seconds
+        setTimeout(function() {
+            // Hide individual field errors
+            {% for field in bill_form %}
+                {% if field.errors %}
+                    var errorElement = document.getElementById('error-{{ forloop.counter }}');
+                    if (errorElement) {
+                        errorElement.style.display = 'none';
+                    }
+                {% endif %}
+            {% endfor %}
+            
+            // Hide non-field errors
+            var nonFieldErrors = document.getElementById('non-field-errors');
+            if (nonFieldErrors) {
+                nonFieldErrors.style.display = 'none';
+            }
+        }, 3000);  // 3000 milliseconds = 3 seconds
+    });
+  </script>
+  <!-- At the bottom of your HTML template -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Select all error messages
+      const errorMessages = document.querySelectorAll('.text-danger');
+
+      errorMessages.forEach((error) => {
+          // Set a timeout to remove each error message after 3 seconds
+          setTimeout(() => {
+              error.style.display = 'none';
+          }, 3000); // 3000ms = 3 seconds
+      });
+  });
+</script>
+</body>
+
 </body>
 
 </html>
