@@ -927,15 +927,14 @@ class Product(models.Model):
 class Bill(models.Model):
     bill_number = models.CharField(max_length=20, unique=True, blank=True)
     buyer_name = models.CharField(max_length=255)
-    buyer_number = models.BigIntegerField(null=True, blank=True)
+    buyer_number = models.BigIntegerField(null=True, blank=True,max_length=10)
     buyer_address = models.TextField()
-    buyer_pan_number = models.CharField(max_length=20)
-    buyer_state = models.CharField(max_length=50)
+    buyer_pan_number = models.CharField(max_length=10)
     invoice_date = models.DateField()
     due_date = models.DateField()
-    total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0)
- 
+    total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0) 
     other_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    buyer_state = models.CharField(max_length=100)
 
     def save(self, *args, **kwargs):
         if not self.bill_number:

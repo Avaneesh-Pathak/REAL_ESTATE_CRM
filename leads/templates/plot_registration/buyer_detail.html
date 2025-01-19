@@ -45,7 +45,7 @@
             </div>
             <div class="col-md-3">
                 <p><strong>Total Paid:</strong> <span class="text-success">₹{{ buyer.total_paid }}</span></p>
-                <p><strong>Total Rest Amount:</strong> <span class="text-success">₹{{ restamount }}</span></p>
+                <p><strong>Total Rest Amount:</strong> <span class="text-danger">₹{{ restamount }}</span></p>
             </div>
             <div class="col-md-3">
                 <p><strong>Payment Date:</strong> {{ buyer.payment_date }}</p>
@@ -112,7 +112,7 @@
             <td class="text-primary">₹{{ payment.amount_for_agent|floatformat:2 }}</td>
             <td class="text-danger">₹{{ payment.interest_earned|floatformat:2 }}</td>
             <td class="status-text">{{ payment.status }}</td>
-            <td class="text-warning">₹{{ payment.remaining_amount|floatformat:2 }}</td>
+            <td class="text-danger">₹{{ payment.remaining_amount|floatformat:2 }}</td>
             <td>
                 {% if payment.status == 'Pending' %}
                 <button onclick="payEmi({{ payment.id }})" class="btn btn-success btn-sm" id="pay-button-{{ payment.id }}">Pay EMI</button>

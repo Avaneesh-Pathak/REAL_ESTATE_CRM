@@ -422,6 +422,12 @@ class BillForm(forms.ModelForm):
         if buyer_number and len(str(buyer_number)) != 10:
             raise forms.ValidationError("Buyer number must be in 10 digits.")
         return buyer_number
+    
+    def clean_buyer_pan_number(self):
+        buyer_number = self.cleaned_data.get('buyer_pan_number')
+        if buyer_number and len(str(buyer_number)) != 10:
+            raise forms.ValidationError("Buyer Pan number must be in 10 digits.")
+        return buyer_number
 
 class BillItemForm(forms.ModelForm):
     class Meta:
