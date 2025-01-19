@@ -42,6 +42,10 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         # Check if it's a new instance or an update
         is_new_instance = self.pk is None
+        
+         # Hash the password if it is provided and not already hashed
+        if self.password and not self.password.startswith('pbkdf2_'):
+            self.set_password(self.password)
 
         # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)

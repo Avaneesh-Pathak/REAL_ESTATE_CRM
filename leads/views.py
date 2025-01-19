@@ -288,273 +288,10 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
 
 
     
-class LeadListView(OrganisorAndLoginRequiredMixin,AgentAndLoginRequiredMixin,generic.ListView):
+class LeadListView(AgentAndLoginRequiredMixin,generic.ListView):
     
     template_name = "leads/lead_list.html"
-    context_object_name = "leads"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+    context_object_name = "leads"    
 
     def get_queryset(self):
         # Use logging in models or views
@@ -562,17 +299,18 @@ class LeadListView(OrganisorAndLoginRequiredMixin,AgentAndLoginRequiredMixin,gen
 
         user = self.request.user
         # initial queryset of leads for the entire organisation
-        if user:
-            queryset = Lead.objects.filter(
+        if user.is_organisor:
+            queryset = Lead.objects.all()
+            # queryset = Lead.objects.filter(
                 # organisation=user.userprofile, 
-                agent__isnull=False
-            ).select_related('agent')
+                # agent__isnull=False
+            # ).select_related('agent')
         else:
             # Check if the user has an associated agent
             if hasattr(user, 'agent'):
                 queryset = Lead.objects.filter(
                     # organisation=user.agent.organisation, 
-                    # agent=user.agent
+                    agent=user.agent
                 ).select_related('agent')
             else:
                 queryset = Lead.objects.none()
