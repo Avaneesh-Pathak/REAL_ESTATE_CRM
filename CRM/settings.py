@@ -26,7 +26,7 @@ DEBUG = True
 
 # Allowed hosts (adjust for production)
 ALLOWED_HOSTS =['0.0.0.0','127.0.0.1']
-# CSRF_TRUSTED_ORIGINS = ['']
+
 
 TWILIO_ACCOUNT_SID = 'AC1aecf01fb386ff58a11d18179e2e0b7b'
 TWILIO_AUTH_TOKEN = '794dfc0b9d3c23a62d5382d25a282aff'
@@ -62,9 +62,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -123,8 +123,7 @@ USE_TZ = True
 USE_I18N = True
 USE_L10N = True
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+
 
 
 # Static files

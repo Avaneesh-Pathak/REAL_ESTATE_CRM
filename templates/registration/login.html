@@ -103,29 +103,37 @@
     }
 </style>
 
+
 <div class="container">
     <div class="form-container">
         <h2 class="form-title">Login</h2>
-        <form method="post">
+        <form id="loginForm" method="POST" action="{% url 'login' %}">
             {% csrf_token %}
-            <div class="login__field">
-                <label for="id_username" class="login__label">{{ form.username.label }}</label>
-                {{ form.username }}
-            </div>
-            <div class="login__field">
-                <label for="id_password" class="login__label">{{ form.password.label }}</label>
-                <div class="input-group">
-                    {{ form.password }}
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('id_password')">
-                            <span id="eye-icon-id_password" class="fas fa-eye"></span>
-                        </button>
-                    </div>
+            {% if messages %}
+                <div class="alert alert-success" role="alert" id="messages">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
                 </div>
+                <script>
+                    // Set a timeout to hide the message after 3 seconds (3000 milliseconds)
+                    setTimeout(function() {
+                        const messageDiv = document.getElementById('messages');
+                        if (messageDiv) {
+                            messageDiv.style.display = 'none'; // Hides the message
+                        }
+                    }, 3000); // Time in milliseconds (3 seconds)
+                </script>
+            {% endif %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" name="username" id="username" class="form-control" required>
             </div>
-            <button class="login__submit" type="submit">
-                Log In Now
-            </button>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
         <div class="login__extras">
             <a href="{% url 'reset_password' %}">Forgot password?</a>
@@ -135,6 +143,24 @@
         </div>
     </div>
 </div>
+<script>
+    // Function to get the CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    </script>
 
 <!-- Load Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -157,5 +183,4 @@
         }
     }
 </script>
-
 {% endblock content %}

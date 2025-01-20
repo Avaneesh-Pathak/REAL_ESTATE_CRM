@@ -53,14 +53,26 @@ logger = logging.getLogger(__name__)
 # views.py
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
+from django.contrib.auth import authenticate, login
 
-class CustomLoginView(LoginView):
-    template_name = 'registration/login.html'  # Replace with your custom login template
+@csrf_protect
+def custom_login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            print("login")
+            # Redirect to the dashboard or desired page after successful login
+            return redirect(reverse_lazy('dashboard'))  # Replace 'dashboard' with your actual URL name
+        else:
+            # Handle invalid login
+            return render(request, 'registration/login.html', {'error': 'Invalid username or password'})
     
-    def get_success_url(self):
-        print("login")
-        # Redirect to the dashboard after successful login
-        return reverse_lazy('dashboard')  # Replace 'dashboard' with your actual dashboard URL name
+    # Render the login template for GET requests
+    return render(request, 'registration/login.html')
 
 
 class SignupView(generic.CreateView):

@@ -13,7 +13,7 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView, 
     PasswordResetCompleteView,
 )
-from leads.views import LandingPageView, SignupView, DashboardView,update_profile,user_profile,search_view,CustomLoginView
+from leads.views import LandingPageView, SignupView, DashboardView,update_profile,user_profile,search_view,custom_login_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,7 +34,7 @@ urlpatterns = [
     path('reset-password-complete/', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     # path('login/', LoginView.as_view(), name='login'),
-    path('login/', CustomLoginView.as_view(), name='login'),
+    path('login/', custom_login_view, name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     
   
