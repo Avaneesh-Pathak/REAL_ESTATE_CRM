@@ -4,7 +4,7 @@ from leads.models import models
 from datetime import timedelta , date
 from django.views.generic import TemplateView
 from django.core.files import File
-
+from django.views.decorators.csrf import csrf_protect
 from decimal import Decimal, InvalidOperation
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -50,6 +50,29 @@ logger = logging.getLogger(__name__)
 
 # CRUD+L - Create, Retrieve, Update and Delete + List
 
+# views.py
+from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
+from django.contrib.auth import authenticate, login
+
+@csrf_protect
+def custom_login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            print("login")
+            # Redirect to the dashboard or desired page after successful login
+            return redirect(reverse_lazy('dashboard'))  # Replace 'dashboard' with your actual URL name
+        else:
+            # Handle invalid login
+            return render(request, 'registration/login.html', {'error': 'Invalid username or password'})
+    
+    # Render the login template for GET requests
+    return render(request, 'registration/login.html')
 
 
 class SignupView(generic.CreateView):
