@@ -1245,35 +1245,44 @@ class SaleListView(LoginRequiredMixin,ListView):
     template_name = 'sale/sale_list.html'  # Update with your template path
     context_object_name = 'sales'
 
-class SalaryListView(LoginRequiredMixin,ListView):
+from django.db.models import F, Value, DecimalField, ExpressionWrapper
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.views.generic.list import ListView
+
+class SalaryListView(AgentAndLoginRequiredMixin, ListView):
     model = Salary
     template_name = 'salary/salary_list.html'  # Update with your template path
     context_object_name = 'salaries'
 
     def get_queryset(self):
+        # If the logged-in user is an organisor, they can access all salaries
+        if self.request.user.is_organisor:
+            queryset = Salary.objects.all()
+        else:
+            # If the user is an agent, only show their own salaries
+            queryset = Salary.objects.filter(agent=self.request.user)
+
         # Annotate the queryset with the total compensation calculation
-        queryset =  Salary.objects.annotate(
+        queryset = queryset.annotate(
             total_compensation=ExpressionWrapper(
-                F('base_salary') + Value(0) + F('bonus') + F('commission'),  # Adjusted for potential None values
+                F('base_salary') + Value(0) + F('bonus') + F('commission'),
                 output_field=DecimalField()
             )
         )
-   
 
+        # Apply optional filtering by payment date
         payment_date = self.request.GET.get('payment_date')
         if payment_date:
-            # Filter salaries based on the selected payment date
             queryset = queryset.filter(payment_date=payment_date)
 
-        # Ensure that only agents with salaries on that date are shown
-        return queryset.order_by('-payment_date', '-id') # Show the latest payments first
+        return queryset.order_by('-payment_date', '-id')  # Show the latest payments first
+
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             html = render_to_string('salary/salary_list.html', context)
-            
             return JsonResponse({'html': html})
         return super().render_to_response(context, **response_kwargs)
-
 
 
 class BonusInfoView(LoginRequiredMixin,ListView):
@@ -1345,7 +1354,7 @@ def calculate_emi(request):
     return render(request, 'EMI/emi_calculation.html', {'emi': emi, 'error_message': error_message})
 
 # DAYBOOK
-class DaybookCreateView(LoginRequiredMixin, View):
+class DaybookCreateView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'Daybook/daybook_form.html'
 
     def get(self, request, *args, **kwargs):
@@ -1397,7 +1406,7 @@ class DaybookCreateView(LoginRequiredMixin, View):
             return redirect('leads:daybook_list')
         return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
 
-class DaybookListView(LoginRequiredMixin, View):
+class DaybookListView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'Daybook/daybook_list.html'
 
     def get(self, request, *args, **kwargs):
@@ -1444,7 +1453,7 @@ class DaybookListView(LoginRequiredMixin, View):
             return redirect('leads:daybook_list')
 
 
-class BalanceUpdateView(LoginRequiredMixin, View):
+class BalanceUpdateView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'Daybook/update_balance.html'
 
     def get(self, request, *args, **kwargs):
@@ -1526,7 +1535,7 @@ def calculate_emi(plot_price, interest_rate, tenure):
     
 
 # PLOT REGISTRATION
-class PlotRegistrationView(LoginRequiredMixin, View):
+class PlotRegistrationView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'plot_registration/plot_registration.html'
 
     def get(self, request, *args, **kwargs):
@@ -1756,7 +1765,7 @@ def load_properties(request):
     properties = Property.objects.filter(project_name_id=project_name).values('id', 'property.title')
     return JsonResponse(list(properties), safe=False)
 
-class BuyersListView(LoginRequiredMixin, View):
+class BuyersListView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'plot_registration/buyers_list.html'
 
     def get(self, request, *args, **kwargs):
@@ -2083,7 +2092,7 @@ def pay_emi(request, payment_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
 
 
-class GetProjectPriceView(View):
+class GetProjectPriceView(OrganisorAndLoginRequiredMixin,View):
     def get(self, request):
         project_id = request.GET.get('project_id')
         try:
@@ -2125,7 +2134,7 @@ def kisan_view(request, pk=None):
 
 # View for listing Kisan
 
-class KisanListView(LoginRequiredMixin, ListView):
+class KisanListView(OrganisorAndLoginRequiredMixin, ListView):
     model = Kisan
     template_name = 'kisan/kisan_list.html'
     context_object_name = 'kisans'
@@ -2147,7 +2156,7 @@ class KisanListView(LoginRequiredMixin, ListView):
 
         return context
 
-class KisanUpdateView(UpdateView):
+class KisanUpdateView(OrganisorAndLoginRequiredMixin,UpdateView):
 
     model = Kisan
     fields = [
@@ -2160,7 +2169,7 @@ class KisanUpdateView(UpdateView):
 
 # View for deleting Kisan
 
-class KisanDeleteView(DeleteView):
+class KisanDeleteView(OrganisorAndLoginRequiredMixin,DeleteView):
     model = Kisan
     template_name = 'kisan/kisan_confirm_delete.html'
     success_url = reverse_lazy('leads:kisan_list')
@@ -2338,7 +2347,7 @@ from django.shortcuts import render, redirect
 from decimal import Decimal
 
 
-class BillListView(ListView):
+class BillListView(OrganisorAndLoginRequiredMixin,ListView):
     model = Bill
     template_name = 'billing/invoice_list.html'
     context_object_name = 'bills'
@@ -2432,7 +2441,7 @@ def render_to_pdf(template_name, context):
     return pdf
 
 # Create Bill and Bill Items
-class CreateBillView(LoginRequiredMixin, ListView):
+class CreateBillView(OrganisorAndLoginRequiredMixin, ListView):
     model = Bill
     template_name = 'billing/create_bill.html'
     context_object_name = 'bills'

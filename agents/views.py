@@ -8,11 +8,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import reverse,get_object_or_404
 from leads.models import Agent,Salary
 from .forms import AgentModelForm,AgentCreateForm,AgentUpdateForm
-from .mixins import OrganisorAndLoginRequiredMixin
+from .mixins import OrganisorAndLoginRequiredMixin ,AgentAndLoginRequiredMixin
 
 
 
-class AgentListView(OrganisorAndLoginRequiredMixin, generic.ListView):
+class AgentListView(AgentAndLoginRequiredMixin, generic.ListView):
     template_name = "agents/agent_list.html"
     
     def get_queryset(self):
@@ -78,7 +78,7 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
         return super(AgentCreateView, self).form_valid(form)
 
 
-class AgentDetailView(OrganisorAndLoginRequiredMixin, generic.DetailView):
+class AgentDetailView(AgentAndLoginRequiredMixin, generic.DetailView):
     template_name = "agents/agent_detail.html"
     context_object_name = "agent"
 
@@ -172,17 +172,23 @@ class AgentDeleteView(OrganisorAndLoginRequiredMixin, generic.DeleteView):
     def get_queryset(self):
         # organisation = self.request.user.userprofile
         return Agent.objects.all()
+from django.views import generic
 
-
-class AgentTreeView(generic.TemplateView):
+class AgentTreeView(AgentAndLoginRequiredMixin, generic.TemplateView):
     template_name = 'agents/agent_tree.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Fetch all agents in the organization
-        # organisation = self.request.user.userprofile
-        agents = Agent.objects.all()
+        # Fetch the logged-in user
+        user = self.request.user
+        
+        # Fetch all agents if the user is an organisor
+        if user.is_organisor:
+            agents = Agent.objects.all()
+        else:
+            # Fetch only the logged-in agent and their descendants
+            agents = self.get_agent_and_descendants(user.agent)
 
         # Create a dictionary to hold agents by their ID
         agent_dict = {agent.id: agent for agent in agents}
@@ -205,3 +211,13 @@ class AgentTreeView(generic.TemplateView):
         # Add the tree agents to context
         context['agents'] = tree_agents  # Use the list of top-level agents
         return context
+
+    def get_agent_and_descendants(self, agent):
+        """
+        Recursively fetch the given agent and all their descendants.
+        """
+        descendants = [agent]
+        sub_agents = Agent.objects.filter(parent_agent=agent)
+        for sub_agent in sub_agents:
+            descendants.extend(self.get_agent_and_descendants(sub_agent))
+        return descendants
