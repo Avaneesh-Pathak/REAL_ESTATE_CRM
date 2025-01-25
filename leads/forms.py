@@ -68,11 +68,7 @@ class CustomUserCreationForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("This email is already in use.")
         return email
-        # widgets = {
-        #     'username': forms.TextInput(attrs={'class': 'login__input'}),
-        #     'email': forms.EmailInput(attrs={'class': 'login__input'}),
-        #     'password': forms.PasswordInput(attrs={'class': 'login__input'}),
-        # }
+        
 
 
 
