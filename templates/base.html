@@ -447,49 +447,38 @@
     </div>
     <nav>
         <a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
-
-        {% if request.user.is_organisor %}
-        <a href="{% url 'agents:agent-list' %}"><i class="fas fa-users"></i> Agents</a>
-        {% endif %}
-
-        <a href="#" id="toggle-leads-menu"><i class="fas fa-clipboard-list"></i> Leads <i class="fas fa-chevron-down"></i></a>
-        <div class="nested-menu" id="leads-menu">
-            <a href="{% url 'leads:lead-list' %}"><i class="fas fa-list"></i> Lead List</a>
-            <a href="{% url 'leads:lead-create' %}"><i class="fas fa-plus-circle"></i> Create Lead</a>
-            <a href="{% url 'leads:category-create' %}"><i class="fas fa-tags"></i> Create Category</a>
-        </div>
-
-        <a href="{% url 'leads:buyers_list' %}"><i class="fas fa-user-friends"></i> Buyers List</a>
-        <a href="#" id="toggle-properties-menu"><i class="fas fa-building"></i> Properties <i class="fas fa-chevron-down"></i></a>
-        <div class="nested-menu" id="properties-menu">
-            <a href="{% url 'leads:property_list' %}"><i class="fas fa-list-alt"></i> Property List</a>
-            <a href="{% url 'leads:property-create' %}"><i class="fas fa-plus-square"></i> Property Create</a>
-            <a href="{% url 'leads:plot_registration' %}"><i class="fas fa-map-marker-alt"></i> Register Plot</a>
-            <a href="{% url 'leads:project-create' %}" class="fas fa-project-diagram">Create Project</a>
-        </div>
         <a href="#" id="toggle-Kisan-menu"><i class="fas fa-building"></i> Kisan Management <i class="fas fa-chevron-down"></i></a>
         <div class="nested-menu" id="Kisan-menu">
             <a href="{% url 'leads:kisan_create' %}"><i class="fas fa-plus-circle"></i> Add Kisan</a>     
             <a href="{% url 'leads:kisan_list' %}"><i class="fas fa-seedling"></i> View Kisan List</a>       
-            {% comment %} <a href="{% url 'leads:property-create' %}"><i class="fas fa-plus-square"></i> Property Create</a>
-            <a href="{% url 'leads:plot_registration' %}"><i class="fas fa-map-marker-alt"></i> Register Plot</a>
-            <a href="{% url 'leads:project-create' %}" class="fas fa-project-diagram">Create Project</a> {% endcomment %}
         </div>
-
-        
-        
-
+        <a href="#" id="toggle-properties-menu"><i class="fas fa-building"></i> Properties <i class="fas fa-chevron-down"></i></a>
+        <div class="nested-menu" id="properties-menu">
+            <a href="{% url 'leads:project-create' %}" class="fas fa-project-diagram">Create Project</a>
+            <a href="{% url 'leads:property-create' %}"><i class="fas fa-plus-square"></i> Property Create</a>
+            <a href="{% url 'leads:property_list' %}"><i class="fas fa-list-alt"></i> Property List</a>
+        </div>
+        <a href="#" id="toggle-buyer-menu"><i class="fas fa-building"></i> Buyers Manage. <i class="fas fa-chevron-down"></i></a>
+        <div class="nested-menu" id="buyer-menu">
+            <a href="{% url 'leads:plot_registration' %}"><i class="fas fa-map-marker-alt"></i> Register Plot</a>
+            <a href="{% url 'leads:buyers_list' %}"><i class="fas fa-user-friends"></i> Buyers List</a>
+        </div>
+        <a href="#" id="toggle-leads-menu"><i class="fas fa-clipboard-list"></i> Leads <i class="fas fa-chevron-down"></i></a>
+        <div class="nested-menu" id="leads-menu">
+            <a href="{% url 'leads:lead-create' %}"><i class="fas fa-plus-circle"></i> Create Lead</a>
+            <a href="{% url 'leads:category-create' %}"><i class="fas fa-tags"></i> Create Category</a>
+            <a href="{% url 'leads:lead-list' %}"><i class="fas fa-list"></i> Lead List</a>
+        </div>
+        {% if  request.user.is_agent %}
+        <a href="{% url 'agents:agent-list' %}"><i class="fas fa-users"></i> Agents</a>
+        {% endif %}
         <a href="{% url 'leads:salary_list' %}"><i class="fas fa-rupee-sign"></i> Salary</a>
         <a href="{% url 'leads:daybook_list' %}"><i class="fas fa-book"></i> Daybook</a>
-
-        <a class="nav-link" href="{% url 'leads:create_bill' %}">
-            <i class="fa fa-file-invoice"></i> Create Bill
-        </a>
-        <a href="{% url 'leads:bill_list' %}" class="sidebar-btn">
-            <button class="download-btn">
-                <i class="fa fa-receipt"></i> View All Bills
-            </button>
-        </a>
+        <a href="#" id="toggle-bills-menu"><i class="fas fa-money-check-alt"></i> Billing <i class="fas fa-chevron-down"></i></a>
+        <div class="nested-menu" id="bills-menu">
+            <a class="nav-link" href="{% url 'leads:create_bill' %}"><i class="fa fa-file-invoice"></i> Create Bill</a>
+            <a href="{% url 'leads:bill_list' %}" class="sidebar-btn"><button class="download-btn"><i class="fa fa-receipt"></i> View All Bills</button></a>
+        </div>    
     </nav>
 </div>
 
@@ -566,21 +555,6 @@
             document.getElementById('sidebar').style.transform = 'translateX(-100%)';
         });
 
-        {% comment %} document.getElementById('toggle-leads-menu').addEventListener('click', function () {
-            document.getElementById('leads-menu').classList.toggle('hidden');
-        }); {% endcomment %}
-
-        document.getElementById('toggle-sales-menu').addEventListener('click', function () {
-            document.getElementById('sales-menu').classList.toggle('hidden');
-        });
-
-        document.getElementById('toggle-properties-menu').addEventListener('click', function () {
-            document.getElementById('properties-menu').classList.toggle('hidden');
-        });
-        document.getElementById('toggle-Kisan-menu').addEventListener('click', function () {
-            document.getElementById('Kisan-menu').classList.toggle('hidden');
-        });
-
         document.getElementById('profile-menu-button').addEventListener('click', function (event) {
             event.stopPropagation();
             document.getElementById('profile-dropdown').classList.toggle('hidden');
@@ -651,6 +625,21 @@
         $('#toggle-leads-menu').on('click', function (e) {
             e.preventDefault(); // Prevent default link behavior
             $('#leads-menu').slideToggle(); // Use slideToggle for animation
+        });
+        // Toggle nested menu for Leads
+        $('#toggle-Kisan-menu').on('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            $('#Kisan-menu').slideToggle(); // Use slideToggle for animation
+        });
+        // Toggle nested menu for Leads
+        $('#toggle-buyer-menu').on('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            $('#buyer-menu').slideToggle(); // Use slideToggle for animation
+        });
+        // Toggle nested menu for Leads
+        $('#toggle-bills-menu').on('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            $('#bills-menu').slideToggle(); // Use slideToggle for animation
         });
     </script>
 </body>

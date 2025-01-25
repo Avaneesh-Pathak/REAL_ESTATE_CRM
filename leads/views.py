@@ -1,5 +1,7 @@
 import logging
 import datetime
+from django.utils.dateparse import parse_date
+from django import forms
 from leads.models import models
 from datetime import timedelta , date
 from django.views.generic import TemplateView
@@ -21,7 +23,9 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views import View, generic
 from django.views.generic import ListView, UpdateView, DeleteView
-
+from django.db.models import Sum
+from django.utils.timezone import now
+from datetime import timedelta
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot,send_sms
 from agents.mixins import OrganisorAndLoginRequiredMixin ,AgentAndLoginRequiredMixin
 from leads.models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,EMIPayment,Balance
@@ -213,79 +217,112 @@ def update_profile(request):
     }
     return render(request, 'leads/profile.html', context)
 
+
+
+class ExpenseFilterForm(forms.Form):
+    start_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+    )
+    end_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+    )
+    
 class DashboardView(LoginRequiredMixin, generic.TemplateView):
     template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
-        context = super(DashboardView, self).get_context_data(**kwargs)
-        user = self.request.user
-        property = Property.objects.filter(is_sold = True)
-        totalpropertysold = property.count()
-        totalpropertysoldamount = sum(pro.totalprice for pro in property)
-        plt = PlotBooking.objects.all()
-        emi = EMIPayment.objects.filter(status = 'Paid')
-        totalmoneyearned = sum( plot.total_paidbycust for plot in plt) + sum(em.emi_amount for em in emi) - totalpropertysoldamount
+        context = super().get_context_data(**kwargs)
 
+        # Fetch the current date and start of the month
+        today = now().date()
 
-        # Total leads
-        total_lead_count = Lead.objects.all().count()
+        # Fetch date range from the request
+        request = self.request
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
 
-        recent_buyers = PlotBooking.objects.order_by('-booking_date')[:5]  # Use the appropriate field for your criteria
+        # Parse dates safely
+        if start_date:
+            start_date = parse_date(str(start_date))
+        if end_date:
+            end_date = parse_date(str(end_date))
+
+        # Default date range to current month if no dates provided
+        if not start_date:
+            start_date = today.replace(day=1)
+        if not end_date:
+            end_date = today
+
+        # Calculate monthly expenses for the selected date range
+        monthly_expenses = Daybook.objects.filter(date__range=(start_date, end_date)).aggregate(
+            total_amount=Sum('amount')
+        )['total_amount'] or 0
+
+        # Calculate total salaries distributed in the selected date range
+        total_salaries = Salary.objects.filter(payment_date__gte=start_date).aggregate(
+            total=Sum('base_salary')
+        )['total'] or 0
+
+        # Calculate total agent commissions for the selected date range
+        total_agent_commissions = Salary.objects.filter(payment_date__gte=start_date).aggregate(
+            total=Sum('base_salary')
+        )['total'] or 0
+
+        # Calculate total land and development costs
+        total_land_cost = Kisan.objects.aggregate(total=Sum('land_costing'))['total'] or 0
+        total_development_cost = Kisan.objects.aggregate(total=Sum('development_costing'))['total'] or 0
+
+        # Calculate total sales (earned revenue)
+        total_sales = PlotBooking.objects.aggregate(total=Sum('Plot_price'))['total'] or 0
+
+        # Calculate total profit
+        total_expenses = (
+            total_salaries +
+            total_agent_commissions +
+            total_land_cost +
+            total_development_cost +
+            monthly_expenses
+        )
+        grand_total_profit = total_sales - total_expenses
         
-
-        # Sales Report
+        # Sales Report - Data for graph
         sales_data = PlotBooking.objects.values('booking_date').annotate(
             total_sale_price=Sum('Plot_price'),
             properties_sold=Count('id')
         ).order_by('booking_date')
 
-        labels = [sale['booking_date'].strftime("%Y-%m-%d") for sale in sales_data]  # Format dates
+        labels = [sale['booking_date'].strftime("%Y-%m-%d") for sale in sales_data]
         data = [sale['properties_sold'] for sale in sales_data]
-
-        # Calculate total sales amount and total costs
-        total_sales = PlotBooking.objects.aggregate(total=Sum('Plot_price'))['total'] or 0
-        total_land_cost = Kisan.objects.aggregate(total=Sum('land_costing'))['total'] or 0
-        total_development_cost = Kisan.objects.aggregate(total=Sum('development_costing'))['total'] or 0
 
         # Prepare profit data for the graph
         profit_data = []
         for sale in sales_data:
             profit = sale['total_sale_price'] - total_land_cost - total_development_cost
-            profit_data.append(float(profit))  # Convert Decimal to float for JavaScript compatibility
- 
-        # Calculate total profit
-        total_cost = total_land_cost + total_development_cost
-        total_profit = total_sales - total_cost
+            profit_data.append(float(profit))
 
-        # Calculate total salary distributed
-        total_salary_distributed = Salary.objects.filter(payment_date__gte=timezone.now().date() - timedelta(days=30)).aggregate(total=Sum('base_salary'))['total'] or 0
+        # Total salary distributed in the last 30 days
+        total_salary_distributed = Salary.objects.filter(payment_date__gte=today - timedelta(days=30)).aggregate(
+            total=Sum('base_salary')
+        )['total'] or 0
 
         # Salary distribution data for pie chart
-        
         salary_distribution = [
-            float(total_salary_distributed),  # Convert to float
-            float(total_profit - total_salary_distributed),]  # Convert to float
+            float(total_salary_distributed),
+            float(grand_total_profit - total_salary_distributed),
+        ]
         salaryDistribution_labels = ['Salary Distributed', 'Remaining Profit']
 
-        # Debugging
-        # print("Labels:", labels)
-        # print("Total cost:" , total_cost)
-        # print("Sales Data:", sales_data)
-        # print("Total Sales:", totalpropertysold)
-        # print("Total Land Cost:", total_land_cost)
-        # print("Total Development Cost:", total_development_cost)
-        # print("Profit Data:", profit_data)
-        # print("Total Profit:", total_profit)
-        # print("Total salary_distribution:", salary_distribution)
-        # print("Salary Distribution Data:", salary_distribution)
-        # print("Salary Distribution Labels:", salaryDistribution_labels)
+        # Total leads and recent buyers
+        total_lead_count = Lead.objects.count()
+        recent_buyers = PlotBooking.objects.order_by('-booking_date')[:5]
 
+        # Leads and converted leads in the last 30 days
+        thirty_days_ago = today - timedelta(days=30)
+        total_in_past30 = Lead.objects.filter(date_added__gte=thirty_days_ago).count()
 
-        # Leads in last 30 days
-        thirty_days_ago = timezone.now().date() - timedelta(days=30)
-        total_in_past30 = Lead.objects.filter(
-            date_added__gte=thirty_days_ago
-        ).count()
+        remaining_profit = grand_total_profit - total_salary_distributed
 
         converted_category = Category.objects.filter(name="Converted").first()
         converted_in_past30 = Lead.objects.filter(
@@ -293,29 +330,37 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
             converted_date__gte=thirty_days_ago
         ).count()
 
+        # Update context with all the data
         context.update({
             'labels': labels,
             'data': data,
-            'recent_buyers': recent_buyers,
-            'profit_labels': labels,  # Reuse the same labels for profit
+            'profit_labels': labels,
             'profit_data': profit_data,
             'total_lead_count': total_lead_count,
             'total_in_past30': total_in_past30,
             'converted_in_past30': converted_in_past30,
-            'total_sales': totalpropertysold,
-            'total_cost': totalpropertysoldamount,
-            'total_profit': totalmoneyearned,
+            'total_sales': total_sales,
+            'total_land_cost': total_land_cost,
+            'total_development_cost': total_development_cost,
+            'total_expenses': total_expenses,
+            'total_profit': grand_total_profit,
+            'monthly_expenses': monthly_expenses,
+            'grand_total_profit': grand_total_profit,
             'salary_distribution': salary_distribution,
             'salaryDistribution_labels': salaryDistribution_labels,
-            
+            'recent_buyers': recent_buyers,
+            'remaining_profit': remaining_profit,
         })
+
         return context
 
 
     
-class LeadListView(OrganisorAndLoginRequiredMixin,AgentAndLoginRequiredMixin,generic.ListView):
+class LeadListView(AgentAndLoginRequiredMixin,generic.ListView):
     
     template_name = "leads/lead_list.html"
+    context_object_name = "leads"    
+
     context_object_name = "leads"
     def get_queryset(self):
         # Use logging in models or views
@@ -323,17 +368,18 @@ class LeadListView(OrganisorAndLoginRequiredMixin,AgentAndLoginRequiredMixin,gen
 
         user = self.request.user
         # initial queryset of leads for the entire organisation
-        if user:
-            queryset = Lead.objects.filter(
+        if user.is_organisor:
+            queryset = Lead.objects.all()
+            # queryset = Lead.objects.filter(
                 # organisation=user.userprofile, 
-                agent__isnull=False
-            ).select_related('agent')
+                # agent__isnull=False
+            # ).select_related('agent')
         else:
             # Check if the user has an associated agent
             if hasattr(user, 'agent'):
                 queryset = Lead.objects.filter(
                     # organisation=user.agent.organisation, 
-                    # agent=user.agent
+                    agent=user.agent
                 ).select_related('agent')
             else:
                 queryset = Lead.objects.none()
@@ -1237,35 +1283,44 @@ class SaleListView(LoginRequiredMixin,ListView):
     template_name = 'sale/sale_list.html'  # Update with your template path
     context_object_name = 'sales'
 
-class SalaryListView(LoginRequiredMixin,ListView):
+from django.db.models import F, Value, DecimalField, ExpressionWrapper
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.views.generic.list import ListView
+
+class SalaryListView(AgentAndLoginRequiredMixin, ListView):
     model = Salary
     template_name = 'salary/salary_list.html'  # Update with your template path
     context_object_name = 'salaries'
 
     def get_queryset(self):
+        # If the logged-in user is an organisor, they can access all salaries
+        if self.request.user.is_organisor:
+            queryset = Salary.objects.all()
+        else:
+            # If the user is an agent, only show their own salaries
+            queryset = Salary.objects.filter(agent=self.request.user)
+
         # Annotate the queryset with the total compensation calculation
-        queryset =  Salary.objects.annotate(
+        queryset = queryset.annotate(
             total_compensation=ExpressionWrapper(
-                F('base_salary') + Value(0) + F('bonus') + F('commission'),  # Adjusted for potential None values
+                F('base_salary') + Value(0) + F('bonus') + F('commission'),
                 output_field=DecimalField()
             )
         )
-   
 
+        # Apply optional filtering by payment date
         payment_date = self.request.GET.get('payment_date')
         if payment_date:
-            # Filter salaries based on the selected payment date
             queryset = queryset.filter(payment_date=payment_date)
 
-        # Ensure that only agents with salaries on that date are shown
-        return queryset.order_by('-payment_date', '-id') # Show the latest payments first
+        return queryset.order_by('-payment_date', '-id')  # Show the latest payments first
+
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             html = render_to_string('salary/salary_list.html', context)
-            
             return JsonResponse({'html': html})
         return super().render_to_response(context, **response_kwargs)
-
 
 
 class BonusInfoView(LoginRequiredMixin,ListView):
@@ -1337,7 +1392,7 @@ def calculate_emi(request):
     return render(request, 'EMI/emi_calculation.html', {'emi': emi, 'error_message': error_message})
 
 # DAYBOOK
-class DaybookCreateView(LoginRequiredMixin, View):
+class DaybookCreateView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'Daybook/daybook_form.html'
 
     def get(self, request, *args, **kwargs):
@@ -1389,7 +1444,7 @@ class DaybookCreateView(LoginRequiredMixin, View):
             return redirect('leads:daybook_list')
         return render(request, self.template_name, {'form': form, 'today': timezone.now().date()})
 
-class DaybookListView(LoginRequiredMixin, View):
+class DaybookListView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'Daybook/daybook_list.html'
 
     def get(self, request, *args, **kwargs):
@@ -1436,7 +1491,7 @@ class DaybookListView(LoginRequiredMixin, View):
             return redirect('leads:daybook_list')
 
 
-class BalanceUpdateView(LoginRequiredMixin, View):
+class BalanceUpdateView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'Daybook/update_balance.html'
 
     def get(self, request, *args, **kwargs):
@@ -1518,7 +1573,7 @@ def calculate_emi(plot_price, interest_rate, tenure):
     
 
 # PLOT REGISTRATION
-class PlotRegistrationView(LoginRequiredMixin, View):
+class PlotRegistrationView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'plot_registration/plot_registration.html'
 
     def get(self, request, *args, **kwargs):
@@ -1748,7 +1803,7 @@ def load_properties(request):
     properties = Property.objects.filter(project_name_id=project_name).values('id', 'property.title')
     return JsonResponse(list(properties), safe=False)
 
-class BuyersListView(LoginRequiredMixin, View):
+class BuyersListView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'plot_registration/buyers_list.html'
 
     def get(self, request, *args, **kwargs):
@@ -2075,7 +2130,7 @@ def pay_emi(request, payment_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
 
 
-class GetProjectPriceView(View):
+class GetProjectPriceView(OrganisorAndLoginRequiredMixin,View):
     def get(self, request):
         project_id = request.GET.get('project_id')
         try:
@@ -2117,7 +2172,7 @@ def kisan_view(request, pk=None):
 
 # View for listing Kisan
 
-class KisanListView(LoginRequiredMixin, ListView):
+class KisanListView(OrganisorAndLoginRequiredMixin, ListView):
     model = Kisan
     template_name = 'kisan/kisan_list.html'
     context_object_name = 'kisans'
@@ -2139,7 +2194,7 @@ class KisanListView(LoginRequiredMixin, ListView):
 
         return context
 
-class KisanUpdateView(UpdateView):
+class KisanUpdateView(OrganisorAndLoginRequiredMixin,UpdateView):
 
     model = Kisan
     fields = [
@@ -2152,7 +2207,7 @@ class KisanUpdateView(UpdateView):
 
 # View for deleting Kisan
 
-class KisanDeleteView(DeleteView):
+class KisanDeleteView(OrganisorAndLoginRequiredMixin,DeleteView):
     model = Kisan
     template_name = 'kisan/kisan_confirm_delete.html'
     success_url = reverse_lazy('leads:kisan_list')
@@ -2330,7 +2385,7 @@ from django.shortcuts import render, redirect
 from decimal import Decimal
 
 
-class BillListView(ListView):
+class BillListView(OrganisorAndLoginRequiredMixin,ListView):
     model = Bill
     template_name = 'billing/invoice_list.html'
     context_object_name = 'bills'
@@ -2424,7 +2479,7 @@ def render_to_pdf(template_name, context):
     return pdf
 
 # Create Bill and Bill Items
-class CreateBillView(LoginRequiredMixin, ListView):
+class CreateBillView(OrganisorAndLoginRequiredMixin, ListView):
     model = Bill
     template_name = 'billing/create_bill.html'
     context_object_name = 'bills'

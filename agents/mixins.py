@@ -11,7 +11,7 @@ class OrganisorAndLoginRequiredMixin(AccessMixin):
     
 
 class AgentAndLoginRequiredMixin(AccessMixin):
-    """Verify that the current user is authenticated and is an organisor."""
+    """Verify that the current user is authenticated and is an agent."""
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or not request.user.is_agent:
             return redirect("leads:lead-list")
