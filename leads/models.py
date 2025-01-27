@@ -404,6 +404,13 @@ class Project(models.Model):
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
         logger.info(f'Project instance {self.pk} was {action}. Data: {data}')
 
+
+    def __str__(self):
+        # Log access to the Project instance
+        logger.info(f"Project accessed: Title={self.project_name}")
+        return self.project_name
+    
+
 @receiver(pre_delete, sender=Project)
 def log_userprofile_deletion(sender, instance, **kwargs):
         # Collect the instance data before deletion

@@ -122,20 +122,76 @@
         }
     }
 </style>
-
 <div class="lead-section container mt-8">
-    <h1 style="font-family: 'Poppins', sans-serif; font-size: xx-large; margin-bottom: 20px; font-weight: bold; color: #333; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);" class="text-center">
-        Analysis
+    <h1 style="font-family: 'Poppins', sans-serif; font-size: 2.5rem; margin-bottom: 30px; font-weight: bold; color: #333; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); text-align: center;">
+        Insight's
     </h1>
     
-    <div class="row">
+    <!-- Date Filter Form -->
+    <form method="get" class="row mb-4">
+        <div class="col-md-5">
+            <label for="start_date" style="font-weight: 600; color: #333;">Start Date:</label>
+            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ form.start_date.value }}">
+        </div>
+        <div class="col-md-5">
+            <label for="end_date" style="font-weight: 600; color: #333;">End Date:</label>
+            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ form.end_date.value }}">
+        </div>
+        <div class="col-md-2 align-self-end">
+            <button type="submit" class="btn btn-primary w-100" style="border-radius: 10px; font-weight: 600; background-color: #4A90E2; color: white; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">Filter</button>
+        </div>
+    </form>
+
+    <!-- Project Filter Form and Project Data in One Row -->
+<!-- Project Filter Form and Project Data in One Row -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
+    <!-- Project Filter Form -->
+    <form method="GET" action="{% url 'dashboard' %}" style="display: flex; align-items: flex-start; width: 48%; flex-wrap: wrap;">
+        <label for="project_id" style="margin-right: 10px; font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px; width: 100%;">Select Project:</label>
+        <select name="project_id" id="project_id" style="padding: 12px; margin-right: 15px; width: 100%; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;">
+            <option value="">All Projects</option>
+            {% for project in projects %}
+                <option value="{{ project.id }}" {% if project.id|stringformat:"s" == selected_project_id %}selected{% endif %}>
+                    {{ project.project_name }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="padding: 12px 24px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
+            Filter by Project
+        </button>
+    </form>
+
+    <!-- Project Data -->
+    {% if project_data.selected_project %}
+    <div style="display: flex; flex-wrap: wrap; gap: 15px; width: 48%; justify-content: space-between; align-items: stretch;">
+        <div style="flex: 1; padding: 18px; font-size: 18px; background-color: #f1f1f1; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+            <strong>Total Properties:</strong> <br><span style="color: #333;">{{ project_data.total_properties }}</span>
+        </div>
+        <div style="flex: 1; padding: 18px; font-size: 18px; background-color: #f1f1f1; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+            <strong>Total Sold:</strong> <br><span style="color: #333;">{{ project_data.total_sold }}</span>
+        </div>
+        <div style="flex: 1; padding: 18px; font-size: 18px; background-color: #f1f1f1; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+            <strong>Total EMI:</strong><br> <span style="color: #333;">{{ project_data.total_emi }}</span>
+        </div>
+        <div style="flex: 1; padding: 18px; font-size: 18px; background-color: #f1f1f1; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+            <strong>Available Plots:</strong> <br> <span style="color: #333;">{{ project_data.available_plots }}</span>
+        </div>
+    </div>
+    {% else %}
+    <p>Select a project to view details.</p>
+    {% endif %}
+</div>
+
+
+
+    <div class="row mt-4">
         <!-- Total Leads -->
         <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #4A90E2; border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center text-white" style="background-color: #4A90E2; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.5rem; font-weight: bold; text-transform: uppercase;">Total Leads</h3>
                     <a href="{% url 'leads:lead-list' %}">
-                        <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: #fff;">{{ total_lead_count }}</p>
+                        <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: white;">{{ total_lead_count }}</p>
                     </a>
                 </div>
             </div>
@@ -143,20 +199,20 @@
 
         <!-- Leads in the Past 30 Days -->
         <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #50E3C2; border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center text-white" style="background-color: #50E3C2; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.5rem; font-weight: bold; text-transform: uppercase;">Leads in the Past 30 Days</h3>
-                    <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: #fff;">{{ total_in_past30 }}</p>
+                    <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: white;">{{ total_in_past30 }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Converted Leads in the Past 30 Days -->
         <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #F5A623; border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center text-white" style="background-color: #F5A623; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.5rem; font-weight: bold; text-transform: uppercase;">Converted Leads in the Past 30 Days</h3>
-                    <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: #fff;">{{ converted_in_past30 }}</p>
+                    <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: white;">{{ converted_in_past30 }}</p>
                 </div>
             </div>
         </div>
@@ -165,38 +221,41 @@
     <!-- Sales and Profit Section -->
     <div class="row mt-4">
         <!-- Sales Data -->
-        <div class="bg-white col-md-6" style="border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-            <h3 style="font-size:x-large; margin-left: 25%; font-weight: bold; color: #333;">Properties Sold Over Time</h3>
-            <canvas id="salesChart"></canvas>
+        <div class="col-md-6" style="border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 1.6rem; font-weight: bold; color: #333; text-align: center; margin-top: 20px;">Properties Sold Over Time</h3>
+            <canvas id="salesChart" style="width: 100%; height: 300px;"></canvas>
         </div>
-       
+
         <!-- Profit Data -->
-        <div class="bg-white col-md-6" style="border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-            <h3 style="font-size:x-large; margin-left: 40%; font-weight: bold; color: #333;">Profit Over Time</h3>
-            <canvas id="profitChart"></canvas>
+        <div class="col-md-6" style="border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 1.6rem; font-weight: bold; color: #333; text-align: center; margin-top: 20px;">Profit Over Time</h3>
+            <canvas id="profitChart" style="width: 100%; height: 300px;"></canvas>
         </div>
     </div>
 
     <!-- Summary Section -->
     <div class="row mt-4">
         <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #34495E; border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center text-white" style="background-color: #34495E; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.25rem;">Total Sales</h3>
                     <p class="display-4" style="font-size: 2.5rem;">₹{{ total_sales }}</p>
                 </div>
             </div>
         </div>
+
         <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #E74C3C; border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center text-white" style="background-color: #E74C3C; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.25rem;">Total Cost of Registered Buyer</h3>
                     <p class="display-4" style="font-size: 2.5rem;">₹{{ total_cost|floatformat:2 }}</p>
+                    <small class="text-light">Including Land cost and Development cost</small>
                 </div>
             </div>
         </div>
+
         <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #1ABC9C; border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center text-white" style="background-color: #1ABC9C; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.25rem;">Total Profit After</h3>
                     <p class="display-4" style="font-size: 2.5rem;">₹{{ total_profit|floatformat:2 }}</p>
@@ -204,6 +263,8 @@
             </div>
         </div>
     </div>
+</div>
+
 
     <br>
 
@@ -248,19 +309,12 @@
     </div>
 </div>
 
-<form method="get" class="row mb-3">
-    <div class="col-md-5">
-        <label for="start_date" style="font-weight: bold; color: #333;">Start Date:</label>
-        <input type="date" name="start_date" id="start_date" class="form-control" value="{{ form.start_date.value }}">
-    </div>
-    <div class="col-md-5">
-        <label for="end_date" style="font-weight: bold; color: #333;">End Date:</label>
-        <input type="date" name="end_date" id="end_date" class="form-control" value="{{ form.end_date.value }}">
-    </div>
-    <div class="col-md-2 align-self-end">
-        <button type="submit" class="btn btn-primary w-100" style="border-radius: 10px; font-weight: bold; background-color: #4A90E2; color: #fff;">Filter</button>
-    </div>
-</form>
+<br><br>
+
+
+
+<br>
+<br>
 
 <!-- Total Sales and Expenses Section -->
 <div class="container-fluid">
@@ -295,7 +349,7 @@
         <div class="col-md-3">
             <div class="card text-center text-white bg-primary">
                 <div class="card-body">
-                    <h4>Salaries Expense</h4>
+                    <h4>Agent Commissions</h4>
                     <p class="display-5">₹{{ total_salaries|floatformat:2 }}</p>
                     <small>For the selected date range</small>
                 </div>
@@ -306,8 +360,8 @@
         <div class="col-md-3">
             <div class="card text-center text-white bg-success">
                 <div class="card-body">
-                    <h4>Agent Commissions</h4>
-                    <p class="display-5">₹{{ total_agent_commissions|floatformat:2 }}</p>
+                    <h4>Total Number of Projects</h4>
+                    <p class="display-5">{{ total_projects}}</p>
                     <small>For the selected date range</small>
                 </div>
             </div>

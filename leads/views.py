@@ -242,6 +242,7 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
         request = self.request
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
+        selected_project_id = self.request.GET.get('project_id')
 
         # Parse dates safely
         if start_date:
@@ -261,22 +262,29 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
         )['total_amount'] or 0
 
         # Calculate total salaries distributed in the selected date range
-        total_salaries = Salary.objects.filter(payment_date__gte=start_date).aggregate(
-            total=Sum('base_salary')
-        )['total'] or 0
+        total_salaries = (
+            Salary.objects.filter(payment_date__range=(start_date, end_date))
+            .aggregate(total=Sum('base_salary'))['total']
+            or 0
+        )
 
-        # Calculate total agent commissions for the selected date range
-        total_agent_commissions = Salary.objects.filter(payment_date__gte=start_date).aggregate(
-            total=Sum('base_salary')
-        )['total'] or 0
+        # Calculate total agent commissions in the selected date range
+        total_agent_commissions = (
+            Salary.objects.filter(payment_date__range=(start_date, end_date))
+            .aggregate(total_commissions=Sum('commission'))['total_commissions']
+            or 0
+        )
 
+        
+    
         # Calculate total land and development costs
         total_land_cost = Kisan.objects.aggregate(total=Sum('land_costing'))['total'] or 0
-        total_development_cost = Kisan.objects.aggregate(total=Sum('development_costing'))['total'] or 0
+        total_development_cost = Project.objects.aggregate(total=Sum('dev_cost'))['total'] or 0
+       
 
         # Calculate total sales (earned revenue)
         total_sales = PlotBooking.objects.aggregate(total=Sum('Plot_price'))['total'] or 0
-
+        total_cost = total_development_cost + total_land_cost
         # Calculate total profit
         total_expenses = (
             total_salaries +
@@ -330,16 +338,42 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
             converted_date__gte=thirty_days_ago
         ).count()
 
+        projects = Project.objects.all()
+        total_projects = Project.objects.count()
+        # If a specific project is selected, calculate project-related data
+        project_data = {}
+        if selected_project_id:
+            selected_project = projects.filter(id=selected_project_id).first()
+
+            if selected_project:
+                total_properties = Property.objects.filter(project_id=selected_project).count()
+                total_sold = Property.objects.filter(project_id=selected_project, is_sold=True).count()
+                total_emi = Property.objects.filter(project_id=selected_project, is_in_emi=True).count()
+                available_plots = Property.objects.filter(project_id=selected_project, is_sold=False).count()
+
+                project_data = {
+                    "selected_project": selected_project,
+                    "total_properties": total_properties,
+                    "total_sold": total_sold,
+                    "total_emi": total_emi,
+                    "available_plots": available_plots,
+                    
+                }
+
+
         # Update context with all the data
         context.update({
             'labels': labels,
             'data': data,
             'profit_labels': labels,
+            'total_salaries': total_salaries,
+            'total_projects': total_projects,
             'profit_data': profit_data,
             'total_lead_count': total_lead_count,
             'total_in_past30': total_in_past30,
             'converted_in_past30': converted_in_past30,
             'total_sales': total_sales,
+            'total_cost': total_cost,
             'total_land_cost': total_land_cost,
             'total_development_cost': total_development_cost,
             'total_expenses': total_expenses,
@@ -350,6 +384,9 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
             'salaryDistribution_labels': salaryDistribution_labels,
             'recent_buyers': recent_buyers,
             'remaining_profit': remaining_profit,
+            "projects": projects,
+            "project_data": project_data,
+            "selected_project_id": selected_project_id,
         })
 
         return context
