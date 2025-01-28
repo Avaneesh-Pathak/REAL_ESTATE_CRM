@@ -1,142 +1,79 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
-{% block content %} 
+{% block content %}
 
-<!-- Load static template tag library -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Promoter</title>
-    <style>
-        /* General Styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 50px;
-        }
-
-        /* Container Styles */
-        .container {
-            max-width: 6000px;
-            margin: auto;
-            background: #fff;
-            padding: 50px;
-            border-radius: 10px;
-            box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Header Styles */
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        /* Form Styles */
-        .promoter-form {
-            display: flex justify-center;
-            flex-direction:row;              
-        }
-
-        .form-group {
-            margin-bottom: 5px;
-        }
-
-        label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="number"],
-        textarea {
-            padding: 5px;
-            border: 2px solid #ccc;
-            border-radius: 50px;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box; /* Ensure padding doesn't affect overall width */
-        }
-
-        /* Submit Button Styles */
-        .submit-button {
-            display: flex;
-            padding: 10px;
-            background-color: #28a745;
-            color: #fff;
-            border: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 20px;
-            transition: background-color 0.3s; /* Smooth transition */
-        }
-
-        .submit-button:hover {
-            background-color: #218838;
-        }
-
-        /* Back Button Styles */
-        .back-button {
-            display: inline-block;
-            margin-bottom: 10px;
-            color: #007bff;
-            text-decoration-color:black;
-            font-size: 14px;
-            transition: color 0.3s; /* Smooth transition */
-        }
-
-        .back-button:hover {
-            text-decoration: underline;
-            text-decoration-color:black;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <h1 class="text-4xl" style="color: hsl(240, 100%, 60%)">Add New Promoter</h1>
-        <a href="{% url 'leads:promoter_list' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">Back to Promoter List</a>
-        <form method="POST" class="promoter-form">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="mobile_number">Mobile Number:</label>
-                <input type="text" id="mobile_number" name="mobile_number" required>
-            </div>
-            <div class="form-group">
-                <label for="address">Address:</label>
-                <textarea id="address" name="address" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="pan_no">PAN No.:</label>
-                <input type="text" id="pan_no" name="pan_no" required>
-            </div>
-            <div class="form-group">
-                <label for="id_card_number">ID Card Number:</label>
-                <input type="text" id="id_card_number" name="id_card_number" required>
-            </div>
-            <div class="form-group">
-                <label for="joining_percentage">Joining Percentage:</label>
-                <input type="number" id="joining_percentage" name="joining_percentage" step="0.01" required>
-            </div>
-            <button type="submit" class="submit-button">Add Promoter</button>
-        </form>
+<div style="margin-top: 100px; padding: 20px; font-family: Arial, sans-serif; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); max-width: 900px; margin: auto;">
+    <h1 style="text-align: center; font-size: 28px; color: #4a4a4a; margin-bottom: 20px;">Add New Employee</h1>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="{% url 'leads:promoter_list' %}" style="text-decoration: none; padding: 10px 20px; background-color: #007bff; color: white; border-radius: 5px; font-size: 14px; font-weight: bold; display: inline-block;">
+            Back to Employee List
+        </a>
     </div>
-</body>
-</html>
+    
+    <form method="POST" style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+        {% csrf_token %}
+        
+        <!-- Name and Email -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <label for="name" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Name:</label>
+                <input type="text" id="name" name="name" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" placeholder="Enter full name" required>
+            </div>
+            <div style="flex: 1;">
+                <label for="email" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Email:</label>
+                <input type="email" id="email" name="email" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" placeholder="Enter email address" required>
+            </div>
+        </div>
+        
+        <!-- Mobile Number and Address -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <label for="mobile_number" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Mobile Number:</label>
+                <input type="text" id="mobile_number" name="mobile_number" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" placeholder="Enter mobile number" required>
+            </div>
+            <div style="flex: 1;">
+                <label for="address" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Address:</label>
+                <textarea id="address" name="address" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" rows="3" placeholder="Enter address" required></textarea>
+            </div>
+        </div>
+        
+        <!-- Joining Date and Salary -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <label for="joining_date" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Joining Date:</label>
+                <input type="date" id="joining_date" name="joining_date" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" required>
+            </div>
+            <div style="flex: 1;">
+                <label for="salary" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Salary:</label>
+                <input type="number" id="salary" name="salary" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" placeholder="Enter salary amount" required>
+            </div>
+        </div>
+        
+        <!-- Department and Status -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <label for="department" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Department:</label>
+                <input type="text" id="department" name="department" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" placeholder="e.g., Sales, Marketing" required>
+            </div>
+            <div style="flex: 1;">
+                <label for="status" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Status:</label>
+                <select id="status" name="status" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" required>
+                    <option value="Active">Active</option>
+                    <option value="On Leave">On Leave</option>
+                    <option value="Resigned">Resigned</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" style="padding: 12px 25px; background-color: #28a745; color: white; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">
+                Add Employee
+            </button>
+        </div>
+    </form>
+</div>
 
-{%endblock content%}
-
+{% endblock content %}

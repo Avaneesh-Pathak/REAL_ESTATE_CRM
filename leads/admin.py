@@ -52,8 +52,22 @@ class DaybookAdmin(admin.ModelAdmin):
 
 # Admin class for Promoter model
 class PromoterAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'mobile_number', 'pan_no', 'id_card_number', 'joining_percentage']
-    search_fields = ['name', 'email', 'mobile_number', 'pan_no']
+    list_display = ['name', 'email', 'mobile_number', 'department', 'status', 'joining_date', 'payment_date', 'salary']
+    list_filter = ['department', 'status', 'joining_date']
+    search_fields = ['name', 'email', 'mobile_number', 'department']
+    ordering = ['name']
+    date_hierarchy = 'joining_date'
+
+    fieldsets = (
+        ("Personal Information", {
+            'fields': ('name', 'email', 'mobile_number', 'address')
+        }),
+        ("Employment Details", {
+            'fields': ('department', 'joining_date', 'salary', 'payment_date', 'status')
+        }),
+    )
+
+
 
 
 # Register models with admin

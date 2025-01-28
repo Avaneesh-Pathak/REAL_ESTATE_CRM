@@ -668,21 +668,51 @@ def log_userprofile_deletion(sender, instance, **kwargs):
     send_sms(to=my_number, message=message)
 
 # PROMOTER MODEL
+from datetime import timedelta
 class Promoter(models.Model):
     # Personal Information
     name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255)
+    email = models.EmailField(max_length=255,null=True,blank=True,)
     mobile_number = models.CharField(max_length=15)
-    address = models.TextField()
+    address = models.TextField(null=True,blank=True,)
+    joining_date = models.DateField(null=True,blank=True,)
+    salary = models.IntegerField(null=True,blank=True,)
+    payment_date = models.DateField(null=True,blank=True,)
+    department = models.CharField(null=True,blank=True,max_length=100)
 
-    # Legal and Joining Information
-    pan_no = models.CharField(max_length=15)
-    id_card_number = models.CharField(max_length=20)
-    joining_percentage = models.DecimalField(max_digits=5, decimal_places=2)  # Percentage of joining
+    status = models.CharField(
+        max_length=50,
+        choices=[
+            ('Active', 'Active'),
+            ('On Leave', 'On Leave'),
+            ('Resigned', 'Resigned'),
+            ('Inactive', 'Inactive'),
+        ],
+        default='Active',
+        help_text="Current employment status of the promoter."
+    )
+    def save(self, *args, **kwargs):
+        # Automatically calculate payment_date based on joining_date
+        if self.joining_date:
+            self.payment_date = self.calculate_next_payment_date()
+        super().save(*args, **kwargs)
+
+    def calculate_next_payment_date(self):
+        """Calculate the next payment date based on the joining date."""
+        # Add 30 days to the joining date for first payment
+        initial_payment_date = self.joining_date + timedelta(days=30)
+
+        # Example rule: Payments are always on the last day of the month
+        if initial_payment_date.day != 30:
+            # Adjust to the end of the joining month's payment cycle
+            next_month = initial_payment_date.replace(day=1) + timedelta(days=31)
+            end_of_month = next_month.replace(day=1) - timedelta(days=1)
+            return end_of_month
+        return initial_payment_date
 
     def __str__(self):
         logger.info(f"Promoter created: {self.name}, Email: {self.email}")
-        return self.name
+        return f"{self.name} ({self.department})"
 
 
 # PLOT BOOKING

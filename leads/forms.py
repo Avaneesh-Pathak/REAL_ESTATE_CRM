@@ -234,19 +234,14 @@ class BalanceUpdateForm(forms.Form):
 
 class PromoterForm(forms.ModelForm):
     class Meta:
-        model = Promoter  # Use the model from models.py
+        model = Promoter
         fields = [
-            'name', 'email', 'mobile_number', 'address',
-            'pan_no', 'id_card_number', 'joining_percentage'
+            'name', 'email', 'mobile_number', 'address', 
+            'joining_date', 'salary', 'department', 'status'
         ]
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'mobile_number': forms.TextInput(attrs={'class': 'form-control'}),
-            'address': forms.Textarea(attrs={'class': 'form-control'}),
-            'pan_no': forms.TextInput(attrs={'class': 'form-control'}),
-            'id_card_number': forms.TextInput(attrs={'class': 'form-control'}),
-            'joining_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'joining_date': forms.DateInput(attrs={'type': 'date'}),
+            'payment_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
 

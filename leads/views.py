@@ -269,6 +269,12 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
             .aggregate(total=Sum('base_salary'))['total']
             or 0
         )
+        # Calculate total promoter salaries
+        total_promoter_salaries = (
+            Promoter.objects.filter(joining_date__range=(start_date, end_date))
+            .aggregate(total_salary=Sum('salary'))['total_salary']
+            or 0
+        )
 
         # Calculate total agent commissions in the selected date range
         total_agent_commissions = (
@@ -297,7 +303,8 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
             total_agent_commissions +
             total_land_cost +
             total_development_cost +
-            monthly_expenses
+            monthly_expenses +
+            total_promoter_salaries
         )
         grand_total_profit = total_sales - total_expenses
         
@@ -393,6 +400,7 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
             "projects": projects,
             "project_data": project_data,
             "selected_project_id": selected_project_id,
+            "total_promoter_salaries":total_promoter_salaries
         })
 
         return context
@@ -1638,41 +1646,100 @@ class BalanceUpdateView(OrganisorAndLoginRequiredMixin, View):
         return render(request, self.template_name, {'form': form})
 
 # PROMOTER 
-
 class PromoterListView(LoginRequiredMixin, ListView):
     model = Promoter
     template_name = 'promoter/promoter_list.html'
     context_object_name = 'promoters'
+    ordering = ['name']
+    def get_queryset(self):
+            queryset = super().get_queryset()
 
+            # Get the 'start_date' and 'end_date' from request parameters
+            start_date = self.request.GET.get('start_date')
+            end_date = self.request.GET.get('end_date')
+
+            if start_date:
+                queryset = queryset.filter(joining_date__gte=start_date)
+            
+            if end_date:
+                queryset = queryset.filter(joining_date__lte=end_date)
+
+            return queryset
+
+    def get(self, request, *args, **kwargs):
+        if 'download' in request.GET:  # Check for 'download' query parameter
+            return self.download_csv(request)
+        return super().get(request, *args, **kwargs)
+
+    def download_csv(self, request):
+        # Get the filtered queryset
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        promoters = self.get_queryset()
+
+        # Create a CSV response
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Employee.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow([ 'Name', 'Email', 'Mobile Number', 'Joining Date','Salary', 'Payment Date', 'Department', 'Status'])
+
+        for promoter in promoters:
+            writer.writerow([ promoter.name, promoter.email, promoter.mobile_number, promoter.joining_date,promoter.salary, promoter.payment_date, promoter.department, promoter.status])
+
+        return response
+
+# Update/Delete Promoter View
 def update_delete_promoter(request, promoter_id):
     promoter = get_object_or_404(Promoter, id=promoter_id)
 
     if request.method == 'POST':
         if 'update' in request.POST:  # Handle update request
+            # Bind the form to the submitted data
             form = PromoterForm(request.POST, instance=promoter)
             if form.is_valid():
-                form.save()
-                return redirect('leads:promoter_list')  # Ensure this redirects to the correct URL
+                # If the form is valid, save the updated promoter
+                updated_promoter = form.save(commit=False)
+                
+                # Preserve the original joining date if it's not provided in the form
+                if not updated_promoter.joining_date:
+                    updated_promoter.joining_date = promoter.joining_date
+                
+                # Calculate the next payment date based on the updated information
+                updated_promoter.payment_date = updated_promoter.calculate_next_payment_date()  # Optional logic
+                updated_promoter.save()  # Save changes to the database
+                return redirect('leads:promoter_list')  # Redirect to the promoter list
+            else:
+                print(form.errors)  # Print errors to debug in the console
+
         elif 'delete' in request.POST:  # Handle delete request
-            promoter.delete()
-            return redirect('leads:promoter_list')  # Ensure this redirects to the correct URL
+            try:
+                promoter.delete()
+                return redirect('leads:promoter_list')  # Redirect to the promoter list
+            except Exception as e:
+                print(f"Error deleting promoter: {str(e)}")  # Log the error
 
     else:
+        # Populate the form with the promoter's current details
         form = PromoterForm(instance=promoter)
 
+    # Render the page with the form and promoter details
     return render(request, 'promoter/update_delete_promoter.html', {'form': form, 'promoter': promoter})
+
+
 
 def add_promoter(request):
     if request.method == 'POST':
         form = PromoterForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('leads:promoter_list')  # Redirect to the promoter list after adding
+            promoter = form.save(commit=False)
+            promoter.payment_date = promoter.calculate_next_payment_date()  # Ensure the payment_date logic is applied
+            promoter.save()
+            return redirect('leads:promoter_list')  # Redirect to the promoter list
     else:
         form = PromoterForm()
 
     return render(request, 'promoter/add_promoter.html', {'form': form})
-
 
 def calculate_emi(plot_price, interest_rate, tenure):
     if interest_rate is not None and tenure > 0:

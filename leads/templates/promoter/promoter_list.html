@@ -1,103 +1,80 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="text-gray-700 body-font">
-    <div class="container px-1 py-8 mx-auto flex flex-wrap">
-        <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-gray-200">
-            <div>
-                <h1 class="text-4xl text-gray-800">Promoters</h1>
-            </div>
+<section style="background-color: #f8fafc; padding: 20px;">
+    <div style="max-width: 1200px; margin: 0 auto; border-radius: 10px; background: #ffffff; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px;">
+            <h1 style="font-size: 28px; color: #2d3748; font-weight: bold;">Employee Management</h1>
             {% if request.user.is_organisor %}
-            <div>
-                <a class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" href="{% url 'leads:add_promoter' %}">
-                    Create a new promoter
-                </a>
-            </div>
+            <a style="background-color: #3182ce; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer;" href="{% url 'leads:add_promoter' %}">
+                + Create New Employee
+            </a>
             {% endif %}
         </div>
-
-        <div class="flex flex-col w-full">
-            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        ID
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Name
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Email
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Mobile Number
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-small text-gray-500 uppercase tracking-wider">
-                                        Address
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        PAN No.
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        ID Card No.
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Joining Percentage
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Update Details
-                                    </th>
-                                    
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for promoter in promoters %}
-                                    <tr class="bg-white">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {{ promoter.id }} <!-- Database ID -->
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            <a class="text-blue-500 hover:text-blue-800">{{ promoter.name }}</a>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ promoter.email }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ promoter.mobile_number }} <!-- Mobile Number -->
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ promoter.address }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ promoter.pan_no }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ promoter.id_card_number }} <!-- ID Card Number -->
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ promoter.joining_percentage }}%
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <a href="{% url 'leads:update_delete_promoter' promoter.id %}">Edit</a>
-                                        </td>
-                                    </tr>
-                                {% empty %}
-                                    <tr class="bg-white">
-                                        <td colspan="8" class="px-6 py-4 text-sm text-gray-500 text-center">
-                                            There are currently no promoters.
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        
+        <!-- Filter Form -->
+        <form method="GET" style="margin-bottom: 20px; display: flex; gap: 15px;">
+            <div style="display: flex; flex-direction: column;">
+                <label for="start_date" style="font-weight: bold; color: #333;">Start Date:</label>
+                <input type="date" id="start_date" name="start_date" value="{{ request.GET.start_date }}" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 200px;">
             </div>
+            <div style="display: flex; flex-direction: column;">
+                <label for="end_date" style="font-weight: bold; color: #333;">End Date:</label>
+                <input type="date" id="end_date" name="end_date" value="{{ request.GET.end_date }}" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 200px;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="background-color: #3182ce; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer;">Filter</button>
+        </form>
+        
+        <!-- CSV Download Button -->
+        <a href="?download=true{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" class="btn btn-success" style="background-color: #38a169; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; margin-bottom: 20px;">
+            <i class="fas fa-download" style="margin-right: 8px;"></i> Download CSV
+        </a>
+        
+        <!-- Table -->
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <!-- Table Header -->
+                <thead>
+                    <tr style="background-color: #3182ce; color: white;">
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Name</th>
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Email</th>
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Mobile Number</th>
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Address</th>
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Joining Date</th>
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Salary</th>
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Payment Date</th>
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Department</th>
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Status</th>
+                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Actions</th>
+                    </tr>
+                </thead>
+
+                <!-- Table Body -->
+                <tbody>
+                    {% for promoter in promoters %}
+                    <tr style="background-color: {% cycle '#edf2f7' '#ffffff' %};">
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #2d3748;">{{ promoter.name }}</td>
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.email }}</td>
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.mobile_number }}</td>
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.address }}</td>
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.joining_date }}</td>
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.salary }}</td>
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.payment_date }}</td>
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.department }}</td>
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: {% if promoter.status == 'Active' %}green{% else %}red{% endif %}; font-weight: bold;">{{ promoter.status }}</td>
+                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0;">
+                            <a href="{% url 'leads:update_delete_promoter' promoter.id %}" style="color: #3182ce; text-decoration: none; font-weight: bold;">Edit</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr style="background-color: #f8d7da;">
+                        <td colspan="10" style="padding: 10px; text-align: center; color: #721c24; font-weight: bold;">No Employees Found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </section>
-
 {% endblock content %}

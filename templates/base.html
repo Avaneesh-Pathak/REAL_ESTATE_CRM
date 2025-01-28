@@ -471,9 +471,20 @@
             <a href="{% url 'leads:lead-list' %}"><i class="fas fa-list"></i> Lead List</a>
         </div>
         {% if  request.user.is_agent %}
-        <a href="{% url 'agents:agent-list' %}"><i class="fas fa-users"></i> Agents</a>
+        <a href="#" id="toggle-agents-menu"><i class="fas fa-users"></i> Agents <i class="fas fa-chevron-down"></i></a>
+        <div class="nested-menu" id="agents-menu">
+            <a href="{% url 'agents:agent-list' %}"><i class="fas fa-users"></i> Agents</a>
+            <a href="{% url 'leads:salary_list' %}"><i class="fas fa-rupee-sign"></i> Commision</a>
+            
+        </div>
+        
         {% endif %}
-        <a href="{% url 'leads:salary_list' %}"><i class="fas fa-rupee-sign"></i> Salary</a>
+        <a href="#" id="toggle-emp-menu"><i class="fas fa-users"></i> Employee Management <i class="fas fa-chevron-down"></i></a>
+        <div class="nested-menu" id="emp-menu">
+            <a href="{% url 'leads:promoter_list' %}"><i class="fas fa-eye me-2"></i>View Employee</a>
+            <a href="{% url 'leads:add_promoter' %}"><i class="fas fa-plus me-2"></i> Add Employee</a>
+            
+        </div>
         <a href="{% url 'leads:daybook_list' %}"><i class="fas fa-book"></i> Daybook</a>
         <a href="#" id="toggle-bills-menu"><i class="fas fa-money-check-alt"></i> Billing <i class="fas fa-chevron-down"></i></a>
         <div class="nested-menu" id="bills-menu">
@@ -653,6 +664,16 @@
         $('#toggle-bills-menu').on('click', function (e) {
             e.preventDefault(); // Prevent default link behavior
             $('#bills-menu').slideToggle(); // Use slideToggle for animation
+        });
+        // Toggle nested menu for Leads
+        $('#toggle-agents-menu').on('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            $('#agents-menu').slideToggle(); // Use slideToggle for animation
+        });
+        // Toggle nested menu for Leads
+        $('#toggle-emp-menu').on('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            $('#emp-menu').slideToggle(); // Use slideToggle for animation
         });
     </script>
 </body>

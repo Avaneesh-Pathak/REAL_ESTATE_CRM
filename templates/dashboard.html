@@ -74,9 +74,7 @@
             <div class="card text-center text-white" style="background-color: #06305f; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.5rem; font-weight: bold; text-transform: uppercase;">Total Leads</h3>
-                    <span data-toggle="tooltip" title="Total leads in the past month">Leads</span>
-
-                    <a href="{% url 'leads:lead-list' %}">
+                        <a href="{% url 'leads:lead-list' %}">
                         <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: white;">{{ total_lead_count }}</p>
                     </a>
                 </div>
@@ -121,7 +119,7 @@
 
     <!-- Summary Section -->
     <div class="row mt-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card text-center text-white" style="background-color: #34495E; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.25rem;">Total Sales</h3>
@@ -131,7 +129,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card text-center text-white" style="background-color: #34495E; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.25rem;">Expenditure in Plotting</h3>
@@ -141,14 +139,15 @@
             </div>
         </div>
 
-        <!-- <div class="col-md-4">
+        <div class="col-md-4">
             <div class="card text-center text-white" style="background-color:#34495E; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
-                    <h3 style="font-size: 1.25rem;">Total Profit After</h3>
-                    <p class="display-4" style="font-size: 2.5rem;">₹{{ total_profit|floatformat:2 }}</p>
+                    <h3 style="font-size: 1.25rem;">Total Employee Salary</h3>
+                    <p class="display-4" style="font-size: 2.5rem;">₹{{ total_promoter_salaries|floatformat:2 }}</p>
+                    <small>For the selected date range</small>
                 </div>
             </div>
-        </div> -->
+        </div>
     </div>
 </div>
 
@@ -223,7 +222,7 @@
                 <div class="card-body">
                     <h3 class="text-white">Total Expenses</h3>
                     <p class="display-4 text-white">₹{{ total_expenses|floatformat:2 }}</p>
-                    <small class="text-light">Including Salaries, Agent Commissions, Land & Development Costs, and Monthly Expenses</small>
+                    <small class="text-light">Including Employee Salaries, Agent Commissions, Land & Development Costs, and Monthly Expenses</small>
                 </div>
             </div>
         </div>
