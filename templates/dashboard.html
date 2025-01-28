@@ -2,131 +2,15 @@
 
 {% block content %}
 <style>
-    /* Additional CSS for hover effect and animation */
-    .table tbody tr:hover {
-        background: linear-gradient(135deg, #1481af 0%, #fbfbfb 100%);
-        transform: scale(1.02); /* Slight scale on hover */
-        transition: transform 0.3s ease, background-color 0.3s ease;
-    }
+
     
-    .table {
-        border: 2px solid #061a30;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    /* Animation for cards */
-    .card {
-        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    }
-
-    .card:hover {
-        transform: translateY(-10px); /* Elevate the card slightly on hover */
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
-    }
-
-    /* Background color transitions for cards */
-    .card {
-        background: linear-gradient(135deg, #08056f 0%, #2c0355 100%);
-        color: #011853;
-    }
-
-    .card-body h3 {
-        font-size: 1.4rem; /* Adjust heading size */
-        transition: color 0.3s ease;
-    }
-
-    .card-body p.display-4 {
-        font-size: 2.5rem;
-        font-weight: bold;
-    }
-
-    /* Subtle text color change on hover */
-    .card:hover h3 {
-        color: #d9450f; /* Gold color on hover */
-    }
-
-    /* Animation for graphs */
-    canvas {
-        transition: transform 0.3s ease;
-        background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
-    }
-
-    canvas:hover {
-        transform: scale(1.05); /* Slight scale on hover */
-    }
-
-    /* Styling for the summary section cards */
-    .card.text-center.text-white {
-        background-color: #1B4242;
-        color: #feffff;
-    }
-
-    /* Animation for salary distribution chart */
-    #salaryDistributionChart {
-        animation: fadeIn 2s ease;
-    }
-
-    /* Keyframes for fade-in animation */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    /* Media Queries for responsive design */
-    @media (max-width: 768px) {
-        .lead-section h1 {
-            font-size: 2rem; /* Adjust heading size for small screens */
-        }
-        
-        .card-body h3 {
-            font-size: 1.2rem; /* Adjust card heading size */
-        }
-
-        .display-4 {
-            font-size: 2rem; /* Adjust display size */
-        }
-
-        .table {
-            font-size: 0.9rem; /* Adjust table font size */
-        }
-
-        .col-md-4,
-        .col-md-6,
-        .col-md-5,
-        .col-md-7 {
-            flex: 0 0 100%; /* Stack columns vertically on small screens */
-            max-width: 100%;
-        }
-
-        .row {
-            margin: 0; /* Remove margin for rows on small screens */
-        }
-    }
-
-    @media (max-width: 576px) {
-        .lead-section h1 {
-            font-size: 1.5rem; /* Further adjust heading size for extra small screens */
-        }
-
-        .card-body h3 {
-            font-size: 1rem; /* Further adjust card heading size */
-        }
-
-        .display-4 {
-            font-size: 1.5rem; /* Further adjust display size */
-        }
-    }
 </style>
 <div class="lead-section container mt-8">
     <h1 style="font-family: 'Poppins', sans-serif; font-size: 2.5rem; margin-bottom: 30px; font-weight: bold; color: #333; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); text-align: center;">
         Insight's
     </h1>
-    
+ 
+
     <!-- Date Filter Form -->
     <form method="get" class="row mb-4">
         <div class="col-md-5">
@@ -187,9 +71,11 @@
     <div class="row mt-4">
         <!-- Total Leads -->
         <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #4A90E2; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center text-white" style="background-color: #06305f; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.5rem; font-weight: bold; text-transform: uppercase;">Total Leads</h3>
+                    <span data-toggle="tooltip" title="Total leads in the past month">Leads</span>
+
                     <a href="{% url 'leads:lead-list' %}">
                         <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: white;">{{ total_lead_count }}</p>
                     </a>
@@ -199,7 +85,7 @@
 
         <!-- Leads in the Past 30 Days -->
         <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #50E3C2; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center text-white" style="background-color: #0d5545; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.5rem; font-weight: bold; text-transform: uppercase;">Leads in the Past 30 Days</h3>
                     <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: white;">{{ total_in_past30 }}</p>
@@ -209,7 +95,7 @@
 
         <!-- Converted Leads in the Past 30 Days -->
         <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #F5A623; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center text-white" style="background-color: #65491c; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.5rem; font-weight: bold; text-transform: uppercase;">Converted Leads in the Past 30 Days</h3>
                     <p class="display-4" style="font-size: 2.5rem; font-weight: bold; color: white;">{{ converted_in_past30 }}</p>
@@ -235,33 +121,34 @@
 
     <!-- Summary Section -->
     <div class="row mt-4">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card text-center text-white" style="background-color: #34495E; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.25rem;">Total Sales</h3>
                     <p class="display-4" style="font-size: 2.5rem;">₹{{ total_sales }}</p>
+                    <small class="text-light">Till todays</small>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #E74C3C; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
+        <div class="col-md-6">
+            <div class="card text-center text-white" style="background-color: #34495E; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
-                    <h3 style="font-size: 1.25rem;">Total Cost of Registered Buyer</h3>
+                    <h3 style="font-size: 1.25rem;">Expenditure in Plotting</h3>
                     <p class="display-4" style="font-size: 2.5rem;">₹{{ total_cost|floatformat:2 }}</p>
                     <small class="text-light">Including Land cost and Development cost</small>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card text-center text-white" style="background-color: #1ABC9C; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
+        <!-- <div class="col-md-4">
+            <div class="card text-center text-white" style="background-color:#34495E; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);">
                 <div class="card-body">
                     <h3 style="font-size: 1.25rem;">Total Profit After</h3>
                     <p class="display-4" style="font-size: 2.5rem;">₹{{ total_profit|floatformat:2 }}</p>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
 
@@ -321,7 +208,7 @@
     <div class="row">
         <!-- Total Sales Section -->
         <div class="col-md-6">
-            <div class="card text-center bg-primary" style="border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center " style="border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);background-color:#06305f;">
                 <div class="card-body">
                     <h3 class="text-white">Total Sales</h3>
                     <p class="display-4 text-white">₹{{ total_sales|floatformat:2 }}</p>
@@ -332,7 +219,7 @@
 
         <!-- Total Expenses Section -->
         <div class="col-md-6">
-            <div class="card text-center bg-primary" style="border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div class="card text-center" style="border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); background-color:#06305f;">
                 <div class="card-body">
                     <h3 class="text-white">Total Expenses</h3>
                     <p class="display-4 text-white">₹{{ total_expenses|floatformat:2 }}</p>
@@ -347,7 +234,7 @@
     <div class="row mt-4">
         <!-- Salaries Expense -->
         <div class="col-md-3">
-            <div class="card text-center text-white bg-primary">
+            <div class="card text-center text-white" style="background-color:#34495E;">
                 <div class="card-body">
                     <h4>Agent Commissions</h4>
                     <p class="display-5">₹{{ total_salaries|floatformat:2 }}</p>
@@ -358,7 +245,7 @@
 
         <!-- Agent Commissions Expense -->
         <div class="col-md-3">
-            <div class="card text-center text-white bg-success">
+            <div class="card text-center text-white" style="background-color:#34495E;">
                 <div class="card-body">
                     <h4>Total Number of Projects</h4>
                     <p class="display-5">{{ total_projects}}</p>
@@ -369,7 +256,7 @@
 
         <!-- Land Cost Expense -->
         <div class="col-md-3">
-            <div class="card text-center text-white bg-warning">
+            <div class="card text-center text-white" style="background-color:#34495E;">
                 <div class="card-body">
                     <h4>Land Cost</h4>
                     <p class="display-5">₹{{ total_land_cost|floatformat:2 }}</p>
@@ -380,7 +267,7 @@
 
         <!-- Development Cost Expense -->
         <div class="col-md-3">
-            <div class="card text-center text-white bg-danger">
+            <div class="card text-center text-white " style="background-color:#34495E;">
                 <div class="card-body">
                     <h4>Development Cost</h4>
                     <p class="display-5">₹{{ total_development_cost|floatformat:2 }}</p>
@@ -392,12 +279,21 @@
 
     <!-- Monthly Expenses Section -->
         <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card text-center bg-primary"> <!-- Blue background -->
+            <div class="col-md-6">
+                <div class="card text-center bg-danger"> <!-- Blue background -->
                     <div class="card-body">
                         <h3 class="text-white">Monthly Expenses</h3> <!-- White text for contrast on blue -->
                         <p class="display-4 text-white">₹{{ monthly_expenses|floatformat:2 }}</p> <!-- White text for contrast on blue -->
                         <small class="text-light">For the selected date range</small> <!-- Lighter text for contrast -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-center bg-info text-white">
+                    <div class="card-body">
+                        <h3>Remaining amount after all expense</h3>
+                        <p class="display-4">₹{{ grand_total_profit|floatformat:2 }}</p>
+                        <small>Salary included</small>
                     </div>
                 </div>
             </div>
@@ -407,20 +303,12 @@
 
     <!-- Profit Calculation -->
     <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card text-center bg-info text-white">
-                <div class="card-body">
-                    <h3>Total Profit</h3>
-                    <p class="display-4">₹{{ grand_total_profit|floatformat:2 }}</p>
-                    <small>Calculated after all expenses</small>
-                </div>
-            </div>
-        </div>
+        
 
-        <div class="col-md-6">
-            <div class="card text-center bg-primary text-white">
+        <div class="col-md-12">
+            <div class="card text-center text-white" style="background-color:#0f6710;">
                 <div class="card-body">
-                    <h3>Remaining Profit</h3>
+                    <h3>Grand Total Profit</h3>
                     <p class="display-4">₹{{ remaining_profit|floatformat:2 }}</p>
                     <small>After salary distribution</small>
                 </div>
@@ -546,6 +434,13 @@
             }
         },
         plugins: [ChartDataLabels]  // Activate the datalabels plugin
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("theme-toggle").addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+        });
     });
 </script>
 

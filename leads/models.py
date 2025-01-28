@@ -136,25 +136,27 @@ class Lead(models.Model):
     agent = models.ForeignKey("Agent", null=True, blank=True, on_delete=models.SET_NULL)
     category = models.ForeignKey("Category",related_name="leads" ,null=True, blank=True, on_delete=models.SET_NULL)
     description = models.TextField()
-    date_added = models.DateTimeField(auto_now_add=True)
+    date_added = models.DateField(default=timezone.now)
     phone_number = models.CharField(max_length=20)
     email = models.EmailField()   
     profile_picture = models.ImageField(null=True, blank=True, upload_to="profile_pictures/")
     converted_date = models.DateTimeField(null=True, blank=True) 
     objects = LeadManager()
 
+
 # New Added profile picture, converted date and objects
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     def save(self, *args, **kwargs):
         # Check if it's a new instance or an update
-        is_new_instance = self.pk is None
+        if not self.pk:
+            self.date_added = timezone.now().date() 
 
         # Call the parent save method to save the instance to the database
         super().save(*args, **kwargs)
 
         # Determine the action
-        action = "created" if is_new_instance else "updated"
+        action = "created" if not self.pk else "updated"
 
         # Log the instance data in dictionary format (excluding internal attributes)
         data = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
@@ -381,6 +383,7 @@ class Project(models.Model):
     type = models.CharField(max_length=255, null=True, blank=True)
     total_land_available_fr_plotting = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     total_development_cost = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    date_added = models.DateField(default=timezone.now)
 
     def create_composite_key(self):
         letters = f"{self.project_name[:]}".upper()
@@ -456,6 +459,7 @@ class Property(models.Model):
     title = models.CharField(max_length=7, blank=True)
     is_sold = models.BooleanField(default=False)
     is_in_emi = models.BooleanField(default=False)
+    date_added = models.DateField(default=timezone.now)
     
     # Removed the redundant ForeignKey to Property itself
     related_property = models.ForeignKey('Property', null=True, blank=True, on_delete=models.DO_NOTHING) 
@@ -865,7 +869,7 @@ class Level(models.Model):
         return self.level   
 
 class Kisan(models.Model):
-
+    date_added = models.DateField(default=timezone.now)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     contact_number = models.IntegerField()

@@ -25,6 +25,8 @@ from django.views import View, generic
 from django.views.generic import ListView, UpdateView, DeleteView
 from django.db.models import Sum
 from django.utils.timezone import now
+from django.http import HttpResponse
+from weasyprint import HTML
 from datetime import timedelta
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot,send_sms
 from agents.mixins import OrganisorAndLoginRequiredMixin ,AgentAndLoginRequiredMixin
@@ -278,8 +280,12 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
         
     
         # Calculate total land and development costs
-        total_land_cost = Kisan.objects.aggregate(total=Sum('land_costing'))['total'] or 0
-        total_development_cost = Project.objects.aggregate(total=Sum('dev_cost'))['total'] or 0
+        total_land_cost = Kisan.objects.filter(date_added__range=(start_date, end_date)).aggregate(
+            total=Sum('land_costing')
+        )['total'] or 0
+        total_development_cost = Project.objects.filter(date_added__range=(start_date, end_date)).aggregate(
+            total=Sum('dev_cost')
+        )['total'] or 0
        
 
         # Calculate total sales (earned revenue)
@@ -323,7 +329,7 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
         salaryDistribution_labels = ['Salary Distributed', 'Remaining Profit']
 
         # Total leads and recent buyers
-        total_lead_count = Lead.objects.count()
+        total_lead_count  = Lead.objects.filter(date_added__range=(start_date, end_date)).count()
         recent_buyers = PlotBooking.objects.order_by('-booking_date')[:5]
 
         # Leads and converted leads in the last 30 days
@@ -390,6 +396,8 @@ class DashboardView(LoginRequiredMixin, generic.TemplateView):
         })
 
         return context
+
+
 
 
     
@@ -792,7 +800,8 @@ class LeadJsonView(generic.View):
         return JsonResponse({
             "qs": qs,
         })
-    
+
+ 
 
 def create_salary(request):
     if request.method == 'POST':
@@ -1331,11 +1340,10 @@ class SalaryListView(AgentAndLoginRequiredMixin, ListView):
     context_object_name = 'salaries'
 
     def get_queryset(self):
-        # If the logged-in user is an organisor, they can access all salaries
+        # Start with a base queryset depending on the user type
         if self.request.user.is_organisor:
             queryset = Salary.objects.all()
         else:
-            # If the user is an agent, only show their own salaries
             queryset = Salary.objects.filter(agent=self.request.user)
 
         # Annotate the queryset with the total compensation calculation
@@ -1346,14 +1354,27 @@ class SalaryListView(AgentAndLoginRequiredMixin, ListView):
             )
         )
 
-        # Apply optional filtering by payment date
+        # Apply filtering by start date and end date if provided
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
         payment_date = self.request.GET.get('payment_date')
+
         if payment_date:
             queryset = queryset.filter(payment_date=payment_date)
 
-        return queryset.order_by('-payment_date', '-id')  # Show the latest payments first
+
+        if start_date:
+            queryset = queryset.filter(payment_date__gte=start_date)  # Filter by start date
+        if end_date:
+            queryset = queryset.filter(payment_date__lte=end_date)  # Filter by end date
+
+        if not payment_date:
+            queryset = queryset.order_by('-payment_date', '-id')  # Show all records, latest first
+
+        return queryset
 
     def render_to_response(self, context, **response_kwargs):
+        # If the request is an Ajax request, return the partial HTML response
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             html = render_to_string('salary/salary_list.html', context)
             return JsonResponse({'html': html})
@@ -1485,39 +1506,59 @@ class DaybookListView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'Daybook/daybook_list.html'
 
     def get(self, request, *args, **kwargs):
+        # Get today's date
         today = timezone.now().date()
+
+        # Get start and end date from the GET parameters for filtering
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        # Initialize the queryset with all daybook entries
+        daybook_entries = Daybook.objects.all()
+
+        # Apply filtering based on start and end date if provided
+        if start_date:
+            daybook_entries = daybook_entries.filter(date__gte=start_date)  # filter greater than or equal to start_date
+        if end_date:
+            daybook_entries = daybook_entries.filter(date__lte=end_date)  # filter less than or equal to end_date
         
-        # Fetch today's and total expenses
-        todays_expenses = Daybook.objects.filter(date=today)
-        print("todays expense is ",todays_expenses)
+        # Check if we need to show all expenses or just today's expenses
+        show_all = request.GET.get('show_all') == 'true'
+
+        if show_all:
+            expenses_to_display = daybook_entries  # Show all filtered expenses
+        else:
+            # Filter only today's expenses
+            expenses_to_display = daybook_entries.filter(date=today)
+
+        # Calculate today's expenses
+        todays_expenses = daybook_entries.filter(date=today)
         total_todays_expenses = sum(expense.amount for expense in todays_expenses)
-        print("total expens of today",total_todays_expenses)
-        total_expenses = Daybook.objects.aggregate(total_amount=models.Sum('amount'))['total_amount'] or 0
-        print("total expense is",total_expenses)
+
+        # Total expenses for the filtered date range
+        total_expenses = daybook_entries.aggregate(total_amount=models.Sum('amount'))['total_amount'] or 0
+
         # Retrieve current balance and carryover amount
         current_balance_record = Balance.objects.first()
-        print("current balance record",current_balance_record)
         current_balance = current_balance_record.amount if current_balance_record else 0
-        print("current balance",current_balance)
         carryover_amount = current_balance_record.carryover_amount if current_balance_record else 0
-        print("carryover amount is ",carryover_amount)
-
 
         # Calculate carryover for next day
         remaining_balance = current_balance - total_todays_expenses
         if remaining_balance > 0:
             carryover_amount += remaining_balance
-            print("remaining carryover is ",carryover_amount)
         else:
             carryover_amount = max(0, carryover_amount + remaining_balance)
-            print("remaining carryover 2 is ",carryover_amount)
 
         context = {
-            'expenses': todays_expenses,
+            'expenses': expenses_to_display,  # Pass the expenses to display (all or today's)
             'total_balance': current_balance,
             'carryover_amount': carryover_amount,
             'todays_expense': total_todays_expenses,
             'total_expenses': total_expenses,
+            'start_date': start_date,
+            'end_date': end_date,
+            'show_all': show_all  # Pass the status of the show_all flag
         }
         return render(request, self.template_name, context)
 
@@ -1526,6 +1567,41 @@ class DaybookListView(OrganisorAndLoginRequiredMixin, View):
             Daybook.objects.all().delete()
             Balance.objects.all().delete()
             return redirect('leads:daybook_list')
+
+
+def export_daybook_to_csv(request):
+    # Get the start_date and end_date from the request's GET parameters
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Start building the response with CSV content type
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="daybook.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Date', 'Activity', 'Custom Activity', 'Amount', 'Remark'])  # Adjust columns as needed
+    
+    # Start with all daybook entries
+    daybook_entries = Daybook.objects.all()
+
+    # Filter based on the provided date range
+    if start_date:
+        daybook_entries = daybook_entries.filter(date__gte=start_date)  # Greater than or equal to start_date
+    if end_date:
+        daybook_entries = daybook_entries.filter(date__lte=end_date)  # Less than or equal to end_date
+
+    # Write the daybook data rows
+    for entry in daybook_entries:
+        writer.writerow([
+            entry.date,  # Date of the entry
+            entry.activity,  # Activity type
+            entry.custom_activity or '',  # Custom activity for 'Others'
+            entry.amount,  # Amount of the expense
+            entry.remark or '',  # Remark, empty if not provided
+        ])
+    
+    return response
+
 
 
 class BalanceUpdateView(OrganisorAndLoginRequiredMixin, View):
@@ -1840,12 +1916,124 @@ def load_properties(request):
     properties = Property.objects.filter(project_name_id=project_name).values('id', 'property.title')
     return JsonResponse(list(properties), safe=False)
 
+
+
+from datetime import timedelta, date
+from dateutil import parser
+from django.utils import timezone
+from django.shortcuts import render
+from django.views import View
+from .models import PlotBooking
+
 class BuyersListView(OrganisorAndLoginRequiredMixin, View):
     template_name = 'plot_registration/buyers_list.html'
 
     def get(self, request, *args, **kwargs):
-        buyers = PlotBooking.objects.select_related('agent').all().order_by('-booking_date')
-        return render(request, self.template_name, {'buyers': buyers})
+        today = timezone.now().date()
+        last_month = today - timedelta(days=30)
+
+        # Handle missing start_date and end_date
+        start_date = request.GET.get('start_date', last_month)
+        end_date = request.GET.get('end_date', today)
+
+        # Convert to proper date format if the values are passed as strings
+        try:
+            start_date = self.convert_to_date(start_date)
+            end_date = self.convert_to_date(end_date)
+        except ValueError:
+            # Handle invalid date format or fallback to defaults
+            start_date = last_month
+            end_date = today
+
+        # Get buyers filtered by the date range
+        buyers = PlotBooking.objects.filter(booking_date__range=[start_date, end_date]).order_by('-booking_date')
+
+        # Handle showing all buyers
+        show_all = request.GET.get('show_all') == 'true'
+        if show_all:
+            buyers = PlotBooking.objects.all().order_by('-booking_date')
+
+        context = {
+            'buyers': buyers,
+            'start_date': start_date,
+            'end_date': end_date,
+            'show_all': show_all
+        }
+        return render(request, self.template_name, context)
+
+    def convert_to_date(self, date_str):
+        """
+        Convert date string to a datetime.date object using dateutil.parser.
+        """
+        # Check if the input is already a date object, return it directly
+        if isinstance(date_str, date):
+            return date_str
+        
+        # If the input is a string, parse it
+        return parser.parse(date_str).date()
+
+    
+
+
+from dateutil import parser
+import csv
+from django.http import HttpResponse
+from .models import PlotBooking  # Make sure to import your model
+
+def convert_to_date(date_str):
+    """
+    Convert date string to a datetime.date object using dateutil.parser.
+    """
+    return parser.parse(date_str).date()
+
+def export_buyers_to_csv(request):
+    # Get the start_date and end_date from the GET parameters
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Convert start_date and end_date to the correct format if necessary
+    try:
+        # Ensure start_date and end_date are in the proper format
+        if start_date:
+            start_date = convert_to_date(start_date)
+        if end_date:
+            end_date = convert_to_date(end_date)
+    except ValueError:
+        return HttpResponse("Invalid date format", status=400)
+
+    # Start building the response with CSV content type
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="buyers.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Name', 'Mobile', 'Email', 'Property', 'Address', 'Booking Date', 'Agent Name'])
+
+    # Filter the buyers based on the selected date range
+    buyers = PlotBooking.objects.all()  # Default to all
+    if start_date and end_date:
+        buyers = buyers.filter(booking_date__range=[start_date, end_date])
+
+    # Write the buyers data rows
+    for buyer in buyers:
+        writer.writerow([ 
+            buyer.id,
+            buyer.name,
+            buyer.mobile_no,
+            buyer.email,
+            buyer.project,
+            buyer.address,
+            buyer.booking_date,
+            buyer.agent,
+        ])
+    
+    return response
+
+def convert_to_date(date_str):
+        """
+        Convert date string to a datetime.date object using dateutil.parser.
+        """
+        return parser.parse(date_str).date()
+
 
 
 import datetime
@@ -2209,6 +2397,18 @@ def kisan_view(request, pk=None):
 
 # View for listing Kisan
 
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import timedelta
+from django.shortcuts import render
+from .models import Kisan
+
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import timedelta
+from django.shortcuts import render
+from .models import Kisan
+
 class KisanListView(OrganisorAndLoginRequiredMixin, ListView):
     model = Kisan
     template_name = 'kisan/kisan_list.html'
@@ -2217,19 +2417,56 @@ class KisanListView(OrganisorAndLoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # Handle date range filtering
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+
+        if not start_date:
+            start_date = (timezone.now() - timedelta(days=30)).date()  # Default to last 30 days if no start_date
+        if not end_date:
+            end_date = timezone.now().date()  # Default to today if no end_date
+
+        try:
+            # Convert to date objects
+            start_date = self.convert_to_date(start_date)
+            end_date = self.convert_to_date(end_date)
+        except ValueError:
+            start_date = (timezone.now() - timedelta(days=30)).date()  # Fallback on error
+            end_date = timezone.now().date()
+
+        # Filtering Kisans based on date range
+        kisans = Kisan.objects.filter(date_added__range=[start_date, end_date])
+
+        # Show all option
+        show_all = self.request.GET.get('show_all') == 'true'
+        if show_all:
+            kisans = Kisan.objects.all()  # Fetch all kisans if "show_all" is true
+
         # Calculate total available land
-        total_available_land = (
-            Kisan.objects.filter(is_sold=False)
-            .aggregate(total_area=Sum('area_in_beegha'))
-            .get('total_area', 0)
-        )
+        total_available_land = kisans.filter(is_sold=False).aggregate(total_area=Sum('area_in_beegha')).get('total_area', 0)
         total_available_land = total_available_land or 0  # Default to 0 if None
 
         # Total land in sqft
         total_land_in_sqft = total_available_land * 27200
+
+        context['kisans'] = kisans
         context['total_land_in_sqft'] = total_land_in_sqft
+        context['start_date'] = start_date
+        context['end_date'] = end_date
+        context['show_all'] = show_all
 
         return context
+
+    def convert_to_date(self, date_str):
+        """
+        Convert date string to a datetime.date object. 
+        If the input is already a date object, it will return it as is.
+        """
+        if isinstance(date_str, str):
+            return parser.parse(date_str).date()
+        return date_str  # If it's already a date object, return it as is.
+
+
 
 class KisanUpdateView(OrganisorAndLoginRequiredMixin,UpdateView):
 
@@ -2282,67 +2519,84 @@ def export_properties_to_csv(request):
     
     return response
 
-def export_buyers_to_csv(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="buyers.csv"'
-    
-    writer = csv.writer(response)
-    writer.writerow(['ID', 'Name', 'Mobile','Email','Property',  'Address', 'Booking Date', 'Agent Name'])  # Adjust columns as needed
-    
-    buyers = PlotBooking.objects.all()  # Adjust your queryset as needed
 
-    for buyer in buyers:
-        writer.writerow([
-            buyer.id,
-            buyer.name,
-            buyer.mobile_no,
-            buyer.email,
-            buyer.project,
-            buyer.address,
-            buyer.booking_date,
-            buyer.agent,
-           
-            # buyer.plot_id,  # Adjust field name based on your Buyer model
-            # buyer.agent if buyer.agent else 'N/A'
-        ])
-    
-    return response
 
 from .models import Salary  # Replace with your Salary model
-
 def export_salaries_to_csv(request):
+    # Get the start_date and end_date from the request's GET parameters
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Start building the response with CSV content type
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="salaries.csv"'
     
     writer = csv.writer(response)
-    writer.writerow(['Agent Name', 'Commision', 'Payment Date', 'Property ID'])  # Adjust columns as needed
+    writer.writerow(['Agent Name', 'Commission', 'Payment Date', 'Property ID'])  # Adjust columns as needed
     
-    salaries = Salary.objects.all()  # Adjust your queryset as needed
+    # Start with all salaries, but apply filters if date range is provided
+    salaries = Salary.objects.all()
 
+    # Filter salaries based on the date range if provided
+    if start_date:
+        salaries = salaries.filter(payment_date__gte=start_date)  # Greater than or equal to start_date
+    if end_date:
+        salaries = salaries.filter(payment_date__lte=end_date)  # Less than or equal to end_date
+
+    # Write the salary data rows for the filtered data
     for salary in salaries:
         writer.writerow([
-            salary.agent,  # Assuming agent has a user relation with username
+            salary.agent.username,  # Assuming agent has a user relation with username
             salary.base_salary,
-            # salary.bonus,
-            salary.payment_date,
-            salary.property.title if salary.property else 'N/A'
+            salary.payment_date,  # Format the payment date as needed
+            salary.property.title if salary.property else 'N/A'  # Handle the case if there's no property
         ])
     
     return response
+
 
 
 
 from .models import Kisan  # Replace with your Kisan model
 
+import csv
+from django.http import HttpResponse
+from .models import Kisan
+
 def export_kisans_to_csv(request):
+    # Handle date range filtering
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if not start_date:
+        start_date = (timezone.now() - timedelta(days=30)).date()  # Default to last 30 days if no start_date
+    if not end_date:
+        end_date = timezone.now().date()  # Default to today if no end_date
+
+    try:
+        # Convert to date objects if they are strings
+        start_date = convert_to_date(start_date)
+        end_date = convert_to_date(end_date)
+    except ValueError:
+        start_date = (timezone.now() - timedelta(days=30)).date()  # Fallback on error
+        end_date = timezone.now().date()
+
+    # Handle showing all Kisans
+    show_all = request.GET.get('show_all') == 'true'
+    if show_all:
+        kisans = Kisan.objects.all()  # Fetch all kisans if "show_all" is true
+    else:
+        # Filter Kisans based on the date range
+        kisans = Kisan.objects.filter(date_added__range=[start_date, end_date])
+
+    # Start building the response with CSV content type
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="kisans.csv"'
-    
-    writer = csv.writer(response)
-    writer.writerow(['ID', 'First Name','Last Name', 'Contact','Khasra Number', 'Area in Beegha','Land Cost'])  # Adjust columns as needed
-    
-    kisans = Kisan.objects.all()  # Adjust your queryset as needed
 
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'First Name', 'Last Name', 'Contact', 'Khasra Number', 'Area in Beegha', 'Land Cost', 'Date Added'])  # Adjust columns as needed
+
+    # Write Kisan data rows
     for kisan in kisans:
         writer.writerow([
             kisan.id,
@@ -2351,10 +2605,21 @@ def export_kisans_to_csv(request):
             kisan.contact_number,
             kisan.khasra_number,
             kisan.area_in_beegha,
-            kisan.land_costing
+            kisan.land_costing,
+            kisan.date_added  # You can adjust this column as needed
         ])
-    
+
     return response
+
+def convert_to_date(date_str):
+    """
+    Convert date string to a datetime.date object.
+    If the input is already a date object, it will return it as is.
+    """
+    if isinstance(date_str, str):
+        return parser.parse(date_str).date()
+    return date_str  # If it's already a date object, return it as is.
+
 
 
 

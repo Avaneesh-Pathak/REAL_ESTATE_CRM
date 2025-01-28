@@ -3,6 +3,10 @@ from .models import (User, Lead, Agent, UserProfile, Category, FollowUp, Salary,
                      Property, Bonus, EmiPlan, Daybook, Promoter,Bill,BillItem)
 
 
+admin.site.site_header = "Mateshwari Infrasolutions Pvt. Ltd."
+admin.site.site_title = "Real Estate Management System"
+admin.site.index_title = "Welcome to Admin Pannel"
+
 class LeadAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'age', 'email']
     list_display_links = ['first_name']

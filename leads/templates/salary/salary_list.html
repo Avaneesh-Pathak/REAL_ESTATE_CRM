@@ -13,20 +13,30 @@
         <div>
             <h1 class="text-4xl text-gray-800">Salary Data</h1>
         </div>
+    
         {% if request.user.is_organisor %}
-        <div>
-            {% comment %} <a style="margin-right: 8px;" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
-                href="{% url 'leads:create_salary' %}">
-                Add Salary Data
-            </a> {% endcomment %}
-            <a style="margin-right: 8px;" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" href="{% url 'leads:export_salaries_to_csv' %}">
-                Download Salary List CSV
-            </a>
-            
-        </div>
+        <form method="GET" action="{% url 'leads:export_salaries_to_csv' %}" class="flex items-center space-x-4">
+            <!-- Start Date Input -->
+            <div class="flex items-center space-x-2">
+                <label for="start_date" class="text-black">Start Date:</label>
+                <input type="date" id="start_date" name="start_date" class="border rounded p-2" value="{{ request.GET.start_date }}">
+            </div>
+    
+            <!-- End Date Input -->
+            <div class="flex items-center space-x-2">
+                <label for="end_date" class="text-black">End Date:</label>
+                <input type="date" id="end_date" name="end_date" class="border rounded p-2" value="{{ request.GET.end_date }}">
+            </div>
+    
+            <!-- Export Button -->
+            <button type="submit" class="ml-4 px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                Export CSV
+            </button>
+        </form>
         {% endif %}
     </div>
-    <!-- Filter Form -->
+    
+     <!-- Filter Form -->
     <form id="date-filter-form" method="GET" class="ml-6px inline-flex items-center px-2 py-2 bg-blue-600 text-sm font-medium rounded-md hover:bg-blue-700">
         <div class="flex items-center">
             <label for="payment_date" class="text-white">Select Payment Date:</label>

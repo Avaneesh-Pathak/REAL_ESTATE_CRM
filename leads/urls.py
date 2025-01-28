@@ -13,7 +13,7 @@ from .views import (
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
     PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,DaybookListView,DaybookCreateView,add_promoter,update_delete_promoter,
     PromoterListView,load_properties,PlotRegistrationView,user_profile_view,BalanceUpdateView,CreateBillView,BillListView,
-    update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView,kisan_view,KisanListView,KisanUpdateView,KisanDeleteView
+    update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView,kisan_view,KisanListView,KisanUpdateView,KisanDeleteView,export_daybook_to_csv
 )
 
 app_name = "leads"
@@ -22,7 +22,7 @@ app_name = "leads"
 
 urlpatterns = [
     path('dashboard/',DashboardView.as_view(), name='dashboard'),
-
+    # path("dashboard/pdf/", DashboardPDFView.as_view(), name="dashboard_pdf"),
     path('sales/', SaleListView.as_view(), name='sale_list'),
     path('profile/<int:user_id>/', user_profile_view, name='user-profile'),
     path('salaries/', SalaryListView.as_view(), name='salary_list'),
@@ -83,9 +83,9 @@ urlpatterns = [
     path('kisan/delete/<int:pk>/', KisanDeleteView.as_view(), name='kisan_delete'),
     path('export/properties/', views.export_properties_to_csv, name='export_properties_to_csv'),
     path('export/buyers/', views.export_buyers_to_csv, name='export_buyers_to_csv'),
-    path('export/salaries/', views.export_salaries_to_csv, name='export_salaries_to_csv'),
+    path('salary/export/', views.export_salaries_to_csv, name='export_salaries_to_csv'),
     path('export/kisans/', views.export_kisans_to_csv, name='export_kisans_to_csv'),
-  
+    path('daybook/export/', export_daybook_to_csv, name='export_daybook_to_csv'),
     path('create_bill/',CreateBillView.as_view(), name='create_bill'),
     path('bills/', BillListView.as_view(), name='bill_list'),
     path('download_invoice/<int:bill_id>/', views.download_invoice, name='download_invoice'),

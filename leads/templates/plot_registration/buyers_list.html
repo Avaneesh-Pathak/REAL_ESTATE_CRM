@@ -1,101 +1,152 @@
-<!-- buyers_list.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
-<style>
-    th {
-        background-color: rgb(58, 32, 142);
-    }
-    .table-container {
-        width: 100%;
-        overflow-x: auto; /* Allows horizontal scrolling on small screens */
-    }
-    table {
-        width: 100%; /* Full width */
-        border-collapse: collapse; /* Ensures borders between cells are merged */
-    }
-    th, td {
-        padding: 6px; /* Adds some padding */
-        border: 1px solid #000000; /* Gray border for table cells */
-        text-align: center; /* Aligns text to the left */
-    }
-    th {
-        color: white; /* White text color for headers */
-    }
-    tbody tr:hover {
-        background: linear-gradient(135deg, #c4cddb 0%, #1481af 100%); /* Light gray background on row hover */
-    }
-</style>
-<div  class="container mx-auto">
-    <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-black-100">
-        <div>
-            <h1 class="text-4xl font-bold text-darker-800">Buyers</h1>
-        </div>
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <div style="width: 100%; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb;">
+        <h1 style="font-size: 2.5rem; color: #4b5563;">Buyers</h1>
         {% if request.user.is_organisor %}
-        <div>
-            <a class="mr-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:plot_registration' %}">
-                Register New Plot
-            </a>
-            <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:export_buyers_to_csv' %}">
-                Download Buyer List CSV
-            </a>
-            
+        <!-- Export CSV Button aligned to the right -->
+        <div style="display: flex; justify-content: flex-end;">
+            <form method="GET" action="{% url 'leads:export_buyers_to_csv' %}" style="display: inline-flex; align-items: center; margin-right: 16px;">
+                <input type="hidden" name="start_date" value="{{ start_date }}">
+                <input type="hidden" name="end_date" value="{{ end_date }}">
+                <button type="submit" style="background-color: #16A34A; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; border: none;">
+                    Export to CSV
+                </button>
+            </form>
         </div>
         {% endif %}
     </div>
 
-    <div class="table-container">
-        <table class="bg-white border border-gray-200">
+    <!-- Filters and Buttons on the next row -->
+    <div style="margin-bottom: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
+        <!-- Date Filter Form -->
+        <form method="GET" action="{% url 'leads:buyers_list' %}" style="display: inline-flex; align-items: center; padding: 8px 16px; background-color: #1d4ed8; font-size: 0.875rem; border-radius: 8px; flex-grow: 1;">
+            <label for="start_date" style="margin-right: 10px; color: white;">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" style="border: 1px solid #ccc; padding: 8px; border-radius: 4px; margin-right: 8px; margin-bottom: 8px;" value="{{ start_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+
+            <label for="end_date" style="margin-left: 20px; margin-right: 10px; color: white;">End Date:</label>
+            <input type="date" id="end_date" name="end_date" style="border: 1px solid #ccc; padding: 8px; border-radius: 4px; margin-bottom: 8px;" value="{{ end_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+        </form>
+
+        <!-- Show All / Show Filtered Button -->
+        <div style="margin-top: 16px;">
+            <a href="{% url 'leads:buyers_list' %}?show_all=true&start_date={{ start_date }}&end_date={{ end_date }}" style="background-color: #3b82f6; color: white; padding: 8px 20px; border-radius: 8px; margin-right: 15px; text-decoration: none; display: inline-block; cursor: pointer;">
+                Show All Buyers
+            </a>
+            <a href="{% url 'leads:buyers_list' %}?show_all=false&start_date={{ start_date }}&end_date={{ end_date }}" style="background-color: #3b82f6; color: white; padding: 8px 20px; border-radius: 8px; text-decoration: none; display: inline-block; cursor: pointer;">
+                Show Filtered Buyers
+            </a>
+        </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-container" style="overflow-x: auto; margin-top: 32px;">
+        <table style="width: 100%; border-collapse: collapse; background-color: white; border: 1px solid #D1D5DB;">
             <thead>
-                <tr class="bg-gray-200">
-                    <th class="text-xm text-center font-semibold">Name</th>
-                    <th class="text-xm text-center font-semibold">Gender</th>
-                    <th class="text-xm text-center font-semibold">Mobile No.</th>
-                    <th class="text-xm text-center font-semibold">Address</th>
-                    <th class="text-xm text-center font-semibold">Email</th>
-                    <th class="text-xm text-center font-semibold">Property ID</th>
-                    <th class="text-xm text-center font-semibold">Associate Detail</th>
-                    <th class="text-xm text-center font-semibold">Booking Date</th>
-                    <th class="text-xm text-center font-semibold">Details</th>
-                    <th class="text-xm text-center font-semibold">Print Receipt</th>
+                <tr style="background-color: #3A208E; color: white;">
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Name</th>
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Gender</th>
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Mobile No.</th>
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Address</th>
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Email</th>
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Property ID</th>
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Associate Detail</th>
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Booking Date</th>
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Details</th>
+                    <th style="padding: 12px; text-align: center; font-weight: bold;">Print Receipt</th>
                 </tr>
             </thead>
             <tbody>
                 {% for buyer in buyers %}
                 <tr>
-                    <td>
-                        <a href="{% url 'leads:update_delete_buyer' buyer.id %}" class="text-blue-500 font-bold hover:underline">{{ buyer.name }}</a>
+                    <td style="padding: 12px; text-align: center;">
+                        <a href="{% url 'leads:update_delete_buyer' buyer.id %}" style="color: #3B82F6; font-weight: bold; text-decoration: none;">{{ buyer.name }}</a>
                     </td>
-                    <td>{{ buyer.gender }}</td>
-                    <td>{{ buyer.mobile_no }}</td>
-                    <td>{{ buyer.address }}</td>
-                    <td><a href="mailto:{{ buyer.email }}">{{ buyer.email }}</a></td>
-                    <td>{{ buyer.project.title }}</td>
-                    <td>{% if buyer.agent %}{{ buyer.agent.user.username }}{% else %} None {% endif %}</td>
-                    <td>{{ buyer.booking_date }}</td>
-                    <td>
-                        <a href="{% url 'leads:buyer_detail' buyer.id %}" class="hover:bg-red text-lightblue font-bold">View Details</a>
+                    <td style="padding: 12px; text-align: center;">{{ buyer.gender }}</td>
+                    <td style="padding: 12px; text-align: center;">{{ buyer.mobile_no }}</td>
+                    <td style="padding: 12px; text-align: center;">{{ buyer.address }}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <a href="mailto:{{ buyer.email }}" style="color: #3B82F6; text-decoration: none;">{{ buyer.email }}</a>
                     </td>
-                    <td>
-                        <a href="{% url 'leads:buyer_print' buyer.id %}" class="hover:bg-red text-lightblue font-bold">Print</a>
+                    <td style="padding: 12px; text-align: center;">{{ buyer.project.title }}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        {% if buyer.agent %}{{ buyer.agent.user.username }}{% else %} None {% endif %}
+                    </td>
+                    <td style="padding: 12px; text-align: center;">{{ buyer.booking_date }}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <a href="{% url 'leads:buyer_detail' buyer.id %}" style="color: #EF4444; font-weight: bold; text-decoration: none;">View Details</a>
+                    </td>
+                    <td style="padding: 12px; text-align: center;">
+                        <a href="{% url 'leads:buyer_print' buyer.id %}" style="color: #EF4444; font-weight: bold; text-decoration: none;">Print</a>
                     </td>
                     {% if receipt_file %}
-                    <td>
-                        <a href="{{ receipt_file.url }}" download class="btn btn-success font-bold">Download Receipt</a>
+                    <td style="padding: 12px; text-align: center;">
+                        <a href="{{ receipt_file.url }}" download style="background-color: #10B981; padding: 8px 16px; color: white; border-radius: 4px; text-decoration: none;">Download Receipt</a>
                     </td>
                     {% endif %}
-                                    
-                  
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="9" class="text-center">No buyers found.</td>
+                    <td colspan="10" style="text-align: center; padding: 12px; font-style: italic; color: #6B7280;">No buyers found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<style>
+    /* Media Queries for Responsiveness */
+    @media (max-width: 768px) {
+        form {
+            flex-direction: column;
+        }
+
+        .table-container {
+            overflow-x: scroll;
+            margin-top: 16px;
+        }
+
+        table {
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 8px;
+        }
+
+        a {
+            font-size: 12px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .button-container a,
+        .button-container button {
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        a, button {
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+
+        table {
+            font-size: 10px;
+        }
+
+        th, td {
+            padding: 6px;
+        }
+    }
+</style>
 
 {% endblock %}

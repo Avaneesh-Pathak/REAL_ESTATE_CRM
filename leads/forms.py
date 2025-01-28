@@ -48,7 +48,13 @@ class LeadModelForm(forms.ModelForm):
         return data
     def clean(self):
         pass
-
+    def save(self, commit=True):
+        lead = super().save(commit=False)
+        if not lead.pk:
+            lead.date_added = timezone.now().date()  # Set date_added only when creating a new lead
+        if commit:
+            lead.save()
+        return lead
 
 class LeadForm(forms.Form):
     first_name = forms.CharField()

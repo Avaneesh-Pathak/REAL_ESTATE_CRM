@@ -257,7 +257,7 @@
             display: none;
             position: absolute;
             right: 0;
-            background-color: #031638;
+            background-color: #12216d;;
             color: rgb(255, 255, 255);
             border-radius: 5px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -287,7 +287,8 @@
         }
 
         .dropdown-item:hover {
-            background-color: #110247;
+            background-color: #01082a;
+            color: white;
         }
 
         /* Login Link */
@@ -458,7 +459,7 @@
             <a href="{% url 'leads:property-create' %}"><i class="fas fa-plus-square"></i> Property Create</a>
             <a href="{% url 'leads:property_list' %}"><i class="fas fa-list-alt"></i> Property List</a>
         </div>
-        <a href="#" id="toggle-buyer-menu"><i class="fas fa-building"></i> Buyers Manage. <i class="fas fa-chevron-down"></i></a>
+        <a href="#" id="toggle-buyer-menu"><i class="fas fa-building"></i> Buyers Management <i class="fas fa-chevron-down"></i></a>
         <div class="nested-menu" id="buyer-menu">
             <a href="{% url 'leads:plot_registration' %}"><i class="fas fa-map-marker-alt"></i> Register Plot</a>
             <a href="{% url 'leads:buyers_list' %}"><i class="fas fa-user-friends"></i> Buyers List</a>
@@ -496,51 +497,63 @@
 
 
             <!-- User Profile Dropdown -->
-            {% if request.user.is_authenticated %}
-            <div class="profile-dropdown-container">
-                <button id="profile-menu-button" class="profile-button">
-                    {% if request.user.userprofile.profile_picture %}
-                    <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile Picture"
-                        class="profile-img">
-                    {% else %}
-                    <i class="fas fa-user-circle profile-icon"></i>
-                    {% endif %}
-                    <span class="profile-name">{{ request.user.username }}</span>
-                    <i class="fas fa-caret-down dropdown-arrow"></i>
-                </button>
+{% if request.user.is_authenticated %}
+<div class="profile-dropdown-container" style="position: relative; display: inline-block;">
+    <button id="profile-menu-button" class="profile-button" style="background-color:rgb(76, 122, 175); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; display: flex; align-items: center; cursor: pointer; transition: background-color 0.3s;">
+        {% if request.user.userprofile.profile_picture %}
+        <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile Picture"
+            class="profile-img" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;">
+        {% else %}
+        <i class="fas fa-user-circle profile-icon" style="font-size: 24px; margin-right: 8px;"></i>
+        {% endif %}
+        <span class="profile-name" style="font-size: 14px; font-weight: 600; color: white;">{{ request.user.username }}</span>
+        <i class="fas fa-caret-down dropdown-arrow" style="font-size: 14px; color: white; margin-left: 8px;"></i>
+    </button>
 
-                <!-- Dropdown Menu -->
-                <div id="profile-dropdown" class="profile-dropdown">
-                    <a href="{% url 'profile' %}" class="dropdown-item"><i class="fas fa-user-circle"></i>
-                        Profile</a>
-                    <a href="{% url 'logout' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>
-                        Logout</a>
-                    <a href="{% url 'reset_password' %}" class="dropdown-item"><i class="fas fa-key"></i> Reset
-                        Password</a>
-                </div>
-            </div>
-            {% else %}
-            <a href="{% url 'login' %}" class="login-link">Login</a>
-            {% endif %}
+    <!-- Dropdown Menu -->
+    <div id="profile-dropdown" class="profile-dropdown" style="position: absolute; top: 50px; right: 0; width: 200px; background-color: #12216d; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(138, 60, 60, 0.1); opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;">
+        <a href="{% url 'profile' %}" class="dropdown-item" style="display: flex; align-items: center; padding: 10px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #ddd; transition: background-color 0.3s;">
+            <i class="fas fa-user-circle" style="margin-right: 8px; color: white;"></i> <span style="color: white;">Profile</span>
+        </a>
+        <a href="{% url 'logout' %}" class="dropdown-item" style="display: flex; align-items: center; padding: 10px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #ddd; transition: background-color 0.3s;">
+            <i class="fas fa-sign-out-alt" style="margin-right: 8px; color: white;"></i> <span style="color: white;">Logout</span> 
+        </a>
+        <a href="{% url 'reset_password' %}" class="dropdown-item" style="display: flex; align-items: center; padding: 10px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #ddd; transition: background-color 0.3s;">
+            <i class="fas fa-key" style="margin-right: 8px; color: white;"></i> <span style="color: white;">Reset Password</span> 
+        </a>
+    </div>
+</div>
+{% else %}
+<a href="{% url 'login' %}" class="login-link" style="color: #456ba9; font-size: 16px; font-weight: 600; text-decoration: none;">Login</a>
+{% endif %}
 
+<!-- Script for Toggle & Close -->
+<script>
+    // Toggle profile dropdown on button click
+    document.getElementById('profile-menu-button').addEventListener('click', function (event) {
+        event.stopPropagation();
+        const dropdown = document.getElementById('profile-dropdown');
+        dropdown.classList.toggle('active');
+        if (dropdown.classList.contains('active')) {
+            dropdown.style.opacity = '1';
+            dropdown.style.visibility = 'visible';
+        } else {
+            dropdown.style.opacity = '0';
+            dropdown.style.visibility = 'hidden';
+        }
+    });
 
-            <!-- Script for Toggle & Close -->
-            <script>
-                // Toggle profile dropdown on button click
-                document.getElementById('profile-menu-button').addEventListener('click', function (event) {
-                    event.stopPropagation();
-                    const dropdown = document.getElementById('profile-dropdown');
-                    dropdown.classList.toggle('active');
-                });
+    // Close the dropdown if clicked outside
+    document.addEventListener('click', function (event) {
+        const dropdown = document.getElementById('profile-dropdown');
+        if (!event.target.closest('#profile-menu-button') && !event.target.closest('#profile-dropdown')) {
+            dropdown.classList.remove('active');
+            dropdown.style.opacity = '0';
+            dropdown.style.visibility = 'hidden';
+        }
+    });
+</script>
 
-                // Close the dropdown if clicked outside
-                document.addEventListener('click', function (event) {
-                    const dropdown = document.getElementById('profile-dropdown');
-                    if (!event.target.closest('#profile-menu-button') && !event.target.closest('#profile-dropdown')) {
-                        dropdown.classList.remove('active');
-                    }
-                });
-            </script>
 
 
 

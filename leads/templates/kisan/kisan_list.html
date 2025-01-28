@@ -2,86 +2,86 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<style>
-    .container{
-        /* margin-top: 5%; */
-    }
-    th {
-        background-color: rgb(58, 32, 142);
-        color: white; /* White text color for headers */
-        font-weight: bold; /* Make header text bold */
-    }
-    .table-container {
-        width: 100%;
-        overflow-x: auto; /* Allows horizontal scrolling on small screens */
-    }
-    table {
-        width: 100%; /* Full width */
-        border-collapse: collapse; /* Ensures borders between cells are merged */
-    }
-    th, td {
-        padding: 12px; /* Adds some padding */
-        border: 1px solid #d1d5db; /* Gray border for table cells */
-        text-align: center; /* Aligns text to the left */
-    }
-    tbody tr:hover {
-        background-color: #f0f0f0; /* Light gray background on row hover */
-    }
-</style>
-<div class="container mx-auto ">
-    <div class="w-full mb-6 py-6 flex justify-between items-center border-b border-black-100">
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <div style="width: 100%; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb;">
+        <h1 style="font-size: 2.5rem; color: #4b5563;">Kisan Detail</h1>
+        {% if request.user.is_organisor %}
         <div>
-            <h1 class="text-4xl text-gray-800">Kisan Detail</h1>
-        </div>
-    {% if request.user.is_organisor %}
-        <div>
-            <a class=" mr-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:kisan_create' %}">
+            <a href="{% url 'leads:kisan_create' %}" style="background-color: #3b82f6; color: white; font-weight: bold; padding: 12px 20px; border-radius: 8px; text-decoration: none; margin-right: 20px; cursor: pointer; display: inline-block;">
                 Add New Kisan
             </a>
-            <a class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded focus:outline-none focus:shadow-outline" href="{% url 'leads:export_kisans_to_csv' %}">
-                Download Kisan List CSV
+            <a href="{% url 'leads:export_kisans_to_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}" 
+               style="background-color: #4CAF50; color: white; font-weight: bold; padding: 12px 20px; border-radius: 8px; text-decoration: none; cursor: pointer; display: inline-block;">
+                Export CSV
             </a>
-            
         </div>
         {% endif %}
     </div>
 
-    <div class="table-container">
-        <table class="bg-white border border-gray-200">
+    <!-- Date Filter Form -->
+    <form method="GET" action="{% url 'leads:kisan_list' %}" style="display: inline-flex; align-items: center; padding: 8px 16px; background-color: #1d4ed8;  font-size: 0.875rem; border-radius: 8px; margin-bottom: 20px;">
+        <label for="start_date" style="margin-right: 10px; color: white;">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 8px; margin-left: 5px;"
+               value="{{ start_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+        
+        <label for="end_date" style="margin-left: 20px; margin-right: 10px; color: white;">End Date:</label>
+        <input type="date" id="end_date" name="end_date" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 8px;"
+               value="{{ end_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+        
+        <input type="hidden" name="show_all" value="{{ show_all }}">
+    </form>
+
+    <!-- Show All / Show Filtered Buttons -->
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'leads:kisan_list' %}?show_all=true&start_date={{ start_date }}&end_date={{ end_date }}"
+           style="background-color: #3b82f6; color: white; padding: 12px 20px; border-radius: 8px; margin-right: 15px; text-decoration: none; display: inline-block; cursor: pointer;">
+            Show All Kisans
+        </a>
+        <a href="{% url 'leads:kisan_list' %}?show_all=false&start_date={{ start_date }}&end_date={{ end_date }}"
+           style="background-color: #3b82f6; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; display: inline-block; cursor: pointer;">
+            Show Filtered Kisans
+        </a>
+    </div>
+
+    <!-- Table Container -->
+    <div style="overflow-x: auto; max-width: 100%; margin-top: 20px;">
+        <table style="width: 100%; border-collapse: collapse; background-color: #fff; border: 1px solid #e5e7eb;">
             <thead>
-                <tr class="bg-gray-200">
-                    <th class="py-2 px-4 border-b">First Name</th>
-                    <th class="py-2 px-4 border-b">Last Name</th>
-                    <th class="py-2 px-4 border-b">Contact Number</th>
-                    <th class="py-2 px-4 border-b">Khasra Number</th>
-                    <th class="py-2 px-4 border-b">Area (Beegha)</th>
-                    <th class="py-2 px-4 border-b">Area (sqft)</th>
-                    <th class="py-2 px-4 border-b">Area (Hectare)</th>
-                    <!-- <th class="py-2 px-4 border-b">Land Type</th> New column for land type -->
-                    <th class="py-2 px-4 border-b">Land Costing</th>
-                    <th class="py-2 px-4 border-b">Actions</th>
+                <tr style="background-color: #4b32a0; color: white; text-align: center;">
+                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">First Name</th>
+                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Last Name</th>
+                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Contact Number</th>
+                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Khasra Number</th>
+                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Area (Beegha)</th>
+                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Area (sqft)</th>
+                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Area (Hectare)</th>
+                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Land Costing</th>
+                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for kisan in kisans %}
-                <tr>
-                    <td class="py-2 px-4 border-b">{{ kisan.first_name }}</td>
-                    <td class="py-2 px-4 border-b">{{ kisan.last_name }}</td>
-                    <td class="py-2 px-4 border-b">{{ kisan.contact_number }}</td>
-                    <td class="py-2 px-4 border-b">{{ kisan.khasra_number }}</td>
-                    <td class="py-2 px-4 border-b">{{ kisan.area_in_beegha }}</td>
-                    <td class="py-2 px-4 border-b">{{ kisan.area_in_sqft }}</td>
-                    <td class="py-2 px-4 border-b">{{ kisan.beegha_to_hectare|floatformat:2}}</td> 
-                    <!-- <td class="py-2 px-4 border-b">{{ kisan.land_type }}</td> Display land type -->
-                    <td class="py-2 px-4 border-b">{{ kisan.land_costing }}</td>
-                    <td class="py-2 px-4 border-b"> {% if kisan.is_assigned %}Assigned {% else %}
-                        <a href="{% url 'leads:kisan_edit' kisan.id %}" class="hover:bg-Blue text-lightblue font-bold">Edit</a>
-                        <a href="{% url 'leads:kisan_delete' kisan.id %}" class="bg-red text-red-600 hover:text-red-800 ml-4">Delete</a>{% endif %}
+                <tr style="text-align: center; background-color: #f9fafb; hover: background-color: #f0f0f0;">
+                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.first_name }}</td>
+                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.last_name }}</td>
+                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.contact_number }}</td>
+                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.khasra_number }}</td>
+                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.area_in_beegha }}</td>
+                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.area_in_sqft }}</td>
+                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.beegha_to_hectare|floatformat:2}}</td> 
+                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.land_costing }}</td>
+                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">
+                        {% if kisan.is_assigned %}
+                            Assigned
+                        {% else %}
+                            <a href="{% url 'leads:kisan_edit' kisan.id %}" style="color: #3b82f6; font-weight: bold;">Edit</a>
+                            <a href="{% url 'leads:kisan_delete' kisan.id %}" style="color: #ef4444; font-weight: bold; margin-left: 10px;">Delete</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="12" class="text-center py-4">No Kisan records available.</td>
+                    <td colspan="9" style="text-align: center; padding: 20px;">No Kisan records available.</td>
                 </tr>
                 {% endfor %}
             </tbody>
