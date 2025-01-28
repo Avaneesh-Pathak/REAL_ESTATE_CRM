@@ -172,7 +172,7 @@ def search_view(request):
 
 
 class LandingPageView(generic.TemplateView):
-    template_name = "landing.html"
+    template_name = "registration/login.html"
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated: 
