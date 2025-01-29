@@ -37,7 +37,7 @@ def send_sms(to, message):
 
 class User(AbstractUser):
     is_organisor = models.BooleanField(default=False)
-    is_agent = models.BooleanField(default=False)
+    is_agent = models.BooleanField(default=True)
     
     def save(self, *args, **kwargs):
         # Check if it's a new instance or an update
@@ -234,7 +234,8 @@ class Agent(models.Model):
         # Get the parent agent
         parent_agent = self.parent_agent
         print(f"Parent agent: {parent_agent}")
-
+        self.user.is_agent = True
+        self.user.save()
         # Check if the parent agent exists and if commission percentage is valid
         if parent_agent:
             # Check if the parent agent's level is at maximum
