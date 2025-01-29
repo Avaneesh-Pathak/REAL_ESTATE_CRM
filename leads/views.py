@@ -589,7 +589,7 @@ class AssignAgentView(generic.FormView):  # Temporarily remove mixin
         return super().form_valid(form)
 
 
-class CategoryListView(OrganisorAndLoginRequiredMixin, generic.ListView):
+class CategoryListView(AgentAndLoginRequiredMixin, generic.ListView):
     template_name = "leads/category_list.html"
     context_object_name = "category_list"
 
