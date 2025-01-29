@@ -231,7 +231,7 @@ class ExpenseFilterForm(forms.Form):
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
     )
     
-class DashboardView(LoginRequiredMixin, generic.TemplateView):
+class DashboardView(OrganisorAndLoginRequiredMixin, generic.TemplateView):
     template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
