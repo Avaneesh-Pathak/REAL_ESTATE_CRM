@@ -15,6 +15,8 @@ import os
 # DEBUG = env('DEBUG')
 # SECRET_KEY = env('SECRET_KEY')
 SECRET_KEY = "django-insecure-_-s#%_=bpv+xk2c4y_tuiea0uw_e7gw!63afunys%vx5-fxyt0"
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,6 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DEBUG = True
+# DEBUG = False
 
 # Allowed hosts (adjust for production)
 ALLOWED_HOSTS =['0.0.0.0','127.0.0.1']

@@ -52,8 +52,8 @@ class DaybookAdmin(admin.ModelAdmin):
 
 # Admin class for Promoter model
 class PromoterAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'mobile_number', 'department', 'status', 'joining_date', 'payment_date', 'salary']
-    list_filter = ['department', 'status', 'joining_date']
+    list_display = ['name', 'email', 'mobile_number', 'department', 'status', 'joining_date', 'payment_date', 'salary', 'get_next_payment_date']
+    list_filter = ['department', 'status', 'joining_date', 'payment_date']
     search_fields = ['name', 'email', 'mobile_number', 'department']
     ordering = ['name']
     date_hierarchy = 'joining_date'
@@ -66,8 +66,6 @@ class PromoterAdmin(admin.ModelAdmin):
             'fields': ('department', 'joining_date', 'salary', 'payment_date', 'status')
         }),
     )
-
-
 
 
 # Register models with admin

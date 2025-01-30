@@ -673,13 +673,15 @@ from datetime import timedelta
 class Promoter(models.Model):
     # Personal Information
     name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255,null=True,blank=True,)
+    email = models.EmailField(max_length=255, null=True, blank=True)
     mobile_number = models.CharField(max_length=15)
-    address = models.TextField(null=True,blank=True,)
-    joining_date = models.DateField(null=True,blank=True,)
-    salary = models.IntegerField(null=True,blank=True,)
-    payment_date = models.DateField(null=True,blank=True,)
-    department = models.CharField(null=True,blank=True,max_length=100)
+    address = models.TextField(null=True, blank=True)
+    joining_date = models.DateField(null=True, blank=True)
+    salary = models.IntegerField(null=True, blank=True)
+    payment_date = models.DateField(null=True, blank=True)
+    last_payment_date = models.DateField(null=True, blank=True)
+    next_payment_date = models.DateField(null=True, blank=True)  # Add the next_payment_date field here
+    department = models.CharField(null=True, blank=True, max_length=100)
 
     status = models.CharField(
         max_length=50,
@@ -692,28 +694,30 @@ class Promoter(models.Model):
         default='Active',
         help_text="Current employment status of the promoter."
     )
+
     def save(self, *args, **kwargs):
-        # Automatically calculate payment_date based on joining_date
-        if self.joining_date:
-            self.payment_date = self.calculate_next_payment_date()
+        # Automatically update last_payment_date and next_payment_date when saving
+        if self.payment_date:
+            self.last_payment_date = self.payment_date
+            # Calculate next_payment_date only if payment_date is provided
+            self.next_payment_date = self.get_next_payment_date()
+
+        # Call the parent save method to save the object to the database
         super().save(*args, **kwargs)
 
-    def calculate_next_payment_date(self):
-        """Calculate the next payment date based on the joining date."""
-        # Add 30 days to the joining date for first payment
-        initial_payment_date = self.joining_date + timedelta(days=30)
-
-        # Example rule: Payments are always on the last day of the month
-        if initial_payment_date.day != 30:
-            # Adjust to the end of the joining month's payment cycle
-            next_month = initial_payment_date.replace(day=1) + timedelta(days=31)
-            end_of_month = next_month.replace(day=1) - timedelta(days=1)
-            return end_of_month
-        return initial_payment_date
+    def get_next_payment_date(self):
+        """
+        Calculate the next payment date based on the current payment date.
+        Assumes monthly payments (adjust timedelta as necessary).
+        """
+        if self.payment_date:
+            # You can adjust the interval depending on your payment schedule (e.g., 30 days for monthly)
+            return self.payment_date + timedelta(days=30)  # Adjust interval as needed
+        return None
 
     def __str__(self):
-        logger.info(f"Promoter created: {self.name}, Email: {self.email}")
         return f"{self.name} ({self.department})"
+
 
 
 # PLOT BOOKING

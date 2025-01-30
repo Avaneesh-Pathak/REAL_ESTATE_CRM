@@ -1651,20 +1651,21 @@ class PromoterListView(LoginRequiredMixin, ListView):
     template_name = 'promoter/promoter_list.html'
     context_object_name = 'promoters'
     ordering = ['name']
+    
     def get_queryset(self):
-            queryset = super().get_queryset()
+        queryset = super().get_queryset()
 
-            # Get the 'start_date' and 'end_date' from request parameters
-            start_date = self.request.GET.get('start_date')
-            end_date = self.request.GET.get('end_date')
+        # Get the 'start_date' and 'end_date' from request parameters
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
 
-            if start_date:
-                queryset = queryset.filter(joining_date__gte=start_date)
-            
-            if end_date:
-                queryset = queryset.filter(joining_date__lte=end_date)
+        if start_date:
+            queryset = queryset.filter(joining_date__gte=start_date)
+        
+        if end_date:
+            queryset = queryset.filter(joining_date__lte=end_date)
 
-            return queryset
+        return queryset
 
     def get(self, request, *args, **kwargs):
         if 'download' in request.GET:  # Check for 'download' query parameter
@@ -1673,8 +1674,6 @@ class PromoterListView(LoginRequiredMixin, ListView):
 
     def download_csv(self, request):
         # Get the filtered queryset
-        start_date = request.GET.get('start_date')
-        end_date = request.GET.get('end_date')
         promoters = self.get_queryset()
 
         # Create a CSV response
@@ -1682,12 +1681,15 @@ class PromoterListView(LoginRequiredMixin, ListView):
         response['Content-Disposition'] = 'attachment; filename="Employee.csv"'
 
         writer = csv.writer(response)
-        writer.writerow([ 'Name', 'Email', 'Mobile Number', 'Joining Date','Salary', 'Payment Date', 'Department', 'Status'])
+        writer.writerow([ 'Name', 'Email', 'Mobile Number', 'Joining Date', 'Salary', 'Payment Date', 'Department', 'Status'])
 
         for promoter in promoters:
-            writer.writerow([ promoter.name, promoter.email, promoter.mobile_number, promoter.joining_date,promoter.salary, promoter.payment_date, promoter.department, promoter.status])
+            writer.writerow([promoter.name, promoter.email, promoter.mobile_number, promoter.joining_date, 
+                             promoter.salary, promoter.payment_date, promoter.department, promoter.status])
 
         return response
+    
+
 
 # Update/Delete Promoter View
 def update_delete_promoter(request, promoter_id):
@@ -1705,8 +1707,11 @@ def update_delete_promoter(request, promoter_id):
                 if not updated_promoter.joining_date:
                     updated_promoter.joining_date = promoter.joining_date
                 
-                # Calculate the next payment date based on the updated information
-                updated_promoter.payment_date = updated_promoter.calculate_next_payment_date()  # Optional logic
+                # Update the last payment date and next payment date when the payment date is updated
+                if updated_promoter.payment_date != promoter.payment_date:
+                    updated_promoter.last_payment_date = updated_promoter.payment_date
+                    updated_promoter.next_payment_date = updated_promoter.get_next_payment_date()
+
                 updated_promoter.save()  # Save changes to the database
                 return redirect('leads:promoter_list')  # Redirect to the promoter list
             else:
@@ -1733,13 +1738,17 @@ def add_promoter(request):
         form = PromoterForm(request.POST)
         if form.is_valid():
             promoter = form.save(commit=False)
-            promoter.payment_date = promoter.calculate_next_payment_date()  # Ensure the payment_date logic is applied
+            # Automatically set last_payment_date and next_payment_date based on the provided payment_date
+            promoter.last_payment_date = promoter.payment_date
+            promoter.next_payment_date = promoter.get_next_payment_date()  # Automatically calculate the next payment date
             promoter.save()
             return redirect('leads:promoter_list')  # Redirect to the promoter list
     else:
         form = PromoterForm()
 
     return render(request, 'promoter/add_promoter.html', {'form': form})
+
+
 
 def calculate_emi(plot_price, interest_rate, tenure):
     if interest_rate is not None and tenure > 0:

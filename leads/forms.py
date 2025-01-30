@@ -237,13 +237,15 @@ class PromoterForm(forms.ModelForm):
         model = Promoter
         fields = [
             'name', 'email', 'mobile_number', 'address', 
-            'joining_date', 'salary', 'department', 'status'
+            'payment_date', 'last_payment_date', 'salary', 'department', 'status'
         ]
         widgets = {
-            'joining_date': forms.DateInput(attrs={'type': 'date'}),
-            'payment_date': forms.DateInput(attrs={'type': 'date'}),
+            'payment_date': forms.DateInput(attrs={'type': 'date'}),  # Payment date field as date picker
+            'last_payment_date': forms.DateInput(attrs={'type': 'date', 'readonly': 'readonly'}),  # Last payment date is read-only
         }
 
+    def __init__(self, *args, **kwargs):
+        super(PromoterForm, self).__init__(*args, **kwargs)
 
 # PLOT REGISTRATION
 from decimal import Decimal

@@ -66,6 +66,22 @@
                 </select>
             </div>
         </div>
+
+        <!-- Payment Date -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <label for="payment_date" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Payment Date:</label>
+                <input type="date" id="payment_date" name="payment_date" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" required>
+            </div>
+        </div>
+
+        <!-- Last Payment Date (Readonly, auto-calculated) -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                <label for="last_payment_date" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Last Payment Date:</label>
+                <input type="date" id="last_payment_date" name="last_payment_date" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" readonly>
+            </div>
+        </div>
         
         <!-- Submit Button -->
         <div style="text-align: center; margin-top: 30px;">

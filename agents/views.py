@@ -86,30 +86,6 @@ class AgentDetailView(AgentAndLoginRequiredMixin, generic.DetailView):
         # organisation = self.request.user.userprofile
         return Agent.objects.all()
     
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-        
-    #     agent = self.get_object()
-    #     current_date = timezone.now()
-    #     current_month = current_date.month
-    #     current_year = current_date.year
-
-    #     # Calculate monthly commission for the agent
-    #     monthly_commission = Salary.objects.filter(
-    #         agent=agent,
-    #         payment_date__year=current_year,
-    #         payment_date__month=current_month
-    #     ).aggregate(total_commission=Sum('commission'))['total_commission'] or 0
-
-    #     context['monthly_commission'] = monthly_commission
-    #     return context
-
-
-# cfrom django.shortcuts import get_object_or_404
-# from django.urls import reverse
-# from django.views import generic
-# from .models import Agent
-# from .forms import AgentUpdateForm
 
 class AgentUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
     template_name = "agents/agent_update.html"

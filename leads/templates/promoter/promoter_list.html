@@ -32,49 +32,58 @@
         </a>
         
         <!-- Table -->
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <!-- Table Header -->
-                <thead>
-                    <tr style="background-color: #3182ce; color: white;">
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Name</th>
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Email</th>
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Mobile Number</th>
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Address</th>
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Joining Date</th>
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Salary</th>
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Payment Date</th>
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Department</th>
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Status</th>
-                        <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Actions</th>
-                    </tr>
-                </thead>
+<div style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <!-- Table Header -->
+        <thead>
+            <tr style="background-color: #3182ce; color: white;">
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Name</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Email</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Mobile Number</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Address</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Joining Date</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Salary</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Payment Date</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Next Payment Date</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Department</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Status</th>
+                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Actions</th>
+            </tr>
+        </thead>
 
-                <!-- Table Body -->
-                <tbody>
-                    {% for promoter in promoters %}
-                    <tr style="background-color: {% cycle '#edf2f7' '#ffffff' %};">
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #2d3748;">{{ promoter.name }}</td>
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.email }}</td>
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.mobile_number }}</td>
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.address }}</td>
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.joining_date }}</td>
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.salary }}</td>
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.payment_date }}</td>
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.department }}</td>
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: {% if promoter.status == 'Active' %}green{% else %}red{% endif %}; font-weight: bold;">{{ promoter.status }}</td>
-                        <td style="padding: 10px 15px; border: 1px solid #e2e8f0;">
-                            <a href="{% url 'leads:update_delete_promoter' promoter.id %}" style="color: #3182ce; text-decoration: none; font-weight: bold;">Edit</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr style="background-color: #f8d7da;">
-                        <td colspan="10" style="padding: 10px; text-align: center; color: #721c24; font-weight: bold;">No Employees Found</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        <!-- Table Body -->
+        <tbody>
+            {% for promoter in promoters %}
+            <tr style="background-color: {% cycle '#edf2f7' '#ffffff' %};">
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #2d3748;">{{ promoter.name }}</td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.email }}</td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.mobile_number }}</td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.address }}</td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.joining_date }}</td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.salary }}</td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.last_payment_date }}</td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">
+                    {% if promoter.next_payment_date %}
+                        {{ promoter.next_payment_date }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.department }}</td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: {% if promoter.status == 'Active' %}green{% else %}red{% endif %}; font-weight: bold;">{{ promoter.status }}</td>
+                <td style="padding: 10px 15px; border: 1px solid #e2e8f0;">
+                    <a href="{% url 'leads:update_delete_promoter' promoter.id %}" style="color: #3182ce; text-decoration: none; font-weight: bold;">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr style="background-color: #f8d7da;">
+                <td colspan="11" style="padding: 10px; text-align: center; color: #721c24; font-weight: bold;">No Employees Found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
     </div>
 </section>
 {% endblock content %}

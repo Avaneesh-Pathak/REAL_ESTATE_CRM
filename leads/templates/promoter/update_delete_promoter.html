@@ -32,18 +32,19 @@
             <label for="address" style="display: block; font-weight: bold; color: #555; margin-bottom: 5px;">Address:</label>
             <textarea id="address" name="address" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" rows="3" required>{{ promoter.address }}</textarea>
         </div>
+        
         <!-- Joining Date and Salary -->
         <div style="display: flex; gap: 20px; margin-bottom: 20px;">
             <div style="flex: 1;">
                 <label for="joining_date" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Joining Date:</label>
                 <input type="date" id="joining_date" name="joining_date" value="{{ form.joining_date.value|default:promoter.joining_date|date:'Y-m-d' }}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-
             </div>
             <div style="flex: 1;">
                 <label for="salary" style="font-weight: bold; color: #333; margin-bottom: 5px; display: block;">Salary:</label>
                 <input type="number" id="salary" name="salary" value="{{ promoter.salary }}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" required>
             </div>
         </div>
+
         <!-- Department -->
         <div style="margin-bottom: 15px;">
             <label for="department" style="display: block; font-weight: bold; color: #555; margin-bottom: 5px;">Department:</label>
@@ -60,11 +61,24 @@
                 <option value="Inactive" {% if promoter.status == "Inactive" %}selected{% endif %}>Inactive</option>
             </select>
         </div>
-        
+
+        <!-- Last Payment Date (Read-only) -->
+        <div style="margin-bottom: 15px;">
+            <label for="payment_date" style="display: block; font-weight: bold; color: #555; margin-bottom: 5px;">Payment Date:</label>
+            <input type="date" id="payment_date" name="payment_date" value="{{ form.payment_date.value|default:promoter.payment_date|date:'Y-m-d' }}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+        <!-- Last Payment Date (Read-only) -->
+        <div style="margin-bottom: 15px;">
+            <label for="last_payment_date" style="display: block; font-weight: bold; color: #555; margin-bottom: 5px;">Last Payment Date:</label>
+            <input type="date" id="last_payment_date" name="last_payment_date" value="{{ form.last_payment_date.value|default:promoter.last_payment_date|date:'Y-m-d' }}" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" readonly>
+        </div>
+
         <!-- Submit Button -->
-        <button type="submit" name="update" style="background-color: #3182ce; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer;">
-            Update Employee
-        </button>
+        <div style="text-align: center; margin-top: 30px;">
+            <button type="submit" name="update" style="background-color: #3182ce; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer;">
+                Update Employee
+            </button>
+        </div>
     </form>
     
     <!-- Delete Form -->
