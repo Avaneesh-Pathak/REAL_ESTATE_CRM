@@ -673,7 +673,6 @@ from datetime import timedelta
 class Promoter(models.Model):
     # Personal Information
     name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255, null=True, blank=True)
     mobile_number = models.CharField(max_length=15)
     address = models.TextField(null=True, blank=True)
     joining_date = models.DateField(null=True, blank=True)

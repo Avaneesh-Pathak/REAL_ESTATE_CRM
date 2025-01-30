@@ -236,7 +236,7 @@ class PromoterForm(forms.ModelForm):
     class Meta:
         model = Promoter
         fields = [
-            'name', 'email', 'mobile_number', 'address', 
+            'name', 'mobile_number', 'address', 
             'payment_date', 'last_payment_date', 'salary', 'department', 'status'
         ]
         widgets = {

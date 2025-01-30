@@ -38,7 +38,6 @@
         <thead>
             <tr style="background-color: #3182ce; color: white;">
                 <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Name</th>
-                <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Email</th>
                 <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Mobile Number</th>
                 <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Address</th>
                 <th style="padding: 12px 15px; border: 1px solid #e2e8f0;">Joining Date</th>
@@ -56,7 +55,6 @@
             {% for promoter in promoters %}
             <tr style="background-color: {% cycle '#edf2f7' '#ffffff' %};">
                 <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #2d3748;">{{ promoter.name }}</td>
-                <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.email }}</td>
                 <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.mobile_number }}</td>
                 <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.address }}</td>
                 <td style="padding: 10px 15px; border: 1px solid #e2e8f0; color: #4a5568;">{{ promoter.joining_date }}</td>
