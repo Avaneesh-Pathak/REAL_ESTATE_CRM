@@ -24,8 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # settings.py
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DEBUG = True
-# DEBUG = False
+# DEBUG = True
+DEBUG = False
 
 # Allowed hosts (adjust for production)
 ALLOWED_HOSTS =['0.0.0.0','127.0.0.1']
