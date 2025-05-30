@@ -224,6 +224,17 @@ class BalanceUpdateForm(forms.Form):
 
     action = forms.ChoiceField(choices=ACTION_CHOICES, required=True)
     amount = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
+    added_by = forms.CharField(
+    max_length=100,
+    widget=forms.TextInput(attrs={'placeholder': 'Enter your name'}),)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add Bootstrap classes here directly
+        self.fields['action'].widget.attrs.update({'class': 'form-select form-select-lg'})
+        self.fields['amount'].widget.attrs.update({'class': 'form-control form-control-lg'})
+        self.fields['added_by'].widget.attrs.update({'class': 'form-control form-control-lg'})
+
 
     
       
@@ -389,6 +400,8 @@ class KisanForm(forms.ModelForm):
             field.widget.attrs.update({
                 'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm'
             })
+    
+    
 
 
 

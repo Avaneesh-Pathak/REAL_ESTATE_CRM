@@ -2,189 +2,242 @@
 {% block content %}
 <style>
   .form-container {
-    background-color: #07033b;
-    /* Change this to the desired background color for the form */
+    max-width: full-width;
+    margin: 0 auto;
     padding: 20px;
-    /* Add padding for the form */
-    border-radius: 4px;
-    /* Rounded corners for the form */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    /* Optional: add shadow to the form */
+    background:#003366;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   }
 
-  input,
-  select,
-  textarea {
-    width: 100%;
-    padding: 10px;
-    margin: 4px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0);
+  .form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .form-group {
+    flex: 1;
+    min-width: 0;
   }
 
   label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
     color: white;
-    /* Change label color to white */
-    font-weight: bold;
-    /* Make labels bold */
+    font-size: 20px;
   }
 
-  .error-message {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
+  input, select, textarea {
+    width: 100%;
     padding: 10px;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+  }
+
+  .unit-toggle {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .unit-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .output-box {
+    display: flex;
+    justify-content: space-between;
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 20px 0;
+    font-size: 20px;
+  }
+
+  .output-item {
+    text-align: center;
+  }
+
+  .output-value {
+    font-weight: 600;
+    color: #4285f4;
+    margin-top: 5px;
+  }
+
+  button[type="submit"] {
+    background: #4285f4;
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  button[type="submit"]:hover {
+    background: #3367d6;
   }
 
   .back-button {
     display: inline-block;
     margin-bottom: 20px;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: #ffffff;
+    color: #4285f4;
     text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    font-weight: 500;
   }
 
-  .back-button:hover {
-    background-color: #0056b3;
-  }
-
-  button[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: 100%;
-  }
-
-  button[type="submit"]:hover {
-    background-color: #0056b3;
+  h2 {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 15px;
   }
 </style>
-<div class="mx-20 mt-5">
-  <h2 class="text-2xl font-semibold mb-4">Create Kisan</h2>
-  <a href="{% url 'leads:kisan_list' %}" class="back-button">Back to Kisan List</a>
 
-  <form method="POST" class="form-container">
+<div class="mx-4 mt-5">
+  <h2>Create Kisan</h2>
+  <a href="{% url 'leads:kisan_list' %}" class="back-button">← Back to list</a>
+
+  <form method="POST" class="form-container" id="kisan_form">
     {% csrf_token %}
 
-    {% if form.errors %}
-    <div class="error-message" role="alert">
-      <strong class="font-bold">There were some errors:</strong>
-      <ul>
-        {% for field in form %}
-        {% for error in field.errors %}
-        <li>{{ field.label }}: {{ error }}</li>
-        {% endfor %}
-        {% endfor %}
-        {% for error in form.non_field_errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+        {{ form.first_name }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+        {{ form.last_name }}
+      </div>
     </div>
-    {% endif %}
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <div>
-        <label for="{{ form.first_name.id_for_label }}" class="block mb-1">{{ form.first_name.label }}</label>
-        <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}"
-          value="{{ form.first_name.value|default:'' }}" placeholder="First Name">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.contact_number.id_for_label }}">Contact Number</label>
+        {{ form.contact_number }}
       </div>
+      <div class="form-group">
+        <label for="{{ form.khasra_number.id_for_label }}">Khasra Number</label>
+        {{ form.khasra_number }}
+      </div>
+    </div>
 
-      <div>
-        <label for="{{ form.last_name.id_for_label }}" class="block mb-1">{{ form.last_name.label }}</label>
-        <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}"
-          value="{{ form.last_name.value|default:'' }}" placeholder="Last Name">
-      </div>
+    <div class="form-group">
+      <label for="{{ form.address.id_for_label }}">Address</label>
+      {{ form.address }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.email.id_for_label }}">Select Unit</label></div>
+    <div class="unit-toggle">
+      <label>
+        <input type="radio" name="unit_toggle" value="beegha" checked onclick="toggleUnit()">
+        Beegha
+      </label>
+      <label>
+        <input type="radio" name="unit_toggle" value="aeri" onclick="toggleUnit()">
+        Aeri
+      </label>
+    </div>
 
-      <div>
-        <label for="{{ form.contact_number.id_for_label }}" class="block mb-1">{{ form.contact_number.label }}</label>
-        <input type="number" name="{{ form.contact_number.name }}" id="{{ form.contact_number.id_for_label }}"
-          value="{{ form.contact_number.value|default:'' }}" placeholder="Contact Number">
-      </div>
+    <div class="form-group">
+      <label id="area_label">Area in Beegha</label>
+      <input type="number" step="0.001" id="area_input" name="{{ form.area_in_beegha.name }}" placeholder="Enter area">
+    </div>
 
-      <div>
-        <label for="{{ form.address.id_for_label }}" class="block mb-1">Kisan {{ form.address.label }}</label>
-        <textarea name="{{ form.address.name }}" id="{{ form.address.id_for_label }}"
-          placeholder="Address">{{ form.address.value|default:'' }}</textarea>
+    <div class="output-box">
+      <div class="output-item">
+        <div id="converted_label">Area in Aeri</div>
+        <div class="output-value" id="converted_value">0.000</div>
       </div>
+      <div class="output-item">
+        <div>Area in Hectares</div>
+        <div class="output-value" id="hectare_value">0.0000</div>
+      </div>
+      <div class="output-item">
+        <div>Area in Sq Feet</div>
+        <div class="output-value" id="sqft_value">0.00</div>
+      </div>
+    </div>
 
-      <div>
-        <label for="{{ form.khasra_number.id_for_label }}" class="block mb-1">{{ form.khasra_number.label }}</label>
-        <input type="number" name="{{ form.khasra_number.name }}" id="{{ form.khasra_number.id_for_label }}"
-          value="{{ form.khasra_number.value|default:'' }}" placeholder="Khasra Number">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.land_costing.id_for_label }}">Land Costing</label>
+        {{ form.land_costing }}
       </div>
-
-      <div>
-        <label for="{{ form.area_in_beegha.id_for_label }}" class="block mb-1">{{ form.area_in_beegha.label }}</label>
-        <input type="number" step="0.001" name="{{ form.area_in_beegha.name }}"
-          id="{{ form.area_in_beegha.id_for_label }}" value="{{ form.area_in_beegha.value|default:'' }}"
-          placeholder="Area in Beegha">
+      <div class="form-group">
+        <label for="{{ form.land_address.id_for_label }}">Land Address</label>
+        {{ form.land_address }}
       </div>
-      <div style="display: flex; justify-content: space-around; font-size: x-large; margin-top: 20px;">
-        <!-- Output for the Hectare Value -->
-        <div style="text-align: center;">
-          <label for="hectare_value" class="block mb-1">Area in Hectare</label>
-          <span id="hectare_value" class="text-white font-semibold">0</span>
-        </div>
-      
-        <!-- Output for the Square Feet Value -->
-        <div style="text-align: center;">
-          <label for="sqft_value" class="block mb-1">Area in Square Feet</label>
-          <span id="sqft_value" class="text-white font-semibold">0</span>
-        </div>
-      </div>
-
-      <div>
-        <label for="{{ form.land_costing.id_for_label }}" class="block mb-1">Total {{ form.land_costing.label }}</label>
-        <input type="number" step="0.01" name="{{ form.land_costing.name }}" id="{{ form.land_costing.id_for_label }}"
-          value="{{ form.land_costing.value|default:'' }}" placeholder="Land Costing">
-      </div>
-
-      <div>
-        <label for="{{ form.land_address.id_for_label }}" class="block mb-1">{{ form.land_address.label }}</label>
-        <input type="text" name="{{ form.land_address.name }}" id="{{ form.land_address.id_for_label }}"
-          value="{{ form.land_address.value|default:'' }}" placeholder="Land Address">
-      </div>
-
     </div>
 
     <button type="submit">Save Kisan</button>
   </form>
-
 </div>
-<!-- JavaScript for Real-Time Conversion -->
-<script>
-  // Select the beegha input and hectare/sqft display elements by their IDs
-  const beeghaInput = document.getElementById('{{ form.area_in_beegha.id_for_label }}');
-  const hectareOutput = document.getElementById('hectare_value');
-  const sqftOutput = document.getElementById('sqft_value');
 
-  // Conversion factors
+<script>
+  const areaInput = document.getElementById("area_input");
+  const areaLabel = document.getElementById("area_label");
+  const convertedLabel = document.getElementById("converted_label");
+  const convertedValue = document.getElementById("converted_value");
+  const hectareOutput = document.getElementById("hectare_value");
+  const sqftOutput = document.getElementById("sqft_value");
+
   const BEEGHA_TO_HECTARE = 0.25;
   const BEEGHA_TO_SQFT = 27200;
+  const AERI_TO_BEEGHA = 0.25;
 
-  // Check if elements are found, then listen for input changes
-  if (beeghaInput && hectareOutput && sqftOutput) {
-    beeghaInput.addEventListener('input', function () {
-      const beeghaValue = parseFloat(beeghaInput.value) || 0;  // Get input value or default to 0
+  let currentUnit = "beegha";
 
-      // Convert to hectare and square feet, rounding results for display
-      const hectareValue = (beeghaValue * BEEGHA_TO_HECTARE).toFixed(4);
-      const sqftValue = (beeghaValue * BEEGHA_TO_SQFT).toFixed(2);
-
-      // Display the results
-      hectareOutput.textContent = hectareValue;
-      sqftOutput.textContent = sqftValue;
-    });
+  function toggleUnit() {
+    currentUnit = document.querySelector('input[name="unit_toggle"]:checked').value;
+    if (currentUnit === "beegha") {
+      areaLabel.textContent = "Area in Beegha";
+      convertedLabel.textContent = "Area in Aeri";
+    } else {
+      areaLabel.textContent = "Area in Aeri";
+      convertedLabel.textContent = "Area in Beegha";
+    }
+    updateValues(parseFloat(areaInput.value) || 0);
   }
+
+  function updateValues(val) {
+    let beegha;
+    if (currentUnit === "beegha") {
+      beegha = val;
+      convertedValue.textContent = (val / AERI_TO_BEEGHA).toFixed(3);
+    } else {
+      beegha = val * AERI_TO_BEEGHA;
+      convertedValue.textContent = beegha.toFixed(3);
+    }
+    hectareOutput.textContent = (beegha * BEEGHA_TO_HECTARE).toFixed(4);
+    sqftOutput.textContent = (beegha * BEEGHA_TO_SQFT).toFixed(2);
+  }
+
+  areaInput.addEventListener("input", () => {
+    updateValues(parseFloat(areaInput.value) || 0);
+  });
+
+  document.addEventListener("DOMContentLoaded", toggleUnit);
+  document.getElementById('kisan_form').addEventListener('submit', function(event) {
+  let areaVal = parseFloat(areaInput.value) || 0;
+  if (currentUnit === 'aeri') {
+    // Convert Aeri to Beegha before submitting
+    areaVal = areaVal * AERI_TO_BEEGHA;
+    areaInput.value = areaVal.toFixed(3); // override input with Beegha value
+  }
+});
 </script>
 {% endblock %}

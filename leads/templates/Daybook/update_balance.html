@@ -1,27 +1,143 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-8">
-    <h2 class="text-3xl font-semibold mb-4">Update Balance</h2>
-    
-    <form method="post">
-        {% csrf_token %}
-        <div class="mb-4">
-            <label for="action" class="block text-gray-700">Action</label>
-            {{ form.action }}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+
+      <div class="card shadow-sm border-0 mb-5">
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4 fw-bold">Update Balance</h2>
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-4">
+              <label for="{{ form.action.id_for_label }}" class="form-label fw-semibold">Select Action</label>
+              {{ form.action }}
+              <div class="invalid-feedback">
+                Please select an action.
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ form.amount.id_for_label }}" class="form-label fw-semibold">Amount</label>
+              {{ form.amount }}
+              <div class="invalid-feedback">
+                Please enter a valid amount.
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ form.added_by.id_for_label }}" class="form-label fw-semibold">Added By</label>
+              {{ form.added_by }}
+              {% if form.added_by.errors %}
+              <div class="invalid-feedback d-block">
+                  {{ form.added_by.errors|striptags }}
+              </div>
+              {% endif %}
+          </div>
+
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-gradient btn-lg shadow-sm">
+                Update Balance
+              </button>
+            </div>
+          </form>
         </div>
-        
-        <div>
-            <label for="amount" class="block text-lg font-semibold text-gray-700 mb-2">Amount</label>
-            <input type="number" name="amount" class="block w-full bg-gray-100 text-gray-800 py-3 px-4 rounded-lg shadow-sm border border-gray-300 focus:outline-none focus:bg-white focus:border-blue-400 transition duration-200">
-        </div>
-        {% comment %} <div class="mb-4">
-            <label for="amount" class="block text-gray-700">Amount</label>
-            {{ form.amount }}
-        </div> {% endcomment %}
-        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-            Update Balance
-        </button>
-    </form>
+      </div>
+
+      <hr class="my-5">
+
+      <h3 class="fw-bold text-center mb-4">Transaction History</h3>
+
+      <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'leads:export_balance_logs_csv' %}" class="btn btn-success btn-sm shadow-sm d-flex align-items-center gap-2">
+          <i class="bi bi-download"></i> Export as CSV
+        </a>
+      </div>
+
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-striped align-middle mb-0">
+          <thead class="table-primary text-center">
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Action</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Date &amp; Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+            <tr class="text-center">
+              <td>{{ log.user  }}</td>
+              <td>
+                {% if log.action == 'add' %}
+                  <span class="badge bg-success">Added</span>
+                {% elif log.action == 'deduct' %}
+                  <span class="badge bg-danger">Deducted</span>
+                {% else %}
+                  {{ log.get_action_display }}
+                {% endif %}
+              </td>
+              <td><strong>{{ log.amount }}</strong></td>
+              <td>{{ log.timestamp|date:"d M Y, H:i:s" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted fst-italic py-3">
+                No transactions yet.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
 </div>
+
+<script>
+  (() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>
+
+<style>
+  /* Gradient button */
+  .btn-gradient {
+    background: linear-gradient(45deg, #007bff, #00c6ff);
+    border: none;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    color: #fff;
+  }
+  .btn-gradient:hover, .btn-gradient:focus {
+    background: linear-gradient(45deg, #0056b3, #0098cc);
+    outline: none;
+    box-shadow: 0 0 12px rgba(0,198,255,0.7);
+  }
+
+  /* Table row hover highlight */
+  table.table-hover tbody tr:hover {
+    background-color: #e9f5ff;
+  }
+
+  /* Form fields - add subtle focus effect */
+  select.form-select:focus, input.form-control:focus {
+    border-color: #00c6ff;
+    box-shadow: 0 0 5px rgba(0,198,255,0.5);
+  }
+</style>
+
 {% endblock %}

@@ -13,7 +13,7 @@ from .views import (
     create_salary,create_sale,PropertyListView,SaleListView,SalaryListView,BonusInfoView,select_properties_view,
     PropertyDetailView,PropertyCreateView,PropertyUpdateView,PropertyDeleteView,calculate_emi,DaybookListView,DaybookCreateView,add_promoter,update_delete_promoter,
     PromoterListView,load_properties,PlotRegistrationView,user_profile_view,BalanceUpdateView,CreateBillView,BillListView,
-    update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView,kisan_view,KisanListView,KisanUpdateView,KisanDeleteView,export_daybook_to_csv
+    update_delete_buyer,pay_emi,BuyersListView,GetProjectPriceView,kisan_view,KisanListView,KisanUpdateView,KisanDeleteView,export_daybook_to_csv,ExportBalanceLogsCSVView
 )
 
 app_name = "leads"
@@ -62,6 +62,8 @@ urlpatterns = [
     path('daybook/', DaybookListView.as_view(), name='daybook_list'),  # URL for listing expenses
     path('daybook/create/', DaybookCreateView.as_view(), name='daybook_create'),
     path('update-balance/', BalanceUpdateView.as_view(), name='update_balance'),
+    path('export-logs/', ExportBalanceLogsCSVView.as_view(), name='export_balance_logs_csv'),
+
     
     #PROMOTER
     path('promoters/', PromoterListView.as_view(), name='promoter_list'),

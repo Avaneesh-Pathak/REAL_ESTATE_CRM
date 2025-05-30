@@ -27,10 +27,23 @@ from django.db.models import Sum
 from django.utils.timezone import now
 from django.http import HttpResponse
 from weasyprint import HTML
+from django.forms import modelformset_factory
+from django.shortcuts import render, redirect
+from .forms import BillForm, BillItemForm
+from .models import Bill, BillItem
+from django.http import HttpResponse
+from io import BytesIO
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import os
+from decimal import Decimal, ROUND_HALF_UP
+
+from django.conf import settings
+from num2words import num2words
 from datetime import timedelta
 from leads.models import Lead, Agent, Category, FollowUp, Promoter, PlotBooking, Project, EMIPayment, Area, Typeplot,send_sms
 from agents.mixins import OrganisorAndLoginRequiredMixin ,AgentAndLoginRequiredMixin
-from leads.models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,EMIPayment,Balance
+from leads.models import Property, Sale, Salary, Bonus, Kisan, UserProfile, Daybook,EMIPayment,Balance,BalanceTransactionLog
 from leads.forms import (
     LeadModelForm, 
     CustomUserCreationForm, 
@@ -1612,39 +1625,75 @@ def export_daybook_to_csv(request):
 
 
 
-class BalanceUpdateView(OrganisorAndLoginRequiredMixin, View):
+class BalanceUpdateView(View):
     template_name = 'Daybook/update_balance.html'
 
     def get(self, request, *args, **kwargs):
         form = BalanceUpdateForm()
-        return render(request, self.template_name, {'form': form})
+        logs = BalanceTransactionLog.objects.all().order_by('-timestamp')
+        return render(request, self.template_name, {'form': form, 'logs': logs})
 
     def post(self, request, *args, **kwargs):
         form = BalanceUpdateForm(request.POST)
+        logs = BalanceTransactionLog.objects.all().order_by('-timestamp')
+
         if form.is_valid():
             amount = form.cleaned_data['amount']
             action = form.cleaned_data['action']
-            balance, created = Balance.objects.get_or_create(pk=1)
+            user = form.cleaned_data['added_by']
+
+            balance, _ = Balance.objects.get_or_create(pk=1)
 
             if action == 'add':
                 balance.amount += amount
                 action_message = "added"
-                print("Add",balance.amount)
-            elif action == 'deduct':
+            else:
                 balance.amount = max(0, balance.amount - amount)
                 action_message = "deducted"
-                print("deduct",balance.amount)
 
+            balance.added_by = str(user)  # or user.get_full_name() if available
             balance.save()
-            # Create the message content with remaining balance
+
+            # Create transaction log
+            BalanceTransactionLog.objects.create(
+                user=user,
+                action=action,
+                amount=amount
+            )
+
             message = f"Balance has been {action_message} by {amount}. Current balance: {balance.amount}"
 
-            # Send SMS to the specified phone number (replace with the actual number)
-            my_number = '+918052513208'  # Replace with your actual phone number
-            send_sms(to=my_number, message=message)
-            return redirect('leads:daybook_list')
-        return render(request, self.template_name, {'form': form})
+            # send_sms(to='+918052513208', message=message)  # Uncomment if you want to send SMS
 
+            return redirect('leads:update_balance')  # or your desired URL name
+
+        return render(request, self.template_name, {'form': form, 'logs': logs})
+
+class ExportBalanceLogsCSVView(View):
+    def get(self, request, *args, **kwargs):
+        # Create the HttpResponse object with CSV header.
+        response = HttpResponse(
+            content_type='text/csv',
+        )
+        response['Content-Disposition'] = 'attachment; filename="balance_transaction_logs.csv"'
+
+        writer = csv.writer(response)
+        # Write CSV header row
+        writer.writerow(['User', 'Action', 'Amount', 'Timestamp'])
+
+        # Fetch all logs ordered by latest first
+        logs = BalanceTransactionLog.objects.all().order_by('-timestamp')
+
+        # Write data rows
+        for log in logs:
+            writer.writerow([
+                str(log.user),
+                log.get_action_display(),
+                log.amount,
+                log.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            ])
+
+        return response
 # PROMOTER 
 class PromoterListView(LoginRequiredMixin, ListView):
     model = Promoter
@@ -2705,19 +2754,7 @@ def convert_to_date(date_str):
 
 
 
-from django.forms import modelformset_factory
-from django.shortcuts import render, redirect
-from .forms import BillForm, BillItemForm
-from .models import Bill, BillItem
-from django.http import HttpResponse
-from io import BytesIO
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-import os
-from decimal import Decimal, ROUND_HALF_UP
 
-from django.conf import settings
-from num2words import num2words
 
 # Function to convert number to words
 def convert_number_to_words(amount):

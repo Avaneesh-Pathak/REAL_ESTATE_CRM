@@ -2,90 +2,197 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-    <div style="width: 100%; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb;">
-        <h1 style="font-size: 2.5rem; color: #4b5563;">Kisan Detail</h1>
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <!-- Header Section -->
+    <div style="width: 100%; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+        <h1 style="font-size: 2.5rem; color: #374151; font-weight: 600; letter-spacing: -0.025em;">Kisan Management</h1>
         {% if request.user.is_organisor %}
         <div>
-            <a href="{% url 'leads:kisan_create' %}" style="background-color: #3b82f6; color: white; font-weight: bold; padding: 12px 20px; border-radius: 8px; text-decoration: none; margin-right: 20px; cursor: pointer; display: inline-block;">
+            <a href="{% url 'leads:kisan_create' %}" 
+               style="background-color: #4f46e5; color: white; font-weight: 600; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin-right: 15px; cursor: pointer; display: inline-flex; align-items: center; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
+               onmouseover="this.style.backgroundColor='#4338ca'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" 
+               onmouseout="this.style.backgroundColor='#4f46e5'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
+                <svg style="width: 18px; height: 18px; margin-right: 8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
                 Add New Kisan
             </a>
             <a href="{% url 'leads:export_kisans_to_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}" 
-               style="background-color: #4CAF50; color: white; font-weight: bold; padding: 12px 20px; border-radius: 8px; text-decoration: none; cursor: pointer; display: inline-block;">
+               style="background-color: #10b981; color: white; font-weight: 600; padding: 12px 24px; border-radius: 8px; text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
+               onmouseover="this.style.backgroundColor='#0d9f6e'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" 
+               onmouseout="this.style.backgroundColor='#10b981'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
+                <svg style="width: 18px; height: 18px; margin-right: 8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
                 Export CSV
             </a>
         </div>
         {% endif %}
     </div>
 
-    <!-- Date Filter Form -->
-    <form method="GET" action="{% url 'leads:kisan_list' %}" style="display: inline-flex; align-items: center; padding: 8px 16px; background-color: #1d4ed8;  font-size: 0.875rem; border-radius: 8px; margin-bottom: 20px;">
-        <label for="start_date" style="margin-right: 10px; color: white;">Start Date:</label>
-        <input type="date" id="start_date" name="start_date" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 8px; margin-left: 5px;"
-               value="{{ start_date|date:'Y-m-d' }}" onchange="this.form.submit()">
-        
-        <label for="end_date" style="margin-left: 20px; margin-right: 10px; color: white;">End Date:</label>
-        <input type="date" id="end_date" name="end_date" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 8px;"
-               value="{{ end_date|date:'Y-m-d' }}" onchange="this.form.submit()">
-        
-        <input type="hidden" name="show_all" value="{{ show_all }}">
-    </form>
+    <!-- Filter Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <!-- Date Filter Form -->
+        <form method="GET" action="{% url 'leads:kisan_list' %}" 
+              style="display: flex; align-items: center; padding: 10px 15px; background-color: #4f46e5; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <div style="display: flex; align-items: center; margin-right: 15px;">
+                <label for="start_date" style="margin-right: 10px; color: white; font-weight: 500;">Start Date:</label>
+                <input type="date" id="start_date" name="start_date" 
+                       style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; background-color: white; color: #374151;"
+                       value="{{ start_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+            </div>
+            
+            <div style="display: flex; align-items: center;">
+                <label for="end_date" style="margin-right: 10px; color: white; font-weight: 500;">End Date:</label>
+                <input type="date" id="end_date" name="end_date" 
+                       style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; background-color: white; color: #374151;"
+                       value="{{ end_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+            </div>
+            
+            <input type="hidden" name="show_all" value="{{ show_all }}">
+        </form>
 
-    <!-- Show All / Show Filtered Buttons -->
-    <div style="margin-bottom: 20px;">
-        <a href="{% url 'leads:kisan_list' %}?show_all=true&start_date={{ start_date }}&end_date={{ end_date }}"
-           style="background-color: #3b82f6; color: white; padding: 12px 20px; border-radius: 8px; margin-right: 15px; text-decoration: none; display: inline-block; cursor: pointer;">
-            Show All Kisans
-        </a>
-        <a href="{% url 'leads:kisan_list' %}?show_all=false&start_date={{ start_date }}&end_date={{ end_date }}"
-           style="background-color: #3b82f6; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; display: inline-block; cursor: pointer;">
-            Show Filtered Kisans
-        </a>
+        <!-- Show All / Show Filtered Buttons -->
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'leads:kisan_list' %}?show_all=true&start_date={{ start_date }}&end_date={{ end_date }}"
+               style="background-color: {% if show_all == 'true' %}#4f46e5{% else %}#e5e7eb{% endif %}; color: {% if show_all == 'true' %}white{% else %}#374151{% endif %}; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; border: 1px solid #d1d5db;"
+               onmouseover="this.style.backgroundColor='{% if show_all == 'true' %}#4338ca{% else %}#d1d5db{% endif %}'" 
+               onmouseout="this.style.backgroundColor='{% if show_all == 'true' %}#4f46e5{% else %}#e5e7eb{% endif %}'">
+                Show All Kisans
+            </a>
+            <a href="{% url 'leads:kisan_list' %}?show_all=false&start_date={{ start_date }}&end_date={{ end_date }}"
+               style="background-color: {% if show_all == 'false' %}#4f46e5{% else %}#e5e7eb{% endif %}; color: {% if show_all == 'false' %}white{% else %}#374151{% endif %}; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; border: 1px solid #d1d5db;"
+               onmouseover="this.style.backgroundColor='{% if show_all == 'false' %}#4338ca{% else %}#d1d5db{% endif %}'" 
+               onmouseout="this.style.backgroundColor='{% if show_all == 'false' %}#4f46e5{% else %}#e5e7eb{% endif %}'">
+                Show Filtered Kisans
+            </a>
+        </div>
     </div>
 
     <!-- Table Container -->
-    <div style="overflow-x: auto; max-width: 100%; margin-top: 20px;">
-        <table style="width: 100%; border-collapse: collapse; background-color: #fff; border: 1px solid #e5e7eb;">
+    <div style="overflow-x: auto; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin-top: 20px;">
+        <table style="width: 100%; border-collapse: collapse; background-color: #fff;">
             <thead>
-                <tr style="background-color: #4b32a0; color: white; text-align: center;">
-                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">First Name</th>
-                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Last Name</th>
-                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Contact Number</th>
-                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Khasra Number</th>
-                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Area (Beegha)</th>
-                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Area (sqft)</th>
-                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Area (Hectare)</th>
-                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Land Costing</th>
-                    <th style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">Actions</th>
+                <tr style="background-color: #4f46e5; color: white;">
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">First Name</th>
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">Last Name</th>
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">Contact Number</th>
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">Khasra Number</th>
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">Area (Beegha)</th>
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">Area (Aeri)</th>
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">Area (sqft)</th>
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">Area (Hectare)</th>
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">Land Costing</th>
+                    <th style="padding: 14px 20px; text-align: left; font-weight: 600; border-bottom: 2px solid #4338ca;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for kisan in kisans %}
-                <tr style="text-align: center; background-color: #f9fafb; hover: background-color: #f0f0f0;">
-                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.first_name }}</td>
-                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.last_name }}</td>
-                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.contact_number }}</td>
-                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.khasra_number }}</td>
-                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.area_in_beegha }}</td>
-                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.area_in_sqft }}</td>
-                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.beegha_to_hectare|floatformat:2}}</td> 
-                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">{{ kisan.land_costing }}</td>
-                    <td style="padding: 12px 20px; border-bottom: 1px solid #d1d5db;">
+                <tr style="border-bottom: 1px solid #e5e7eb; transition: background-color 0.2s ease;"
+                    onmouseover="this.style.backgroundColor='#f9fafb'" 
+                    onmouseout="this.style.backgroundColor='#fff'">
+                    <td style="padding: 14px 20px; color: #374151;">{{ kisan.first_name }}</td>
+                    <td style="padding: 14px 20px; color: #374151;">{{ kisan.last_name }}</td>
+                    <td style="padding: 14px 20px; color: #374151;">{{ kisan.contact_number }}</td>
+                    <td style="padding: 14px 20px; color: #374151;">{{ kisan.khasra_number }}</td>
+                    <td style="padding: 14px 20px; color: #374151;">{{ kisan.area_in_beegha|floatformat:3 }}</td>
+                    <!-- Calculate Area in Aeri as Beegha × 4 -->
+                    <td style="padding: 14px 20px; color: #374151;">
+                      {% widthratio kisan.area_in_beegha 1 4 as aeri_val %}
+                      {{ aeri_val|floatformat:3 }}
+                    </td>
+                    <td style="padding: 14px 20px; color: #374151;">{{ kisan.area_in_sqft|floatformat:2 }}</td>
+                    <td style="padding: 14px 20px; color: #374151;">{{ kisan.beegha_to_hectare|floatformat:4 }}</td>
+                    <td style="padding: 14px 20px; color: #374151;">{{ kisan.land_costing|floatformat:2 }}</td>
+                    <td style="padding: 14px 20px;">
                         {% if kisan.is_assigned %}
-                            Assigned
+                            <span style="background-color: #d1fae5; color: #065f46; padding: 6px 12px; border-radius: 20px; font-size: 0.875rem; font-weight: 500;">Assigned</span>
                         {% else %}
-                            <a href="{% url 'leads:kisan_edit' kisan.id %}" style="color: #3b82f6; font-weight: bold;">Edit</a>
-                            <a href="{% url 'leads:kisan_delete' kisan.id %}" style="color: #ef4444; font-weight: bold; margin-left: 10px;">Delete</a>
+                            <a href="{% url 'leads:kisan_edit' kisan.id %}" 
+                               style="color: #3b82f6; font-weight: 500; text-decoration: none; margin-right: 12px; transition: color 0.2s ease;"
+                               onmouseover="this.style.color='#2563eb'" 
+                               onmouseout="this.style.color='#3b82f6'">
+                                Edit
+                            </a>
+                            <a href="{% url 'leads:kisan_delete' kisan.id %}" 
+                               style="color: #ef4444; font-weight: 500; text-decoration: none; transition: color 0.2s ease;"
+                               onmouseover="this.style.color='#dc2626'" 
+                               onmouseout="this.style.color='#ef4444'">
+                                Delete
+                            </a>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="9" style="text-align: center; padding: 20px;">No Kisan records available.</td>
+                    <td colspan="10" style="text-align: center; padding: 30px; color: #6b7280; font-style: italic;">
+                      No Kisan records available.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination (if needed) -->
+    {% if kisans.has_other_pages %}
+    <div style="margin-top: 30px; display: flex; justify-content: center;">
+        <div style="display: flex; gap: 8px;">
+            {% if kisans.has_previous %}
+                <a href="?page={{ kisans.previous_page_number }}&start_date={{ start_date }}&end_date={{ end_date }}&show_all={{ show_all }}"
+                   style="padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none; color: #374151; transition: all 0.3s ease;"
+                   onmouseover="this.style.backgroundColor='#f3f4f6'; this.style.borderColor='#9ca3af'" 
+                   onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='#d1d5db'">
+                    &laquo; Previous
+                </a>
+            {% endif %}
+            
+            {% for i in kisans.paginator.page_range %}
+                {% if kisans.number == i %}
+                    <span style="padding: 8px 16px; border: 1px solid #4f46e5; border-radius: 6px; background-color: #4f46e5; color: white;">{{ i }}</span>
+                {% else %}
+                    <a href="?page={{ i }}&start_date={{ start_date }}&end_date={{ end_date }}&show_all={{ show_all }}"
+                       style="padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none; color: #374151; transition: all 0.3s ease;"
+                       onmouseover="this.style.backgroundColor='#f3f4f6'; this.style.borderColor='#9ca3af'" 
+                       onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='#d1d5db'">
+                        {{ i }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if kisans.has_next %}
+                <a href="?page={{ kisans.next_page_number }}&start_date={{ start_date }}&end_date={{ end_date }}&show_all={{ show_all }}"
+                   style="padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none; color: #374151; transition: all 0.3s ease;"
+                   onmouseover="this.style.backgroundColor='#f3f4f6'; this.style.borderColor='#9ca3af'" 
+                   onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='#d1d5db'">
+                    Next &raquo;
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+<script>
+// Add confirmation for delete actions
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteLinks = document.querySelectorAll('a[href*="kisan_delete"]');
+    deleteLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to delete this Kisan record?')) {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    // Highlight active filter buttons
+    const filterButtons = document.querySelectorAll('a[href*="show_all="]');
+    filterButtons.forEach(button => {
+        if (button.href.includes('show_all={{ show_all }}')) {
+            button.style.backgroundColor = '#4f46e5';
+            button.style.color = 'white';
+        }
+    });
+});
+</script>
 {% endblock content %}

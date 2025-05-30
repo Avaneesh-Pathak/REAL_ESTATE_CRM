@@ -591,6 +591,7 @@ def log_userprofile_deletion(sender, instance, **kwargs):
 class Balance(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     carryover_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # Add this field
+    added_by =  models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         logger.info(f"Balance created with amount: {self.amount} and carryover amount: {self.carryover_amount}")
@@ -609,7 +610,21 @@ def log_userprofile_deletion(sender, instance, **kwargs):
         
         # Log the deletion action with instance data in dictionary format
     logger.info(f'Balance instance  was Deleted. Data: {data}')
-    
+
+class BalanceTransactionLog(models.Model):
+    ACTION_CHOICES = [
+        ('add', 'Add'),
+        ('deduct', 'Deduct'),
+    ]
+    # user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.CharField(max_length=100)
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_action_display()} {self.amount} by {self.user} on {self.timestamp}"
+        
 class Daybook(models.Model):
     ACTIVITY_CHOICES = [
         ('pantry', 'Pantry'),
@@ -921,7 +936,10 @@ class Kisan(models.Model):
     is_sold = models.BooleanField(default=False)
     usable_land_total = models.FloatField(null=True, blank=True)
     
-
+    def area_in_aeri(self):
+        # Assuming 1 beegha = 4 aeri
+        return self.area_in_beegha * Decimal('4')
+    
     def area_in_sqft(self):
         """Convert area from beegha to square feet."""
         convert_in_sqft = 27200
